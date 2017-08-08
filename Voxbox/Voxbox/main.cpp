@@ -17,12 +17,18 @@ int main( int argc, char* argv[] )
 				return -1;
 			}
 
+			Camera camera;
+			camera.setPosition( glm::vec3( 0.0f, 0.0f, -10.0f ) );
+			camera.updatePerspective( WINDOW_WIDTH, WINDOW_HEIGHT );
+
 			Shader shader;
 			if( !shader.load( "./assets/shaders/basic.vs", 
 						nullptr,
 						"./assets/shaders/basic.fs" ) )
 				printf( "Failed to load shader.\n" );
 
+			GLint viewMatrixLocation = shader.getLocation( "viewMatrix" );
+			GLint projectionMatrixLocation = shader.getLocation( "projectionMatrix" );
 			GLint diffuseMapLocation = shader.getLocation( "diffuseMap" );
 
 			Texture texture;
@@ -76,6 +82,9 @@ int main( int argc, char* argv[] )
 
 				shader.bind();
 				texture.bind();
+
+				shader.setMat4( viewMatrixLocation, camera.getViewMatrix() );
+				shader.setMat4( projectionMatrixLocation, camera.getProjectionMatrix() );
 				shader.setInt( diffuseMapLocation, 0 );
 
 				glBindVertexArray( vao );
