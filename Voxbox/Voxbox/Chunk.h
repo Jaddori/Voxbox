@@ -12,13 +12,14 @@ public:
 	Chunk();
 	~Chunk();
 
-	// TEMP
-	void load( Shader* shader );
-
-	void render( Shader* shader, GLint chunkSizeLocation, GLint offsetLocation, GLint positionLocation );
 	void calculatePositions();
 
 	void setOffset( const glm::vec3& offset );
+
+	const uint8_t* getBlocks() const;
+	const glm::vec4* getPositions() const;
+	const glm::vec3& getOffset() const;
+	int getActiveBlocks() const;
 
 private:
 	inline int at( int x, int y, int z ) { return ( y*CHUNK_SIZE*CHUNK_SIZE + z*CHUNK_SIZE + x ); }
@@ -26,11 +27,26 @@ private:
 	uint8_t blocks[CHUNK_VOLUME];
 	glm::vec4 positions[CHUNK_VOLUME];
 	glm::vec3 offset;
-	int activeBlocks = 0;
+	int activeBlocks;
+};
 
-	// TEMP:
-	GLuint vao;
-	GLuint vbo;
-	GLuint ibo;
-	GLuint ubo;
+class ChunkRenderer
+{
+public:
+	ChunkRenderer();
+	~ChunkRenderer();
+
+	void load( Shader* shader );
+	void unload();
+
+	void render( Chunk* chunk );
+
+private:
+	Shader* chunkShader;
+	GLint offsetLocation;
+
+	GLuint vertexArray;
+	GLuint vertexBuffer;
+	GLuint indexBuffer;
+	GLuint uniformBuffer;
 };

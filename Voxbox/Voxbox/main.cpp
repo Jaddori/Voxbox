@@ -36,15 +36,15 @@ int main( int argc, char* argv[] )
 
 			GLint viewMatrixLocation = shader.getLocation( "viewMatrix" );
 			GLint projectionMatrixLocation = shader.getLocation( "projectionMatrix" );
-			GLint chunkSizeLocation = shader.getLocation( "chunkSize" );
-			GLint offsetLocation = shader.getLocation( "offset" );
-			GLint positionLocation = shader.getLocation( "positions" );
 			GLint diffuseMapLocation = shader.getLocation( "diffuseMap" );
 
 			Texture texture;
 			if( !texture.load( "./assets/textures/blocks.dds" ) )
 				printf( "Failed to load texture.\n" );
 			texture.upload();
+
+			ChunkRenderer chunkRenderer;
+			chunkRenderer.load( &shader );
 
 			Chunk chunks[8];
 			for( int y=0; y<2; y++ )
@@ -53,7 +53,7 @@ int main( int argc, char* argv[] )
 				{
 					for( int z=0; z<2; z++ )
 					{
-						chunks[y*2*2+x*2+z].load( &shader );
+						chunks[y*2*2+x*2+z].calculatePositions();
 						chunks[y*2*2+x*2+z].setOffset( glm::vec3( x, y, z ) );
 					}
 				}
@@ -119,7 +119,7 @@ int main( int argc, char* argv[] )
 					{
 						for( int z = 0; z<2; z++ )
 						{
-							chunks[y*2*2+x*2+z].render( &shader, chunkSizeLocation, offsetLocation, positionLocation );
+							chunkRenderer.render( &chunks[y*2*2+x*2+z] );
 						}
 					}
 				}
