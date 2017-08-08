@@ -35,6 +35,8 @@ bool Shader::load( const char* vertex, const char* geometry, const char* fragmen
 		int len = 1024;
 		glGetProgramInfoLog( program, 1024, &len, buffer );
 		printf( "%s\n", buffer );
+
+		result = false;
 	}
 
 	return result;

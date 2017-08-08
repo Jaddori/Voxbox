@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <stdint.h>
 
 // Rendering
 #include "GL\glew.h"
