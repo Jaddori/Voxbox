@@ -12,14 +12,17 @@ Input::~Input()
 {
 }
 
-bool Input::update( SDL_Event* e )
+void Input::reset()
 {
-	bool handled = true;
-
 	memcpy( prevKeys, keys, INPUT_MAX_KEYS );
 	memcpy( prevButtons, buttons, INPUT_MAX_BUTTONS );
 	prevMousePosition = mousePosition;
 	prevMouseWheel = mouseWheel;
+}
+
+bool Input::update( SDL_Event* e )
+{
+	bool handled = true;
 
 	switch( e->type )
 	{

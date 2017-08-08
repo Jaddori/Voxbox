@@ -16,6 +16,7 @@ public:
 	Input();
 	~Input();
 
+	void reset();
 	bool update( SDL_Event* e );
 
 	bool keyDown( int key );

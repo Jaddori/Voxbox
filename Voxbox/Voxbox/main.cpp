@@ -67,6 +67,8 @@ int main( int argc, char* argv[] )
 			bool running = true;
 			while( running )
 			{
+				input.reset();
+
 				// events
 				SDL_Event e;
 				while( SDL_PollEvent( &e ) )
@@ -79,6 +81,24 @@ int main( int argc, char* argv[] )
 				
 				if( input.keyReleased( SDL_SCANCODE_ESCAPE ) )
 					running = false;
+
+				if( input.buttonDown( SDL_BUTTON_LEFT ) )
+				{
+					Point mouseDelta = input.getMouseDelta();
+					camera.updateDirection( mouseDelta.x, mouseDelta.y );
+				}
+
+				glm::vec3 cameraMovement;
+				if( input.keyDown( SDL_SCANCODE_W ) )
+					cameraMovement.z += 1.0f;
+				if( input.keyDown( SDL_SCANCODE_S ) )
+					cameraMovement.z -= 1.0f;
+				if( input.keyDown( SDL_SCANCODE_D ) )
+					cameraMovement.x += 1.0f;
+				if( input.keyDown( SDL_SCANCODE_A ) )
+					cameraMovement.x -= 1.0f;
+				if( glm::length( cameraMovement ) > 0 )
+					camera.updatePosition( cameraMovement );
 
 				// update
 
