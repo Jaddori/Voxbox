@@ -6,6 +6,14 @@
 #include <string>
 #include <stdint.h>
 
+// Windowing
+#include "SDL.h"
+
+#define WINDOW_X SDL_WINDOWPOS_UNDEFINED
+#define WINDOW_Y SDL_WINDOWPOS_UNDEFINED
+#define WINDOW_WIDTH 640
+#define WINDOW_HEIGHT 480
+
 // Rendering
 #include "GL\glew.h"
 
