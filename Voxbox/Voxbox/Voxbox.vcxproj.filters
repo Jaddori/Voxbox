@@ -14,6 +14,9 @@
     <Filter Include="Source Files\Input">
       <UniqueIdentifier>{496ac251-7dbd-49b2-8ace-b91eed0b77fd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Voxels">
+      <UniqueIdentifier>{050d9788-a7c2-4e6d-b55e-10859f4f88ab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -31,6 +34,9 @@
     <ClCompile Include="Input.cpp">
       <Filter>Source Files\Input</Filter>
     </ClCompile>
+    <ClCompile Include="Chunk.cpp">
+      <Filter>Source Files\Voxels</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -47,6 +53,9 @@
     </ClInclude>
     <ClInclude Include="Input.h">
       <Filter>Source Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Chunk.h">
+      <Filter>Source Files\Voxels</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

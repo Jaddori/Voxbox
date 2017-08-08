@@ -23,7 +23,12 @@ public:
 	
 	inline void setInt( GLint location, const int* values, int n ) { glUniform1iv( location, n, values ); }
 	inline void setFloat( GLint location, const float* values, int n ) { glUniform1fv( location, n, values ); }
+	inline void setVec2( GLint location, const glm::vec2* values, int n ) { glUniform2fv( location, n, glm::value_ptr( *values ) ); }
+	inline void setVec3( GLint location, const glm::vec3* values, int n ) { glUniform3fv( location, n, glm::value_ptr( *values ) ); }
+	inline void setVec4( GLint location, const glm::vec4* values, int n ) { glUniform4fv( location, n, glm::value_ptr( *values ) ); }
 	inline void setMat4( GLint location, const glm::mat4* values, int n ) { glUniformMatrix4fv( location, n, GL_FALSE, glm::value_ptr( *values ) ); }
+
+	GLuint getProgram() const;
 
 private:
 	GLuint loadShader( const char* path, GLenum type );

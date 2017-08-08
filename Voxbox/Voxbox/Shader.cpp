@@ -90,3 +90,8 @@ GLuint Shader::loadShader( const char* path, GLenum type )
 
 	return result;
 }
+
+GLuint Shader::getProgram() const
+{
+	return program;
+}

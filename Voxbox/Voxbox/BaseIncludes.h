@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <stdint.h>
+#include <ctime>
 
 // Windowing
 #include "SDL.h"
