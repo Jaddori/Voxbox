@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Chunk.cpp" />
+    <ClCompile Include="Font.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -154,6 +155,7 @@
     <ClInclude Include="BaseIncludes.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Chunk.h" />
+    <ClInclude Include="Font.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Texture.h" />

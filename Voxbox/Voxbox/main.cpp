@@ -3,6 +3,7 @@
 #include "Texture.h"
 #include "Input.h"
 #include "Chunk.h"
+#include "Font.h"
 
 int main( int argc, char* argv[] )
 {
@@ -41,7 +42,18 @@ int main( int argc, char* argv[] )
 			Texture texture;
 			if( !texture.load( "./assets/textures/blocks.dds" ) )
 				printf( "Failed to load texture.\n" );
-			texture.upload();
+			else
+				texture.upload();
+
+			Texture fontTexture;
+			if( !fontTexture.load( "./assets/fonts/verdana12.dds" ) )
+				printf( "Failed to load font texture.\n" );
+			else
+				fontTexture.upload();
+
+			Font font;
+			if( !font.load( "./assets/fonts/verdana12.bin" ) )
+				printf( "Failed to load font.\n" );
 
 			ChunkRenderer chunkRenderer;
 			chunkRenderer.load( &shader );
