@@ -76,12 +76,6 @@ void Texture::upload()
 	pixels = nullptr;
 }
 
-inline void Texture::bind( GLenum target )
-{
-	glActiveTexture( target );
-	glBindTexture( GL_TEXTURE_2D, id );
-}
-
 GLuint Texture::getID() const
 {
 	return id;
