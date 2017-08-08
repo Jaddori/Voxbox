@@ -2,12 +2,12 @@
 
 Chunk::Chunk()
 {
-#if 1
+#if 0
 	memset( blocks, 1, CHUNK_VOLUME );
 #else
 	for( int i=0; i<CHUNK_VOLUME; i++ )
 	{
-		blocks[i] = rand() % 2;
+		blocks[i] = rand() % 2 + 1;
 	}
 #endif
 }
@@ -33,40 +33,40 @@ void Chunk::load( Shader* shader )
 	GLfloat vdata[] =
 	{
 		// front
-		0.0f, 0.0f, 0.0f,		0.0f, 1.0f,
-		0.0f, 1.0f, 0.0f,		0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,		1.0f, 1.0f,
-		1.0f, 1.0f, 0.0f,		1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,		0.0f, 0.1f,
+		0.0f, 1.0f, 0.0f,		0.0f, 0.05f,
+		1.0f, 0.0f, 0.0f,		0.05f, 0.1f,
+		1.0f, 1.0f, 0.0f,		0.05f, 0.05f,
 
 		// right
-		1.0f, 0.0f, 0.0f,		0.0f, 1.0f,
-		1.0f, 1.0f, 0.0f,		0.0f, 0.0f,
-		1.0f, 0.0f, 1.0f,		1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,		1.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,		0.05f, 0.1f,
+		1.0f, 1.0f, 0.0f,		0.05f, 0.05f,
+		1.0f, 0.0f, 1.0f,		0.1f, 0.1f,
+		1.0f, 1.0f, 1.0f,		0.1f, 0.05f,
 
 		// back
-		1.0f, 0.0f, 1.0f,		0.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,		0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f,		1.0f, 1.0f,
-		0.0f, 1.0f, 1.0f,		1.0f, 0.0f,
+		1.0f, 0.0f, 1.0f,		0.0f, 0.1f,
+		1.0f, 1.0f, 1.0f,		0.0f, 0.05f,
+		0.0f, 0.0f, 1.0f,		0.05f, 0.1f,
+		0.0f, 1.0f, 1.0f,		0.05f, 0.05f,
 
 		// left
-		0.0f, 0.0f, 1.0f,		0.0f, 1.0f,
-		0.0f, 1.0f, 1.0f,		0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f,		1.0f, 1.0f,
-		0.0f, 1.0f, 0.0f,		1.0f, 0.0f,
+		0.0f, 0.0f, 1.0f,		0.05f, 0.1f,
+		0.0f, 1.0f, 1.0f,		0.05f, 0.05f,
+		0.0f, 0.0f, 0.0f,		0.1f, 0.1f,
+		0.0f, 1.0f, 0.0f,		0.1f, 0.05f,
 
 		// top
-		0.0f, 1.0f, 0.0f,		0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f,		0.0f, 0.05f,
 		0.0f, 1.0f, 1.0f,		0.0f, 0.0f,
-		1.0f, 1.0f, 0.0f,		1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,		1.0f, 0.0f,
+		1.0f, 1.0f, 0.0f,		0.05f, 0.05f,
+		1.0f, 1.0f, 1.0f,		0.05f, 0.0f,
 
 		// bottom
-		0.0f, 0.0f, 1.0f,		0.0f, 1.0f,
-		0.0f, 0.0f, 0.0f,		0.0f, 0.0f,
-		1.0f, 0.0f, 1.0f,		1.0f, 1.0f,
-		1.0f, 0.0f, 0.0f,		1.0f, 0.0f,
+		0.0f, 0.0f, 1.0f,		0.05f, 0.05f,
+		0.0f, 0.0f, 0.0f,		0.05f, 0.0f,
+		1.0f, 0.0f, 1.0f,		0.1f, 0.05f,
+		1.0f, 0.0f, 0.0f,		0.1f, 0.0f,
 	};
 
 	GLuint idata[] =
@@ -119,7 +119,8 @@ void Chunk::calculatePositions()
 		{
 			for( int x=0; x<CHUNK_SIZE; x++ )
 			{
-				if( blocks[at( x, y, z )] > 0 )
+				uint8_t type = blocks[at( x, y, z )];
+				if( type > 0 )
 				{
 					bool vacantNeighbours = false;
 					if( x == 0 || blocks[at( x-1, y, z )] == 0 )
@@ -137,7 +138,7 @@ void Chunk::calculatePositions()
 
 					if( vacantNeighbours )
 					{
-						positions[activeBlocks++] = glm::vec4( x, y, z, 0.0f );
+						positions[activeBlocks++] = glm::vec4( x, y, z, type-1 );
 					}
 				}
 			}

@@ -1,0 +1,6 @@
+-Clean up main
+-Add logging facilities
+-Lua support
+-Block types
+	-Accurate texture coordinates for block types
+-Chunk renderer

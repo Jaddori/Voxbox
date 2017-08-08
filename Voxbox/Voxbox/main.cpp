@@ -42,7 +42,7 @@ int main( int argc, char* argv[] )
 			GLint diffuseMapLocation = shader.getLocation( "diffuseMap" );
 
 			Texture texture;
-			if( !texture.load( "./assets/textures/bricks1.dds" ) )
+			if( !texture.load( "./assets/textures/blocks.dds" ) )
 				printf( "Failed to load texture.\n" );
 			texture.upload();
 
