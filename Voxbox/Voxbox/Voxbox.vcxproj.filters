@@ -11,6 +11,9 @@
     <Filter Include="Source Files\Assets">
       <UniqueIdentifier>{1c7f2e4b-1128-4efe-8535-29d5422c14da}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Input">
+      <UniqueIdentifier>{496ac251-7dbd-49b2-8ace-b91eed0b77fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -25,6 +28,9 @@
     <ClCompile Include="Texture.cpp">
       <Filter>Source Files\Assets</Filter>
     </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -38,6 +44,9 @@
     </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>Source Files\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Source Files\Input</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

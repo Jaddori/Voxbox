@@ -1,6 +1,7 @@
 #include "Camera.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "Input.h"
 
 int main( int argc, char* argv[] )
 {
@@ -61,6 +62,8 @@ int main( int argc, char* argv[] )
 			glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, 0 );
 			glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, sizeof(float)*4, (void*)(sizeof(float)*2) );
 
+			Input input;
+
 			bool running = true;
 			while( running )
 			{
@@ -70,9 +73,12 @@ int main( int argc, char* argv[] )
 				{
 					if( e.type == SDL_QUIT )
 						running = false;
-					else if( e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE )
-						running = false;
+
+					input.update( &e );
 				}
+				
+				if( input.keyReleased( SDL_SCANCODE_ESCAPE ) )
+					running = false;
 
 				// update
 
