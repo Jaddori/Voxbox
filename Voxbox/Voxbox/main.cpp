@@ -71,7 +71,7 @@ int main( int argc, char* argv[] )
 
 			Console console;
 			console.load();
-			console.setVisible( true );
+			//console.setVisible( true );
 
 			Input input;
 
@@ -114,10 +114,8 @@ int main( int argc, char* argv[] )
 				if( glm::length( cameraMovement ) > 0 )
 					graphics.getChunkCamera().updatePosition( cameraMovement );
 
-				if( input.keyPressed( SDL_SCANCODE_SPACE ) )
-					LOG( VERBOSITY_INFORMATION, "main.cpp - Pressed SPACE" );
-				if( input.keyReleased( SDL_SCANCODE_SPACE ) )
-					LOG( VERBOSITY_INFORMATION, "main.cpp - Released SPACE" );
+				if( input.keyReleased( SDL_SCANCODE_GRAVE ) )
+					console.toggle();
 
 				// update
 

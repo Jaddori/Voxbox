@@ -34,10 +34,10 @@ bool Shader::load( const char* vertex, const char* geometry, const char* fragmen
 	glGetProgramiv( program, GL_LINK_STATUS, &linkSuccess );
 	if( linkSuccess != GL_TRUE )
 	{
-		char buffer[1024] = {};
+		char logbuffer[1024] = {};
 		int len = 1024;
-		glGetProgramInfoLog( program, 1024, &len, buffer );
-		LOG( VERBOSITY_WARNING, "%s", buffer );
+		glGetProgramInfoLog( program, 1024, &len, logbuffer );
+		LOG( VERBOSITY_WARNING, "%s", logbuffer );
 
 		result = false;
 	}
@@ -84,14 +84,14 @@ GLuint Shader::loadShader( const char* path, GLenum type )
 			glGetShaderiv( result, GL_COMPILE_STATUS, &compilationSuccess );
 			if( compilationSuccess != GL_TRUE )
 			{
-				char buffer[1024] = {};
+				char logbuffer[1024] = {};
 				int len = 1024;
-				glGetShaderInfoLog( result, 1024, &len, buffer );
-				LOG( VERBOSITY_WARNING, "%s", buffer );
+				glGetShaderInfoLog( result, 1024, &len, logbuffer );
+				LOG( VERBOSITY_WARNING, "%s", logbuffer );
 			}
 		}
 		else
-			LOG( VERBOSITY_WARNING, "Shader.cpp - File not found." );
+			LOG( VERBOSITY_WARNING, "Shader.cpp - File not found: %s", path );
 	}
 
 	return result;

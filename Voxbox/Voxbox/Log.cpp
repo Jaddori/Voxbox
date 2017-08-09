@@ -51,3 +51,8 @@ const Array<LogMessage>& Log::getMessages() const
 {
 	return messages;
 }
+
+int Log::getThreshold() const
+{
+	return threshold;
+}

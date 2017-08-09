@@ -7,6 +7,7 @@
 #include "Camera.h"
 
 #define GRAPHICS_MAX_GLYPHS 128
+#define GRAPHICS_MAX_QUADS 128
 
 class Graphics
 {
@@ -22,6 +23,7 @@ public:
 
 	void renderChunk( Chunk* chunk );
 	void renderText( Font* font, const char* text, const glm::vec2& position );
+	void renderQuad( const glm::vec2& position, const glm::vec2& size, Texture* texture, float opacity );
 
 	Camera& getChunkCamera();
 
@@ -42,13 +44,17 @@ private:
 	Camera textCamera;
 	Shader textShader;
 	GLint textProjectionMatrixLocation;
-	GLint textWorldMatrixLocation;
-	GLint textUVOffsetLocation;
-	GLint textUVLengthLocation;
 
 	GLuint textVAO;
 	GLuint textVBO;
 	//GLuint textIBO;
+
+	// rendering quads
+	Shader quadShader;
+	GLint quadProjectionMatrixLocation;
+
+	GLuint quadVAO;
+	GLuint quadVBO;
 };
 
 struct Glyph
@@ -56,4 +62,12 @@ struct Glyph
 	glm::vec2 position;
 	glm::vec4 uv;
 	glm::vec2 size;
+};
+
+struct Quad
+{
+	glm::vec2 position;
+	glm::vec4 uv;
+	glm::vec2 size;
+	float opacity;
 };

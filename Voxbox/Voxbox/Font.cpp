@@ -40,6 +40,39 @@ void Font::unload()
 	texture.unload();
 }
 
+glm::vec2 Font::measureText( const char* text )
+{
+	glm::vec2 result( 0.0f, info.height );
+	float currentX = 0.0f;
+
+	const char* cur = text;
+	while( *cur )
+	{
+		if( *cur == '\n' )
+		{
+			if( currentX > result.x )
+				result.x = currentX;
+			result.y += info.height;
+		}
+		else if( *cur == '\t' )
+		{
+			currentX += info.widths[0] * FONT_TAB_WIDTH;
+		}
+		else if( *cur >= FONT_FIRST && *cur <= FONT_LAST )
+		{
+			char c = *cur - FONT_FIRST;
+			currentX += info.widths[c];
+		}
+
+		cur++;
+	}
+
+	if( currentX > result.x )
+		result.x = currentX;
+
+	return result;
+}
+
 int Font::getBitmapSize() const
 {
 	return info.bitmapSize;
@@ -75,10 +108,6 @@ glm::vec4 Font::getUV( char c ) const
 	float t = (float)info.verticalOffsets[c];
 	float u = s + info.widths[c];
 	float v = t + info.height;
-	/*float x = 0.0f;
-	float y = 0.0f;
-	float z = 1.0f;
-	float w = 1.0f;*/
 	return glm::vec4( s, t, u, v ) / (float)info.bitmapSize;
 }
 

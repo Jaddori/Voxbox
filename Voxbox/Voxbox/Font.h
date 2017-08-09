@@ -6,6 +6,7 @@
 #define FONT_FIRST 32
 #define FONT_LAST 128
 #define FONT_RANGE (FONT_LAST-FONT_FIRST)
+#define FONT_TAB_WIDTH 4
 
 struct FontInfo
 {
@@ -25,6 +26,8 @@ public:
 	bool load( const char* infoPath, const char* texturePath );
 	void upload();
 	void unload();
+
+	glm::vec2 measureText( const char* text );
 
 	int getBitmapSize() const;
 	int getHeight() const;

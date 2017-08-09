@@ -135,7 +135,7 @@ bool Graphics::load()
 
 		glGenBuffers( 1, &textVBO );
 		glBindBuffer( GL_ARRAY_BUFFER, textVBO );
-		glBufferData( GL_ARRAY_BUFFER, sizeof(Glyph)*GRAPHICS_MAX_GLYPHS, nullptr, GL_DYNAMIC_DRAW );
+		glBufferData( GL_ARRAY_BUFFER, sizeof(Glyph)*GRAPHICS_MAX_GLYPHS, nullptr, GL_STREAM_DRAW );
 
 		glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, sizeof(Glyph), 0 );
 		glVertexAttribPointer( 1, 4, GL_FLOAT, GL_FALSE, sizeof(Glyph), (void*)(sizeof(GLfloat)*2) );
@@ -147,6 +147,35 @@ bool Graphics::load()
 	{
 		LOG( VERBOSITY_ERROR, "Graphics.cpp - Failed to load text shader." );
 		result = false;
+	}
+
+	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Loading quad shader." );
+	if( quadShader.load( "./assets/shaders/quad.vs",
+							"./assets/shaders/quad.gs",
+							"./assets/shaders/quad.fs" ) )
+	{
+		LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Retrieving uniform locations from text shader." );
+		quadProjectionMatrixLocation = quadShader.getLocation( "projectionMatrix" );
+
+		LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Generating vertex data for quad shader." );
+		glGenVertexArrays( 1, &quadVAO );
+		glBindVertexArray( quadVAO );
+
+		glEnableVertexAttribArray( 0 );
+		glEnableVertexAttribArray( 1 );
+		glEnableVertexAttribArray( 2 );
+		glEnableVertexAttribArray( 3 );
+
+		glGenBuffers( 1, &quadVBO );
+		glBindBuffer( GL_ARRAY_BUFFER, quadVBO );
+		glBufferData( GL_ARRAY_BUFFER, sizeof(Quad)*GRAPHICS_MAX_QUADS, nullptr, GL_STREAM_DRAW );
+
+		glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, sizeof(Glyph), 0 );
+		glVertexAttribPointer( 1, 4, GL_FLOAT, GL_FALSE, sizeof(Glyph), (void*)(sizeof(GLfloat)*2) );
+		glVertexAttribPointer( 2, 2, GL_FLOAT, GL_FALSE, sizeof(Glyph), (void*)(sizeof(GLfloat)*6) );
+		glVertexAttribPointer( 3, 1, GL_FLOAT, GL_FALSE, sizeof(Glyph), (void*)(sizeof(GLfloat)*8) );
+
+		glBindVertexArray( 0 );
 	}
 
 	return result;
@@ -177,6 +206,14 @@ void Graphics::unload()
 	}
 
 	textVAO = textVBO = 0; //textIBO = 0;
+
+	if( quadVAO )
+	{
+		glDeleteVertexArrays( 1, &quadVAO );
+		glDeleteBuffers( 1, &quadVBO );
+	}
+
+	quadVAO = quadVBO = 0;
 }
 
 void Graphics::begin()
@@ -187,6 +224,9 @@ void Graphics::begin()
 
 	textShader.bind();
 	textShader.setMat4( textProjectionMatrixLocation, textCamera.getProjectionMatrix() );
+
+	quadShader.bind();
+	quadShader.setMat4( quadProjectionMatrixLocation, textCamera.getProjectionMatrix() );
 }
 
 void Graphics::end()
@@ -228,6 +268,10 @@ void Graphics::renderText( Font* font, const char* text, const glm::vec2& positi
 			offset.x = 0;
 			offset.y += font->getHeight();
 		}
+		else if( *cur == '\t' )
+		{
+			offset.x += font->getWidth(0) * FONT_TAB_WIDTH;
+		}
 		else if( *cur >= FONT_FIRST && *cur <= FONT_LAST )
 		{
 			char c = *cur - FONT_FIRST;
@@ -258,6 +302,31 @@ void Graphics::renderText( Font* font, const char* text, const glm::vec2& positi
 	glBindBuffer( GL_ARRAY_BUFFER, textVBO );
 	glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(Glyph)*index, glyphs );
 	glDrawArrays( GL_POINTS, 0, index );
+	glBindVertexArray( 0 );
+
+	glDisable( GL_BLEND );
+	glEnable( GL_DEPTH_TEST );
+}
+
+void Graphics::renderQuad( const glm::vec2& position, const glm::vec2& size, Texture* texture, float opacity )
+{
+	quadShader.bind();
+
+	if( texture )
+		texture->bind();
+	else
+		glBindTexture( GL_TEXTURE_2D, 0 );
+
+	Quad quad = { position, glm::vec4( 0.0f, 0.0f, 1.0f, 1.0f ), size, opacity };
+
+	glDisable( GL_DEPTH_TEST );
+	glEnable( GL_BLEND );
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+	glBindVertexArray( quadVAO );
+	glBindBuffer( GL_ARRAY_BUFFER, quadVBO );
+	glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(Quad), &quad );
+	glDrawArrays( GL_POINTS, 0, 1 );
 	glBindVertexArray( 0 );
 
 	glDisable( GL_BLEND );

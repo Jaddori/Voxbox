@@ -20,7 +20,7 @@
 	}
 #define LOG_THRESHOLD( threshold ) Log::instance().setThreshold( threshold )
 #define LOG_INFORMATION() LOG_THRESHOLD( VERBOSITY_INFORMATION )
-#define LOG_WARNINGS() LOG_THRESOLD( VERBOSITY_WARNING )
+#define LOG_WARNINGS() LOG_THRESHOLD( VERBOSITY_WARNING )
 #define LOG_ERRORS() LOG_THRESHOLD( VERBOSITY_ERROR )
 
 enum
@@ -54,6 +54,7 @@ public:
 	void setThreshold( int threshold );
 
 	const Array<LogMessage>& getMessages() const;
+	int getThreshold() const;
 
 private:
 	Log() : file( nullptr ), threshold( VERBOSITY_WARNING ) {}

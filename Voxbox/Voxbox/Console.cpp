@@ -42,17 +42,27 @@ void Console::render( Graphics* graphics )
 {
 	if( visible )
 	{
+		// draw background
+		graphics->renderQuad( glm::vec2( 0.0f, 0.0f ), glm::vec2( 640.0f, 256.0f ), nullptr, 0.45f );
+
+		// draw messages
 		const Array<LogMessage>& messages = Log::instance().getMessages();
+		const int threshold = Log::instance().getThreshold();
 
-		int numMessages = messages.getSize();
-		if( numMessages > 10 )
-			numMessages = 10;
-
-		for( int i=0; i<numMessages; i++ )
+		float yoffset = 256.0f;
+		for( int i=messages.getSize()-1; i>=0 && yoffset > 0.0f; i-- )
 		{
-			int index = messages.getSize() - numMessages + i;
-			glm::vec2 position( 8.0f, i*font.getHeight() );
-			graphics->renderText( &font, messages[index].message, position );
+			const LogMessage& message = messages[i];
+			if( message.verbosity >= threshold )
+			{
+				glm::vec2 textBounds = font.measureText( message.message );
+
+				yoffset -= textBounds.y;
+				if( yoffset >= 0.0f )
+				{
+					graphics->renderText( &font, message.message, glm::vec2( 8.0f, yoffset ) );
+				}
+			}
 		}
 	}
 }
