@@ -296,3 +296,5 @@ QT/build-CityGenerator*/
 *.lof
 *.lot
 *.toc
+
+*/build/log.txt
