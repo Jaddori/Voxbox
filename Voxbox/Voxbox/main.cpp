@@ -117,6 +117,9 @@ int main( int argc, char* argv[] )
 				if( input.keyReleased( SDL_SCANCODE_GRAVE ) )
 					console.toggle();
 
+				if( input.keyReleased( SDL_SCANCODE_SPACE ) )
+					LOG( VERBOSITY_DEBUG, "main.cpp - User pressed the spacebar." );
+
 				// update
 
 				// render

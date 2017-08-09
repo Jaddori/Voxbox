@@ -132,6 +132,7 @@ bool Graphics::load()
 		glEnableVertexAttribArray( 0 );
 		glEnableVertexAttribArray( 1 );
 		glEnableVertexAttribArray( 2 );
+		glEnableVertexAttribArray( 3 );
 
 		glGenBuffers( 1, &textVBO );
 		glBindBuffer( GL_ARRAY_BUFFER, textVBO );
@@ -140,6 +141,7 @@ bool Graphics::load()
 		glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, sizeof(Glyph), 0 );
 		glVertexAttribPointer( 1, 4, GL_FLOAT, GL_FALSE, sizeof(Glyph), (void*)(sizeof(GLfloat)*2) );
 		glVertexAttribPointer( 2, 2, GL_FLOAT, GL_FALSE, sizeof(Glyph), (void*)(sizeof(GLfloat)*6) );
+		glVertexAttribPointer( 3, 4, GL_FLOAT, GL_FALSE, sizeof(Glyph), (void*)(sizeof(GLfloat)*8) );
 
 		glBindVertexArray( 0 );
 	}
@@ -250,7 +252,7 @@ void Graphics::renderChunk( Chunk* chunk )
 	glBindVertexArray( 0 );
 }
 
-void Graphics::renderText( Font* font, const char* text, const glm::vec2& position )
+void Graphics::renderText( Font* font, const char* text, const glm::vec2& position, const glm::vec4& color )
 {
 	const float NEGATIVE_PADDING = -4.0f;
 
@@ -280,6 +282,7 @@ void Graphics::renderText( Font* font, const char* text, const glm::vec2& positi
 			glyphs[index].uv = font->getUV( c );
 			glyphs[index].size.x = font->getWidth( c );
 			glyphs[index].size.y = font->getHeight();
+			glyphs[index].color = color;
 
 			offset.x += glyphs[index].size.x;
 			if( c > FONT_FIRST )

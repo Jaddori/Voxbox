@@ -22,7 +22,7 @@ public:
 	void end();
 
 	void renderChunk( Chunk* chunk );
-	void renderText( Font* font, const char* text, const glm::vec2& position );
+	void renderText( Font* font, const char* text, const glm::vec2& position, const glm::vec4& color );
 	void renderQuad( const glm::vec2& position, const glm::vec2& size, Texture* texture, float opacity );
 
 	Camera& getChunkCamera();
@@ -62,6 +62,7 @@ struct Glyph
 	glm::vec2 position;
 	glm::vec4 uv;
 	glm::vec2 size;
+	glm::vec4 color;
 };
 
 struct Quad

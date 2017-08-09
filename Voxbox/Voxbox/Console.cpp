@@ -42,6 +42,15 @@ void Console::render( Graphics* graphics )
 {
 	if( visible )
 	{
+		// setup colors
+		const glm::vec4 TEXT_COLORS[] =
+		{
+			CONSOLE_COLOR_INFORMATION,
+			CONSOLE_COLOR_WARNING,
+			CONSOLE_COLOR_ERROR,
+			CONSOLE_COLOR_DEBUG
+		};
+
 		// draw background
 		graphics->renderQuad( glm::vec2( 0.0f, 0.0f ), glm::vec2( 640.0f, 256.0f ), nullptr, 0.45f );
 
@@ -60,7 +69,7 @@ void Console::render( Graphics* graphics )
 				yoffset -= textBounds.y;
 				if( yoffset >= 0.0f )
 				{
-					graphics->renderText( &font, message.message, glm::vec2( 8.0f, yoffset ) );
+					graphics->renderText( &font, message.message, glm::vec2( 8.0f, yoffset ), TEXT_COLORS[message.verbosity] );
 				}
 			}
 		}
