@@ -4,10 +4,12 @@
 #include "Array.h"
 #include <cassert>
 
+#define LOG_START( file ) Log::instance().start( file )
+#define LOG_STOP() Log::instance().stop()
 #define LOG( verbosity, fmt, ... ) \
 	{ \
-		char buffer[128] = {}; \
-		snprintf( buffer, 128, fmt, __VA_ARGS__ ); \
+		char buffer[1024] = {}; \
+		snprintf( buffer, 1024, fmt, __VA_ARGS__ ); \
 		Log::instance().addMessage( verbosity, buffer ); \
 	}
 #define LOG_ASSERT( condition, fmt, ... ) \
@@ -16,6 +18,10 @@
 			LOG( VERBOSITY_ERROR, fmt, __VA_ARGS__ ); \
 		assert( (condition) ); \
 	}
+#define LOG_THRESHOLD( threshold ) Log::instance().setThreshold( threshold )
+#define LOG_INFORMATION() LOG_THRESHOLD( VERBOSITY_INFORMATION )
+#define LOG_WARNINGS() LOG_THRESOLD( VERBOSITY_WARNING )
+#define LOG_ERRORS() LOG_THRESHOLD( VERBOSITY_ERROR )
 
 enum
 {
@@ -26,7 +32,7 @@ enum
 
 struct LogMessage
 {
-	char message[128];
+	char message[1024];
 	int verbosity;
 };
 

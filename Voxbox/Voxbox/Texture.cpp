@@ -43,13 +43,19 @@ bool Texture::load( const char* path )
 		}
 
 		fclose( file );
+
+		LOG( VERBOSITY_INFORMATION, "Texture.cpp - Loaded texture from \"%s\".", path );
 	}
+	else
+		LOG( VERBOSITY_WARNING, "Texture.cpp - Failed to load texture from \"%s\".", path );
 
 	return result;
 }
 
 void Texture::unload()
 {
+	LOG( VERBOSITY_INFORMATION, "Texture.cpp - Unloading texture." );
+
 	if( id )
 		glDeleteTextures( 1, &id );
 
@@ -65,6 +71,8 @@ void Texture::unload()
 
 void Texture::upload()
 {
+	LOG( VERBOSITY_INFORMATION, "Texture.cpp - Uploading texture." );
+
 	glGenTextures( 1, &id );
 	glBindTexture( GL_TEXTURE_2D, id );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );

@@ -6,7 +6,7 @@ bool Log::start( const char* logfile )
 	file = fopen( logfile, "w" );
 	if( file )
 	{
-		fprintf( file, "*** Log started ***" );
+		addMessage( VERBOSITY_INFORMATION, "*** Log started ***" );
 	}
 	
 	return ( file != nullptr );
@@ -20,7 +20,7 @@ void Log::stop()
 #if _DEBUG
 	assert( file );
 
-	fprintf( file, "*** Log stopped ***" );
+	addMessage( VERBOSITY_INFORMATION, "*** Log stopped ***" );
 	fclose( file );
 #endif
 }
@@ -33,6 +33,12 @@ void Log::addMessage( int verbosity, const char* message )
 	fprintf( file, "%s\n", message );
 	if( verbosity >= threshold )
 		printf( "%s\n", message );
+
+	LogMessage msg;
+	strcpy( msg.message, message );
+	msg.verbosity = verbosity;
+
+	messages.add( msg );
 #endif
 }
 

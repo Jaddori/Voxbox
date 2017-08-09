@@ -18,7 +18,13 @@ bool Font::load( const char* infoPath, const char* texturePath )
 		fread( &info, sizeof(info), 1, file );
 		fclose( file );
 
+		LOG( VERBOSITY_INFORMATION, "Font.cpp - Loaded font from \"%s\".", infoPath );
+
 		result = texture.load( texturePath );
+	}
+	else
+	{
+		LOG( VERBOSITY_WARNING, "Font.cpp - Failed to load font from \"%s\".", infoPath );
 	}
 
 	return result;

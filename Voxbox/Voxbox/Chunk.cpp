@@ -50,6 +50,8 @@ void Chunk::calculatePositions()
 			}
 		}
 	}
+
+	LOG( VERBOSITY_INFORMATION, "Chunk.cpp - Calculating positions. Active blocks: %d.", activeBlocks );
 }
 
 void Chunk::setOffset( const glm::vec3& o )

@@ -11,6 +11,8 @@ Shader::~Shader()
 
 bool Shader::load( const char* vertex, const char* geometry, const char* fragment )
 {
+	LOG( VERBOSITY_INFORMATION, "Shader.cpp - Loading:" );
+
 	bool result = true;
 
 	unload();
@@ -35,7 +37,7 @@ bool Shader::load( const char* vertex, const char* geometry, const char* fragmen
 		char buffer[1024] = {};
 		int len = 1024;
 		glGetProgramInfoLog( program, 1024, &len, buffer );
-		printf( "%s\n", buffer );
+		LOG( VERBOSITY_WARNING, "%s", buffer );
 
 		result = false;
 	}
@@ -56,6 +58,8 @@ GLuint Shader::loadShader( const char* path, GLenum type )
 
 	if( path )
 	{
+		LOG( VERBOSITY_INFORMATION, "\t%s", path );
+
 		FILE* file = fopen( path, "rb" );
 		if( file )
 		{
@@ -83,9 +87,11 @@ GLuint Shader::loadShader( const char* path, GLenum type )
 				char buffer[1024] = {};
 				int len = 1024;
 				glGetShaderInfoLog( result, 1024, &len, buffer );
-				printf( "%s\n", buffer );
+				LOG( VERBOSITY_WARNING, "%s", buffer );
 			}
 		}
+		else
+			LOG( VERBOSITY_WARNING, "Shader.cpp - File not found." );
 	}
 
 	return result;

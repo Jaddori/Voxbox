@@ -6,10 +6,13 @@ Input::Input()
 	memset( prevKeys, 0, INPUT_MAX_KEYS );
 	memset( buttons, 0, INPUT_MAX_BUTTONS );
 	memset( prevButtons, 0, INPUT_MAX_BUTTONS );
+
+	LOG( VERBOSITY_INFORMATION, "Input.cpp - Constructing." );
 }
 
 Input::~Input()
 {
+	LOG( VERBOSITY_INFORMATION, "Input.cpp - Destructing." );
 }
 
 void Input::reset()

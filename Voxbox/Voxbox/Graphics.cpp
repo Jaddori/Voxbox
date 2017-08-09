@@ -4,27 +4,35 @@ Graphics::Graphics()
 	: chunkViewMatrixLocation( 0 ), chunkProjectionMatrixLocation( 0 ), chunkOffsetLocation( 0 ),
 	chunkVAO( 0 ), chunkVBO( 0 ), chunkIBO( 0 ), chunkUBO( 0 )
 {
+	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Constructing." );
 }
 
 Graphics::~Graphics()
 {
+	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Destructing." );
 }
 
 bool Graphics::load()
 {
+	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Loading." );
+
 	bool result = false;
 
+	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Initializing cameras." );
 	chunkCamera.updatePerspective( WINDOW_WIDTH, WINDOW_HEIGHT );
 	textCamera.updateOrthographic( WINDOW_WIDTH, WINDOW_HEIGHT );
 
+	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Loading chunk shader." );
 	if( chunkShader.load( "./assets/shaders/chunk.vs",
 							nullptr,
 							"./assets/shaders/chunk.fs" ) )
 	{
+		LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Retrieving uniform locations from chunk shader." );
 		chunkViewMatrixLocation = chunkShader.getLocation( "viewMatrix" );
 		chunkProjectionMatrixLocation = chunkShader.getLocation( "projectionMatrix" );
 		chunkOffsetLocation = chunkShader.getLocation( "offset" );
 
+		LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Generating vertex data for chunk shader." );
 		glGenVertexArrays( 1, &chunkVAO );
 		glBindVertexArray( chunkVAO );
 
@@ -105,44 +113,19 @@ bool Graphics::load()
 	}
 	else
 	{
-		printf( "Failed to load chunk shader.\n" );
+		LOG( VERBOSITY_ERROR, "Graphics.cpp - Failed to load chunk shader." );
 		result = false;
 	}
 
+	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Loading text shader." );
 	if( textShader.load( "./assets/shaders/text.vs",
 							"./assets/shaders/text.gs",
 							"./assets/shaders/text.fs" ) )
 	{
+		LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Retrieving uniform locations from text shader." );
 		textProjectionMatrixLocation = textShader.getLocation( "projectionMatrix" );
 
-		/*glGenVertexArrays( 1, &textVAO );
-		glBindVertexArray( textVAO );
-
-		glEnableVertexAttribArray( 0 );
-
-		glGenBuffers( 1, &textVBO );
-		glGenBuffers( 1, &textIBO );
-
-		GLfloat vdata[] =
-		{
-			0.0f, 1.0f,
-			0.0f, 0.0f,
-			1.0f, 1.0f,
-			1.0f, 0.0f
-		};
-
-		GLuint idata[] = { 0, 1, 2, 1, 3, 2 };
-
-		glBindBuffer( GL_ARRAY_BUFFER, textVBO );
-		glBufferData( GL_ARRAY_BUFFER, sizeof(GLfloat)*8, vdata, GL_STATIC_DRAW );
-
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, textIBO );
-		glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*6, idata, GL_STATIC_DRAW );
-
-		glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*2, 0 );
-
-		glBindVertexArray( 0 );*/
-
+		LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Generating vertex data for text shader." );
 		glGenVertexArrays( 1, &textVAO );
 		glBindVertexArray( textVAO );
 
@@ -162,7 +145,7 @@ bool Graphics::load()
 	}
 	else
 	{
-		printf( "Failed to load text shader.\n" );
+		LOG( VERBOSITY_ERROR, "Graphics.cpp - Failed to load text shader." );
 		result = false;
 	}
 
@@ -171,6 +154,8 @@ bool Graphics::load()
 
 void Graphics::unload()
 {
+	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Unloading." );
+
 	chunkShader.unload();
 	textShader.unload();
 
@@ -228,36 +213,6 @@ void Graphics::renderChunk( Chunk* chunk )
 void Graphics::renderText( Font* font, const char* text, const glm::vec2& position )
 {
 	glm::vec2 offset;
-
-	/*textShader.bind();
-	font->getTexture().bind();
-
-	glBindVertexArray( textVAO );
-	glDisable( GL_CULL_FACE );
-	glDisable( GL_DEPTH_TEST );
-	glEnable( GL_BLEND );
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
-	const char* cur = text;
-	while( *cur )
-	{
-		//glm::mat4 worldMatrix = glm::translate( glm::mat4(), position + offset );
-		glm::mat4 worldMatrix = glm::scale( glm::translate( glm::mat4(), position + offset ), glm::vec3( 200.0f, 200.0f, 0.0f ) );
-
-		textShader.setMat4( textWorldMatrixLocation, worldMatrix );
-		textShader.setVec2( textUVOffsetLocation, glm::vec2( 0.0f, 0.0f ) );
-		textShader.setVec2( textUVLengthLocation, glm::vec2( 1.0f, 1.0f ) );
-
-		glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
-
-		cur++;
-	}
-
-	glEnable( GL_CULL_FACE );
-	glEnable( GL_DEPTH_TEST );
-	glDisable( GL_BLEND );
-
-	glBindVertexArray( 0 );*/
 
 	Glyph glyphs[GRAPHICS_MAX_GLYPHS];
 

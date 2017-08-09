@@ -8,16 +8,27 @@
 
 int main( int argc, char* argv[] )
 {
+	LOG_START( "./log.txt" );
+	LOG_INFORMATION();
+
 	SDL_Window* window = SDL_CreateWindow( "Voxbox", WINDOW_X, WINDOW_Y, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL );
 	if( window )
 	{
+		LOG( VERBOSITY_INFORMATION, "main.cpp - Window created." );
+
 		SDL_GLContext context = SDL_GL_CreateContext( window );
 		if( context )
 		{
+			LOG( VERBOSITY_INFORMATION, "main.cpp - OpenGL context created." );
+
 			glewExperimental = GL_TRUE;
-			if( glewInit() != GLEW_OK )
+			if( glewInit() == GLEW_OK )
 			{
-				printf( "Failed to init GLEW.\n" );
+				LOG( VERBOSITY_INFORMATION, "main.cpp - GLEW initialized." );
+			}
+			else
+			{
+				LOG( VERBOSITY_ERROR, "main.cpp - Failed to intialized GLEW." );
 				return -1;
 			}
 
@@ -127,7 +138,7 @@ int main( int argc, char* argv[] )
 				long ticks = SDL_GetTicks();
 				if( ticks - fpsTimer > 1000 )
 				{
-					printf( "Fps: %d\n", fps );
+					//printf( "Fps: %d\n", fps );
 
 					fpsTimer = ticks;
 					fps = 0;
@@ -136,10 +147,15 @@ int main( int argc, char* argv[] )
 					fps++;
 			}
 
+			LOG( VERBOSITY_INFORMATION, "main.cpp - Deleting OpenGL context." );
 			SDL_GL_DeleteContext( context );
 		}
+
+		LOG( VERBOSITY_INFORMATION, "main.cpp - Destroying window." );
 		SDL_DestroyWindow( window );
 	}
+
+	LOG_STOP();
 
 	return 0;
 }
