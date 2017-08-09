@@ -212,6 +212,8 @@ void Graphics::renderChunk( Chunk* chunk )
 
 void Graphics::renderText( Font* font, const char* text, const glm::vec2& position )
 {
+	const float NEGATIVE_PADDING = -4.0f;
+
 	glm::vec2 offset;
 
 	Glyph glyphs[GRAPHICS_MAX_GLYPHS];
@@ -221,24 +223,28 @@ void Graphics::renderText( Font* font, const char* text, const glm::vec2& positi
 	const char* cur = text;
 	while( *cur && index < GRAPHICS_MAX_GLYPHS )
 	{
-		char c = *cur++ - FONT_FIRST;
-
-		if( c == '\n' )
+		if( *cur == '\n' )
 		{
 			offset.x = 0;
 			offset.y += font->getHeight();
 		}
-		else
+		else if( *cur >= FONT_FIRST && *cur <= FONT_LAST )
 		{
+			char c = *cur - FONT_FIRST;
+
 			glyphs[index].position = position + offset;
 			glyphs[index].uv = font->getUV( c );
 			glyphs[index].size.x = font->getWidth( c );
 			glyphs[index].size.y = font->getHeight();
 
 			offset.x += glyphs[index].size.x;
+			if( c > FONT_FIRST )
+				offset.x += NEGATIVE_PADDING;
 
 			index++;
 		}
+
+		*cur++;
 	}
 
 	textShader.bind();

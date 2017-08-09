@@ -5,6 +5,7 @@
 #include "Chunk.h"
 #include "Font.h"
 #include "Graphics.h"
+#include "Console.h"
 
 int main( int argc, char* argv[] )
 {
@@ -68,6 +69,10 @@ int main( int argc, char* argv[] )
 			graphics.load();
 			graphics.getChunkCamera().setPosition( glm::vec3( 0.0f, 0.0f, -10.0f ) );
 
+			Console console;
+			console.load();
+			console.setVisible( true );
+
 			Input input;
 
 			long fpsTimer = SDL_GetTicks();
@@ -109,6 +114,11 @@ int main( int argc, char* argv[] )
 				if( glm::length( cameraMovement ) > 0 )
 					graphics.getChunkCamera().updatePosition( cameraMovement );
 
+				if( input.keyPressed( SDL_SCANCODE_SPACE ) )
+					LOG( VERBOSITY_INFORMATION, "main.cpp - Pressed SPACE" );
+				if( input.keyReleased( SDL_SCANCODE_SPACE ) )
+					LOG( VERBOSITY_INFORMATION, "main.cpp - Released SPACE" );
+
 				// update
 
 				// render
@@ -130,7 +140,8 @@ int main( int argc, char* argv[] )
 					}
 				}
 
-				graphics.renderText( &font, "Testing...", glm::vec2( 32.0f, 32.0f ) );
+				console.render( &graphics );
+
 				graphics.end();
 
 				SDL_GL_SwapWindow( window );

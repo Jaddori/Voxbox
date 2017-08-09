@@ -23,12 +23,24 @@ public:
 		delete[] data;
 	}
 
+	T& operator[]( int index )
+	{
+		assert( index >= 0 && index < size );
+		return data[index];
+	}
+
+	const T& operator[]( int index ) const
+	{
+		assert( index >= 0 && index < size );
+		return data[index];
+	}
+
 	void add( const T& element )
 	{
 		if( size >= capacity )
 			expand( capacity * 2 );
 
-		data[size] = element;
+		data[size++] = element;
 	}
 
 	T& addInPlace()
@@ -67,6 +79,26 @@ public:
 	{
 		assert( index >= 0 && index < size );
 		return data[index];
+	}
+
+	T* getData()
+	{
+		return data;
+	}
+
+	const T* getConstData() const
+	{
+		return data;
+	}
+
+	int getSize() const
+	{
+		return size;
+	}
+
+	int getCapacity() const
+	{
+		return capacity;
 	}
 
 private:
