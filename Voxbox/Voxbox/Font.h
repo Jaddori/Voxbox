@@ -26,6 +26,13 @@ public:
 	void upload();
 	void unload();
 
+	int getBitmapSize() const;
+	int getHeight() const;
+	int getWidth( char c ) const;
+	int getHorizontalOffset( char c ) const;
+	int getVerticalOffset( char c ) const;
+	glm::vec4 getUV( char c ) const;
+
 	const FontInfo& getInfo() const;
 	const Texture& getTexture() const;
 

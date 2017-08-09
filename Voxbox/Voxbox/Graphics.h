@@ -6,6 +6,8 @@
 #include "Chunk.h"
 #include "Camera.h"
 
+#define GRAPHICS_MAX_GLYPHS 128
+
 class Graphics
 {
 public:
@@ -19,7 +21,7 @@ public:
 	void end();
 
 	void renderChunk( Chunk* chunk );
-	void renderText( Font* font, const char* text, const glm::vec3& position );
+	void renderText( Font* font, const char* text, const glm::vec2& position );
 
 	Camera& getChunkCamera();
 
@@ -46,5 +48,12 @@ private:
 
 	GLuint textVAO;
 	GLuint textVBO;
-	GLuint textIBO;
+	//GLuint textIBO;
+};
+
+struct Glyph
+{
+	glm::vec2 position;
+	glm::vec4 uv;
+	glm::vec2 size;
 };

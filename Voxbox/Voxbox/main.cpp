@@ -33,7 +33,7 @@ int main( int argc, char* argv[] )
 				texture.upload();
 
 			Font font;
-			if( font.load( "./assets/fonts/verdana12.bin", "./assets/fonts/verdana12.dds" ) )
+			if( font.load( "./assets/fonts/modern12.bin", "./assets/fonts/modern12.dds" ) )
 			{
 				font.upload();
 			}
@@ -119,7 +119,7 @@ int main( int argc, char* argv[] )
 					}
 				}
 
-				graphics.renderText( &font, "Testing...", glm::vec3( 32, 32, 0.0f ) );
+				graphics.renderText( &font, "Testing...", glm::vec2( 32.0f, 32.0f ) );
 				graphics.end();
 
 				SDL_GL_SwapWindow( window );

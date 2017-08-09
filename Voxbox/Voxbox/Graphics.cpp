@@ -110,15 +110,12 @@ bool Graphics::load()
 	}
 
 	if( textShader.load( "./assets/shaders/text.vs",
-							nullptr,
+							"./assets/shaders/text.gs",
 							"./assets/shaders/text.fs" ) )
 	{
 		textProjectionMatrixLocation = textShader.getLocation( "projectionMatrix" );
-		textWorldMatrixLocation = textShader.getLocation( "worldMatrix" );
-		textUVOffsetLocation = textShader.getLocation( "UVOffset" );
-		textUVLengthLocation = textShader.getLocation( "UVLength" );
 
-		glGenVertexArrays( 1, &textVAO );
+		/*glGenVertexArrays( 1, &textVAO );
 		glBindVertexArray( textVAO );
 
 		glEnableVertexAttribArray( 0 );
@@ -143,6 +140,23 @@ bool Graphics::load()
 		glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*6, idata, GL_STATIC_DRAW );
 
 		glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*2, 0 );
+
+		glBindVertexArray( 0 );*/
+
+		glGenVertexArrays( 1, &textVAO );
+		glBindVertexArray( textVAO );
+
+		glEnableVertexAttribArray( 0 );
+		glEnableVertexAttribArray( 1 );
+		glEnableVertexAttribArray( 2 );
+
+		glGenBuffers( 1, &textVBO );
+		glBindBuffer( GL_ARRAY_BUFFER, textVBO );
+		glBufferData( GL_ARRAY_BUFFER, sizeof(Glyph)*GRAPHICS_MAX_GLYPHS, nullptr, GL_DYNAMIC_DRAW );
+
+		glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, sizeof(Glyph), 0 );
+		glVertexAttribPointer( 1, 4, GL_FLOAT, GL_FALSE, sizeof(Glyph), (void*)(sizeof(GLfloat)*2) );
+		glVertexAttribPointer( 2, 2, GL_FLOAT, GL_FALSE, sizeof(Glyph), (void*)(sizeof(GLfloat)*6) );
 
 		glBindVertexArray( 0 );
 	}
@@ -174,10 +188,10 @@ void Graphics::unload()
 	{
 		glDeleteVertexArrays( 1, &textVAO );
 		glDeleteBuffers( 1, &textVBO );
-		glDeleteBuffers( 1, &textIBO );
+		//glDeleteBuffers( 1, &textIBO );
 	}
 
-	textVAO = textVBO = textIBO = 0;
+	textVAO = textVBO = 0; //textIBO = 0;
 }
 
 void Graphics::begin()
@@ -211,11 +225,11 @@ void Graphics::renderChunk( Chunk* chunk )
 	glBindVertexArray( 0 );
 }
 
-void Graphics::renderText( Font* font, const char* text, const glm::vec3& position )
+void Graphics::renderText( Font* font, const char* text, const glm::vec2& position )
 {
-	glm::vec3 offset;
+	glm::vec2 offset;
 
-	textShader.bind();
+	/*textShader.bind();
 	font->getTexture().bind();
 
 	glBindVertexArray( textVAO );
@@ -243,7 +257,50 @@ void Graphics::renderText( Font* font, const char* text, const glm::vec3& positi
 	glEnable( GL_DEPTH_TEST );
 	glDisable( GL_BLEND );
 
+	glBindVertexArray( 0 );*/
+
+	Glyph glyphs[GRAPHICS_MAX_GLYPHS];
+
+	int index = 0;
+
+	const char* cur = text;
+	while( *cur && index < GRAPHICS_MAX_GLYPHS )
+	{
+		char c = *cur++ - FONT_FIRST;
+
+		if( c == '\n' )
+		{
+			offset.x = 0;
+			offset.y += font->getHeight();
+		}
+		else
+		{
+			glyphs[index].position = position + offset;
+			glyphs[index].uv = font->getUV( c );
+			glyphs[index].size.x = font->getWidth( c );
+			glyphs[index].size.y = font->getHeight();
+
+			offset.x += glyphs[index].size.x;
+
+			index++;
+		}
+	}
+
+	textShader.bind();
+	font->getTexture().bind();
+
+	glDisable( GL_DEPTH_TEST );
+	glEnable( GL_BLEND );
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+	glBindVertexArray( textVAO );
+	glBindBuffer( GL_ARRAY_BUFFER, textVBO );
+	glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(Glyph)*index, glyphs );
+	glDrawArrays( GL_POINTS, 0, index );
 	glBindVertexArray( 0 );
+
+	glDisable( GL_BLEND );
+	glEnable( GL_DEPTH_TEST );
 }
 
 Camera& Graphics::getChunkCamera()
