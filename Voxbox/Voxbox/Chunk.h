@@ -29,24 +29,3 @@ private:
 	glm::vec3 offset;
 	int activeBlocks;
 };
-
-class ChunkRenderer
-{
-public:
-	ChunkRenderer();
-	~ChunkRenderer();
-
-	void load( Shader* shader );
-	void unload();
-
-	void render( Chunk* chunk );
-
-private:
-	Shader* chunkShader;
-	GLint offsetLocation;
-
-	GLuint vertexArray;
-	GLuint vertexBuffer;
-	GLuint indexBuffer;
-	GLuint uniformBuffer;
-};

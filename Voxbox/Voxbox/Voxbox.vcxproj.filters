@@ -40,6 +40,9 @@
     <ClCompile Include="Font.cpp">
       <Filter>Source Files\Assets</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -62,6 +65,9 @@
     </ClInclude>
     <ClInclude Include="Font.h">
       <Filter>Source Files\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics.h">
+      <Filter>Source Files\Rendering</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

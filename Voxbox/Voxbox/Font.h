@@ -22,10 +22,14 @@ public:
 	Font();
 	~Font();
 
-	bool load( const char* path );
+	bool load( const char* infoPath, const char* texturePath );
+	void upload();
+	void unload();
 
 	const FontInfo& getInfo() const;
+	const Texture& getTexture() const;
 
 private:
 	FontInfo info;
+	Texture texture;
 };

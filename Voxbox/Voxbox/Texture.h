@@ -46,7 +46,7 @@ public:
 	bool load( const char* path );
 	void unload();
 	void upload();
-	inline void bind( GLenum target = GL_TEXTURE0 )
+	inline void bind( GLenum target = GL_TEXTURE0 ) const
 	{
 		glActiveTexture( target );
 		glBindTexture( GL_TEXTURE_2D, id );

@@ -4,6 +4,7 @@
 #include "Input.h"
 #include "Chunk.h"
 #include "Font.h"
+#include "Graphics.h"
 
 int main( int argc, char* argv[] )
 {
@@ -25,38 +26,19 @@ int main( int argc, char* argv[] )
 			SDL_GL_SetSwapInterval( 1 );
 			srand( time( 0 ) );
 
-			Camera camera;
-			camera.setPosition( glm::vec3( 0.0f, 0.0f, -10.0f ) );
-			camera.updatePerspective( WINDOW_WIDTH, WINDOW_HEIGHT );
-
-			Shader shader;
-			if( !shader.load( "./assets/shaders/chunk.vs", 
-						nullptr,
-						"./assets/shaders/chunk.fs" ) )
-				printf( "Failed to load shader.\n" );
-
-			GLint viewMatrixLocation = shader.getLocation( "viewMatrix" );
-			GLint projectionMatrixLocation = shader.getLocation( "projectionMatrix" );
-			GLint diffuseMapLocation = shader.getLocation( "diffuseMap" );
-
 			Texture texture;
 			if( !texture.load( "./assets/textures/blocks.dds" ) )
 				printf( "Failed to load texture.\n" );
 			else
 				texture.upload();
 
-			Texture fontTexture;
-			if( !fontTexture.load( "./assets/fonts/verdana12.dds" ) )
-				printf( "Failed to load font texture.\n" );
-			else
-				fontTexture.upload();
-
 			Font font;
-			if( !font.load( "./assets/fonts/verdana12.bin" ) )
+			if( font.load( "./assets/fonts/verdana12.bin", "./assets/fonts/verdana12.dds" ) )
+			{
+				font.upload();
+			}
+			else
 				printf( "Failed to load font.\n" );
-
-			ChunkRenderer chunkRenderer;
-			chunkRenderer.load( &shader );
 
 			Chunk chunks[8];
 			for( int y=0; y<2; y++ )
@@ -70,6 +52,10 @@ int main( int argc, char* argv[] )
 					}
 				}
 			}
+
+			Graphics graphics;
+			graphics.load();
+			graphics.getChunkCamera().setPosition( glm::vec3( 0.0f, 0.0f, -10.0f ) );
 
 			Input input;
 
@@ -97,7 +83,7 @@ int main( int argc, char* argv[] )
 				if( input.buttonDown( SDL_BUTTON_LEFT ) )
 				{
 					Point mouseDelta = input.getMouseDelta();
-					camera.updateDirection( mouseDelta.x, mouseDelta.y );
+					graphics.getChunkCamera().updateDirection( mouseDelta.x, mouseDelta.y );
 				}
 
 				glm::vec3 cameraMovement;
@@ -110,7 +96,7 @@ int main( int argc, char* argv[] )
 				if( input.keyDown( SDL_SCANCODE_A ) )
 					cameraMovement.x -= 1.0f;
 				if( glm::length( cameraMovement ) > 0 )
-					camera.updatePosition( cameraMovement );
+					graphics.getChunkCamera().updatePosition( cameraMovement );
 
 				// update
 
@@ -118,12 +104,8 @@ int main( int argc, char* argv[] )
 				glClearColor( 0.0f, 0.0f, 1.0f, 0.0f );
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-				shader.bind();
+				graphics.begin();
 				texture.bind();
-
-				shader.setMat4( viewMatrixLocation, camera.getViewMatrix() );
-				shader.setMat4( projectionMatrixLocation, camera.getProjectionMatrix() );
-				shader.setInt( diffuseMapLocation, 0 );
 
 				for( int y = 0; y<2; y++ )
 				{
@@ -131,10 +113,14 @@ int main( int argc, char* argv[] )
 					{
 						for( int z = 0; z<2; z++ )
 						{
-							chunkRenderer.render( &chunks[y*2*2+x*2+z] );
+							//chunkRenderer.render( &chunks[y*2*2+x*2+z] );
+							graphics.renderChunk( &chunks[y*2*2+x*2+z] );
 						}
 					}
 				}
+
+				graphics.renderText( &font, "Testing...", glm::vec3( 32, 32, 0.0f ) );
+				graphics.end();
 
 				SDL_GL_SwapWindow( window );
 
