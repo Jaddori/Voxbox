@@ -254,7 +254,7 @@ void Graphics::renderChunk( Chunk* chunk )
 
 void Graphics::renderText( Font* font, const char* text, const glm::vec2& position, const glm::vec4& color )
 {
-	const float NEGATIVE_PADDING = -4.0f;
+	const float NEGATIVE_PADDING = -5.0f;
 
 	glm::vec2 offset;
 
