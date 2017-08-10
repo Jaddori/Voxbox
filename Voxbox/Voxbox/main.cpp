@@ -135,8 +135,10 @@ int main( int argc, char* argv[] )
 					{
 						for( int z = 0; z<2; z++ )
 						{
-							//chunkRenderer.render( &chunks[y*2*2+x*2+z] );
-							graphics.renderChunk( &chunks[y*2*2+x*2+z] );
+							if( graphics.getChunkCamera().getFrustum().intersectCube( glm::vec3( x, y, z ), 1.0f ) > Frustum::OUTSIDE )
+							{
+								graphics.renderChunk( &chunks[y*2*2+x*2+z] );
+							}
 						}
 					}
 				}
