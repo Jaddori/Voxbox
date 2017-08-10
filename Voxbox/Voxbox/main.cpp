@@ -80,6 +80,8 @@ int main( int argc, char* argv[] )
 
 			Input input;
 
+			Frustum cameraFrustum;
+
 			long fpsTimer = SDL_GetTicks();
 			int fps = 0;
 
@@ -125,6 +127,12 @@ int main( int argc, char* argv[] )
 				if( input.keyReleased( SDL_SCANCODE_SPACE ) )
 					LOG( VERBOSITY_DEBUG, "main.cpp - User pressed the spacebar." );
 
+				if( input.keyReleased( SDL_SCANCODE_F ) )
+				{
+					LOG( VERBOSITY_DEBUG, "main.cpp - Getting camera frustum." );
+					cameraFrustum = graphics.getChunkCamera().getFrustum();
+				}
+
 				// update
 
 				// render
@@ -134,19 +142,84 @@ int main( int argc, char* argv[] )
 				graphics.begin();
 				texture.bind();
 
-				for( int y = 0; y<2; y++ )
+				const Frustum& frustum = graphics.getChunkCamera().getFrustum();
+
+				for( int y = 0; y<1; y++ )
 				{
-					for( int x = 0; x<2; x++ )
+					for( int x = 0; x<1; x++ )
 					{
-						for( int z = 0; z<2; z++ )
+						for( int z = 0; z<1; z++ )
 						{
-							//graphics.renderChunk( &chunks[y*2*2+x*2+z] );
+							glm::vec3 chunkPosition( x*CHUNK_SIZE, y*CHUNK_SIZE, z*CHUNK_SIZE );
+							if( graphics.getChunkCamera().getFrustum().intersectCube( chunkPosition, CHUNK_SIZE ) )
+							{
+								graphics.renderChunk( &chunks[y*2*2+x*2+z] );
+								printf("DARWIGN\n");
+							}
+							else
+								printf("NOIT WARNIGN\n");
+							
+							/*DebugAABB aabb =
+							{
+								glm::vec3( x, y, z )*(float)CHUNK_SIZE,
+								glm::vec3( x+1.0f, y+1.0f, z+1.0f )*(float)CHUNK_SIZE,
+								glm::vec4( 0.0f, 1.0f, 0.0f, 1.0f )
+							};
+
+							debugShapes.addAABB( aabb );*/
+
+							glm::vec4 green( 0.0f, 1.0f, 0.0f, 1.0f );
+							glm::vec4 red( 1.0f, 0.0f, 0.0f, 1.0f );
+
+							DebugLine line;
+							line.start = glm::vec3( x, y, z ) * (float)CHUNK_SIZE;
+							line.end = line.start + glm::vec3( 0.0f, 0.5f, 0.0f );
+							line.color = ( frustum.intersectPoint( line.start ) > Frustum::OUTSIDE ? green : red );
+
+							debugShapes.addLine( line );
+
+							line.start.x += CHUNK_SIZE;
+							line.end.x += CHUNK_SIZE;
+							line.color = ( frustum.intersectPoint( line.start ) > Frustum::OUTSIDE ? green : red );
+							debugShapes.addLine( line );
+
+							line.start.z += CHUNK_SIZE;
+							line.end.z += CHUNK_SIZE;
+							line.color = ( frustum.intersectPoint( line.start ) > Frustum::OUTSIDE ? green : red );
+							debugShapes.addLine( line );
+
+							line.start.x -= CHUNK_SIZE;
+							line.end.x -= CHUNK_SIZE;
+							line.color = ( frustum.intersectPoint( line.start ) > Frustum::OUTSIDE ? green : red );
+							debugShapes.addLine( line );
+
+							line.start = glm::vec3( x, y+1, z ) * (float)CHUNK_SIZE;
+							line.end = line.start + glm::vec3( 0.0f, 0.5f, 0.0f );
+							line.color = ( frustum.intersectPoint( line.start ) > Frustum::OUTSIDE ? green : red );
+							debugShapes.addLine( line );
+
+							line.start.x += CHUNK_SIZE;
+							line.end.x += CHUNK_SIZE;
+							line.color = ( frustum.intersectPoint( line.start ) > Frustum::OUTSIDE ? green : red );
+							debugShapes.addLine( line );
+
+							line.start.z += CHUNK_SIZE;
+							line.end.z += CHUNK_SIZE;
+							line.color = ( frustum.intersectPoint( line.start ) > Frustum::OUTSIDE ? green : red );
+							debugShapes.addLine( line );
+
+							line.start.x -= CHUNK_SIZE;
+							line.end.x -= CHUNK_SIZE;
+							line.color = ( frustum.intersectPoint( line.start ) > Frustum::OUTSIDE ? green : red );
+							debugShapes.addLine( line );
 						}
 					}
 				}
 
+				cameraFrustum.addDebugLines( debugShapes );
+
 				debugShapes.finalize();
-				debugShapes.render( &graphics.getChunkCamera() );
+				debugShapes.render( graphics.getChunkCamera().getProjectionMatrix(), graphics.getChunkCamera().getViewMatrix() );
 
 				console.render( &graphics );
 

@@ -162,11 +162,8 @@ void DebugShapes::unload()
 {
 }
 
-void DebugShapes::render( Camera* camera )
+void DebugShapes::render( const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix )
 {
-	const glm::mat4& projectionMatrix = camera->getProjectionMatrix();
-	const glm::mat4& viewMatrix = camera->getViewMatrix();
-
 	const int NUM_LINES = finalLines.getSize();
 	const int NUM_SPHERES = finalSpheres.getSize();
 	const int NUM_AABB = finalAABBs.getSize();
@@ -239,6 +236,11 @@ void DebugShapes::finalize()
 	finalSpheres.fastCopy( spheres );
 	finalAABBs.fastCopy( AABBs );
 	finalOBBs.fastCopy( OBBs );
+
+	lines.clear();
+	spheres.clear();
+	AABBs.clear();
+	OBBs.clear();
 }
 
 void DebugShapes::addLine( const DebugLine& line )

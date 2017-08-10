@@ -1,10 +1,11 @@
 #include "Camera.h"
 
 Camera::Camera()
-	: position( 0.0f ), direction( 0.0f, 0.0f, 1.0f ),
+	: position( 0.0f ), direction( 0.0f, 0.0f, 1.0f ), up( 0.0f, 1.0f, 0.0f ),
 	dirtyViewMatrix( true ), dirtyFrustum( true ),
 	horizontalAngle( 0.0f ), verticalAngle( 0.0f )
 {
+	frustum.setCameraParameters( CAMERA_FOV, (float)WINDOW_WIDTH/(float)WINDOW_HEIGHT, CAMERA_NEAR, CAMERA_FAR );
 }
 
 Camera::~Camera()
@@ -63,6 +64,15 @@ void Camera::updateDirection( int deltaX, int deltaY )
 		glm::cos( verticalAngle ) * glm::cos( horizontalAngle )
 	);
 
+	// calculate up vector
+	glm::vec3 right = glm::vec3(
+		glm::sin( horizontalAngle - 3.14f * 0.5f ),
+		0,
+		glm::cos( horizontalAngle - 3.14f * 0.5f )
+	);
+
+	up = glm::cross( right, direction );
+
 	dirtyViewMatrix = true;
 	dirtyFrustum = true;
 }
@@ -97,6 +107,7 @@ const Frustum& Camera::getFrustum()
 	{
 		glm::mat4 vp = getViewMatrix() * getProjectionMatrix();
 		frustum.extractPlanes( vp );
+		frustum.extractCorners( position, direction, up );
 
 		dirtyFrustum = false;
 	}
@@ -134,17 +145,44 @@ Frustum::Frustum()
 {
 }
 
+Frustum::Frustum( const Frustum& ref )
+{
+	memcpy( planes, ref.planes, sizeof(glm::vec4)*FRUSTUM_NUM_PLANES );
+	memcpy( corners, ref.corners, sizeof(glm::vec3)*FRUSTUM_NUM_CORNERS );
+}
+
 Frustum::~Frustum()
 {
+}
+
+Frustum& Frustum::operator=( const Frustum& ref )
+{
+	memcpy( planes, ref.planes, sizeof(glm::vec4)*FRUSTUM_NUM_PLANES );
+	memcpy( corners, ref.corners, sizeof(glm::vec3)*FRUSTUM_NUM_CORNERS );
+	return *this;
+}
+
+void Frustum::setCameraParameters( float f, float ar, float nd, float fd )
+{
+	fov = f;
+	aspectRatio = ar;
+	nearDistance = nd;
+	farDistance = fd;
+
+	float tang = (float)tan( fov * glm::radians<float>( 1.0f ) * 0.5f );
+	nearHeight = nearDistance * tang;
+	nearWidth = nearHeight * aspectRatio;
+	farHeight = farDistance * tang;
+	farWidth = farHeight * aspectRatio;
 }
 
 void Frustum::extractPlanes( const glm::mat4& vp )
 {
 	// Left clipping plane
-	planes[0].x = vp[0][3] + vp[0][0];
-	planes[0].y = vp[1][3] + vp[1][0];
-	planes[0].z = vp[2][3] + vp[2][0];
-	planes[0].w = vp[3][3] + vp[3][0];
+	/*planes[0].x = vp[0][3] + vp[0][2];
+	planes[0].y = vp[1][3] + vp[1][2];
+	planes[0].z = vp[2][3] + vp[2][2];
+	planes[0].w = vp[3][3] + vp[3][2];
 
 	// Right clipping plane
 	planes[1].x = vp[0][3] - vp[0][0];
@@ -174,10 +212,98 @@ void Frustum::extractPlanes( const glm::mat4& vp )
 	planes[5].x = vp[0][3] - vp[0][2];
 	planes[5].y = vp[1][3] - vp[1][2];
 	planes[5].z = vp[2][3] - vp[2][2];
-	planes[5].w = vp[3][3] - vp[3][2];
+	planes[5].w = vp[3][3] - vp[3][2];*/
+
+	// Left clipping plane
+	planes[0].x = vp[3][0] + vp[0][0];
+	planes[0].y = vp[3][1] + vp[0][1];
+	planes[0].z = vp[3][2] + vp[0][2];
+	planes[0].w = vp[3][3] + vp[0][3];
+
+	// Right clipping plane
+	planes[1].x = vp[3][0] - vp[0][0];
+	planes[1].y = vp[3][1] - vp[0][1];
+	planes[1].z = vp[3][2] - vp[0][2];
+	planes[1].w = vp[3][3] - vp[0][3];
+
+	// Top clipping plane
+	planes[2].x = vp[3][0] - vp[1][0];
+	planes[2].y = vp[3][1] - vp[1][1];
+	planes[2].z = vp[3][2] - vp[1][2];
+	planes[2].w = vp[3][3] - vp[1][3];
+
+	// Bottom clipping plane
+	planes[3].x = vp[3][0] + vp[1][0];
+	planes[3].y = vp[3][1] + vp[1][1];
+	planes[3].z = vp[3][2] + vp[1][2];
+	planes[3].w = vp[3][3] + vp[1][3];
+
+	// Near clipping plane
+	planes[4].x = vp[3][0] + vp[2][0];
+	planes[4].y = vp[3][1] + vp[2][1];
+	planes[4].z = vp[3][2] + vp[2][2];
+	planes[4].w = vp[3][3] + vp[2][3];
+
+	// Far clipping plane
+	planes[5].x = vp[3][0] - vp[2][0];
+	planes[5].y = vp[3][1] - vp[2][1];
+	planes[5].z = vp[3][2] - vp[2][2];
+	planes[5].w = vp[3][3] - vp[2][3];
 
 	for( int i=0; i<6; i++ )
-		planes[i] = glm::normalize( planes[i] );
+	{
+		//planes[i] = glm::normalize( planes[i] );
+		glm::vec3 normal = glm::normalize( glm::vec3( planes[i].x, planes[i].y, planes[i].z ) );
+		planes[i].x = normal.x;
+		planes[i].y = normal.y;
+		planes[i].z = normal.z;
+	}
+}
+
+void Frustum::extractCorners( const glm::vec3& position, const glm::vec3& direction, const glm::vec3& up )
+{
+	glm::vec3 nearCenter, farCenter, x, y, z;
+
+	//compute z axis of camera, opposite direction from the looking direction
+	z = -direction;
+
+	// x axis of camera with given up vector and z axis
+	x = glm::normalize(glm::cross(up, z));
+
+	//y the real "up vector" is the cross product of Z and X
+	y = glm::normalize(glm::cross(z, x));
+
+	// compute near and far planes
+	nearCenter = position - (z * nearDistance);
+	farCenter = position - (z * farDistance);
+
+	//compute 4 corners of near plane
+	nearTopLeft = nearCenter + (y * nearHeight) - (x * nearWidth);
+	nearTopRight = nearCenter + (y * nearHeight) + (x * nearWidth);
+	nearBottomLeft = nearCenter - (y * nearHeight) - (x * nearWidth);
+	nearBottomRight = nearCenter - (y * nearHeight) + (x * nearWidth);
+
+	// compute 4 corners of far plane
+	farTopLeft = farCenter + (y * farHeight) - (x * farWidth);
+	farTopRight = farCenter + (y * farHeight) + (x * farWidth);
+	farBottomLeft = farCenter - (y * farHeight) - (x * farWidth);
+	farBottomRight = farCenter - (y * farHeight) + (x * farWidth);
+}
+
+int Frustum::intersectPoint( const glm::vec3& point ) const
+{
+	int result = INSIDE;
+
+	for( int i=0; i<FRUSTUM_NUM_PLANES && result == INSIDE; i++ )
+	{
+		glm::vec3 planeNormal( planes[i].x, planes[i].y, planes[i].z );
+		float dist = glm::dot( planeNormal, point ) + planes[i].w;
+
+		if( dist < 0.0f )
+			result = OUTSIDE;
+	}
+
+	return result;
 }
 
 int Frustum::intersectSphere( const glm::vec3& center, float radius ) const
@@ -238,4 +364,65 @@ int Frustum::intersectCube( const glm::vec3& position, float radius ) const
 	if(totalInside == 6 )
 		return INTERSECT;
 	return INSIDE;
+}
+
+void Frustum::addDebugLines( DebugShapes& shapes )
+{
+	DebugLine line;
+	line.color = glm::vec4( 1.0f, 1.0f, 0.0f, 1.0f );
+
+	// near quad
+	line.start = nearTopLeft;
+	line.end = nearTopRight;
+	shapes.addLine( line );
+
+	line.start = nearBottomRight;
+	shapes.addLine( line );
+
+	line.end = nearBottomLeft;
+	shapes.addLine( line );
+
+	line.start = nearTopLeft;
+	shapes.addLine( line );
+
+	// far quad
+	line.start = farTopLeft;
+	line.end = farTopRight;
+	shapes.addLine( line );
+
+	line.start = farBottomRight;
+	shapes.addLine( line );
+
+	line.end = farBottomLeft;
+	shapes.addLine( line );
+
+	line.start = farTopLeft;
+	shapes.addLine( line );
+
+	// connectors
+	line.start = nearTopLeft;
+	line.end = farTopLeft;
+	shapes.addLine( line );
+
+	line.start = nearTopRight;
+	line.end = farTopRight;
+	shapes.addLine( line );
+
+	line.start = nearBottomLeft;
+	line.end = farBottomLeft;
+	shapes.addLine( line );
+
+	line.start = nearBottomRight;
+	line.end = farBottomRight;
+	shapes.addLine( line );
+}
+
+const glm::vec4* Frustum::getPlanes() const
+{
+	return planes;
+}
+
+const glm::vec3* Frustum::getCorners() const
+{
+	return corners;
 }

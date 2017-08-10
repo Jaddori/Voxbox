@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BaseIncludes.h"
-#include "Camera.h"
 #include "Shader.h"
 
 #define DEBUG_SHAPES_MAX_LINES 128
@@ -50,7 +49,7 @@ public:
 	void upload();
 	void unload();
 
-	void render( Camera* camera );
+	void render( const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix );
 	void finalize();
 
 	void addLine( const DebugLine& line );
