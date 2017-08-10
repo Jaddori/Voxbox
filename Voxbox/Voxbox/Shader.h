@@ -29,9 +29,11 @@ public:
 	inline void setMat4( GLint location, const glm::mat4* values, int n ) { glUniformMatrix4fv( location, n, GL_FALSE, glm::value_ptr( *values ) ); }
 
 	GLuint getProgram() const;
+	bool getValid() const;
 
 private:
 	GLuint loadShader( const char* path, GLenum type );
 
 	GLuint program;
+	bool valid;
 };

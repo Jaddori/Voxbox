@@ -1,7 +1,7 @@
 #include "Shader.h"
 
 Shader::Shader()
-	: program( 0 )
+	: program( 0 ), valid( false )
 {
 }
 
@@ -13,7 +13,7 @@ bool Shader::load( const char* vertex, const char* geometry, const char* fragmen
 {
 	LOG( VERBOSITY_INFORMATION, "Shader.cpp - Loading:" );
 
-	bool result = true;
+	valid = true;
 
 	unload();
 
@@ -21,28 +21,37 @@ bool Shader::load( const char* vertex, const char* geometry, const char* fragmen
 	GLuint geometryShader = loadShader( geometry, GL_GEOMETRY_SHADER );
 	GLuint fragmentShader = loadShader( fragment, GL_FRAGMENT_SHADER );
 
-	program = glCreateProgram();
-	if( vertexShader )
-		glAttachShader( program, vertexShader );
-	if( geometryShader )
-		glAttachShader( program, geometryShader );
-	if( fragmentShader )
-		glAttachShader( program, fragmentShader );
-	glLinkProgram( program );
-
-	GLint linkSuccess;
-	glGetProgramiv( program, GL_LINK_STATUS, &linkSuccess );
-	if( linkSuccess != GL_TRUE )
+	if( vertex && vertexShader == 0 )
+		valid = false;
+	else if( geometry && geometryShader == 0 )
+		valid = false;
+	else if( fragment && fragmentShader == 0 )
+		valid = false;
+	else
 	{
-		char logbuffer[1024] = {};
-		int len = 1024;
-		glGetProgramInfoLog( program, 1024, &len, logbuffer );
-		LOG( VERBOSITY_WARNING, "%s", logbuffer );
+		program = glCreateProgram();
+		if( vertexShader )
+			glAttachShader( program, vertexShader );
+		if( geometryShader )
+			glAttachShader( program, geometryShader );
+		if( fragmentShader )
+			glAttachShader( program, fragmentShader );
+		glLinkProgram( program );
 
-		result = false;
+		GLint linkSuccess;
+		glGetProgramiv( program, GL_LINK_STATUS, &linkSuccess );
+		if( linkSuccess != GL_TRUE )
+		{
+			char logbuffer[1024] = {};
+			int len = 1024;
+			glGetProgramInfoLog( program, 1024, &len, logbuffer );
+			LOG( VERBOSITY_WARNING, "%s", logbuffer );
+
+			valid = false;
+		}
 	}
 
-	return result;
+	return valid;
 }
 
 void Shader::unload()
@@ -100,4 +109,9 @@ GLuint Shader::loadShader( const char* path, GLenum type )
 GLuint Shader::getProgram() const
 {
 	return program;
+}
+
+bool Shader::getValid() const
+{
+	return valid;
 }
