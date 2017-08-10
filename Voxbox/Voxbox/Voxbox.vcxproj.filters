@@ -55,6 +55,9 @@
     <ClCompile Include="Console.cpp">
       <Filter>Source Files\Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="DebugShapes.cpp">
+      <Filter>Source Files\Debug</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -89,6 +92,9 @@
     </ClInclude>
     <ClInclude Include="Console.h">
       <Filter>Source Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugShapes.h">
+      <Filter>Source Files\Debug</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
