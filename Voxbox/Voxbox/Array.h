@@ -43,8 +43,10 @@ public:
 		data[size++] = element;
 	}
 
-	T& addInPlace()
+	T& append()
 	{
+		if( size >= capacity )
+			expand( capacity * 2 );
 		return data[size++];
 	}
 
@@ -75,10 +77,56 @@ public:
 		return index;
 	}
 
+	void clear()
+	{
+		size = 0;
+	}
+
+	void copy( const Array& ref )
+	{
+		if( capacity < ref.capacity )
+		{
+			capacity = ref.capacity;
+
+			delete[] data;
+			data = new T[capacity];
+		}
+
+		size = ref.size;
+		for( int i=0; i<ref.size; i++ )
+			data[i] = ref.data[i];
+	}
+
+	void fastCopy( const Array& ref )
+	{
+		if( capacity < ref.capacity )
+		{
+			capacity = ref.capacity;
+
+			delete[] data;
+			data = new T[capacity];
+		}
+
+		size = ref.size;
+		memcpy( data, ref.data, sizeof(T)*ref.size );
+	}
+
 	T& at( int index )
 	{
 		assert( index >= 0 && index < size );
 		return data[index];
+	}
+
+	T& first()
+	{
+		assert( size > 0 );
+		return data[0];
+	}
+
+	T& last()
+	{
+		assert( size > 0 );
+		return data[size-1];
 	}
 
 	T* getData()

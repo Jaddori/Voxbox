@@ -6,11 +6,12 @@
 #include "Font.h"
 #include "Graphics.h"
 #include "Console.h"
+#include "DebugShapes.h"
 
 int main( int argc, char* argv[] )
 {
 	LOG_START( "./log.txt" );
-	LOG_INFORMATION();
+	LOG_WARNINGS();
 
 	SDL_Window* window = SDL_CreateWindow( "Voxbox", WINDOW_X, WINDOW_Y, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL );
 	if( window )
@@ -69,6 +70,10 @@ int main( int argc, char* argv[] )
 			graphics.load();
 			graphics.getChunkCamera().setPosition( glm::vec3( 0.0f, 0.0f, -10.0f ) );
 
+			DebugShapes debugShapes;
+			debugShapes.load();
+			debugShapes.upload();
+
 			Console console;
 			console.load();
 			//console.setVisible( true );
@@ -123,7 +128,7 @@ int main( int argc, char* argv[] )
 				// update
 
 				// render
-				glClearColor( 0.0f, 0.0f, 1.0f, 0.0f );
+				glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 				graphics.begin();
@@ -135,11 +140,13 @@ int main( int argc, char* argv[] )
 					{
 						for( int z = 0; z<2; z++ )
 						{
-							//chunkRenderer.render( &chunks[y*2*2+x*2+z] );
-							graphics.renderChunk( &chunks[y*2*2+x*2+z] );
+							//graphics.renderChunk( &chunks[y*2*2+x*2+z] );
 						}
 					}
 				}
+
+				debugShapes.finalize();
+				debugShapes.render( &graphics.getChunkCamera() );
 
 				console.render( &graphics );
 

@@ -4,6 +4,11 @@
 #include "Camera.h"
 #include "Shader.h"
 
+#define DEBUG_SHAPES_MAX_LINES 128
+#define DEBUG_SHAPES_MAX_SPHERES 128
+#define DEBUG_SHAPES_MAX_AABB 64
+#define DEBUG_SHAPES_MAX_OBB 32
+
 struct DebugLine
 {
 	glm::vec3 start;
