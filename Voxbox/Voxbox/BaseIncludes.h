@@ -6,6 +6,7 @@
 #include <string>
 #include <stdint.h>
 #include <ctime>
+#include <Windows.h>
 
 // Windowing
 #include "SDL.h"

@@ -8,6 +8,22 @@
 #include "Console.h"
 #include "DebugShapes.h"
 
+struct GenerationData
+{
+	int first, last;
+	Chunk* chunks;
+};
+
+DWORD WINAPI generateChunkFaces( LPVOID args )
+{
+	GenerationData* data = (GenerationData*)args;
+
+	for( int i=data->first; i<data->last; i++ )
+		data->chunks[i].calculateFaces();
+
+	return 0;
+}
+
 int main( int argc, char* argv[] )
 {
 	LOG_START( "./log.txt" );
@@ -53,36 +69,48 @@ int main( int argc, char* argv[] )
 			else
 				printf( "Failed to load font.\n" );
 
-			/*Chunk chunks[8];
-			for( int y=0; y<2; y++ )
-			{
-				for( int x=0; x<2; x++ )
-				{
-					for( int z=0; z<2; z++ )
-					{
-						chunks[y*2*2+x*2+z].calculatePositions();
-						chunks[y*2*2+x*2+z].setOffset( glm::vec3( x, y, z ) );
-					}
-				}
-			}*/
-
 			Graphics graphics;
 			graphics.load();
 			graphics.getChunkCamera().setPosition( glm::vec3( 0.0f, 0.0f, -10.0f ) );
 
-			const int CHUNK_WIDTH = 50;
-			const int CHUNK_DEPTH = 50;
+			const int CHUNK_WIDTH = 10;
+			const int CHUNK_DEPTH = 10;
+			const int NUM_CHUNKS = CHUNK_WIDTH * CHUNK_DEPTH;
+			Chunk* chunks = new Chunk[NUM_CHUNKS];
 
-			Chunk* chunks = new Chunk[CHUNK_WIDTH*CHUNK_DEPTH];
 			for( int x=0; x<CHUNK_WIDTH; x++ )
 			{
 				for( int z=0; z<CHUNK_DEPTH; z++ )
 				{
-					//chunks[x*10+z].noise( x*CHUNK_SIZE, z*CHUNK_SIZE );
-					//chunks[x*CHUNK_WIDTH+z].calculatePositions();
 					chunks[x*CHUNK_WIDTH+z].setOffset( glm::vec3( x, 0.0f, z ) );
-					chunks[x*CHUNK_WIDTH+z].upload();
 				}
+			}
+
+			const int NUM_THREADS = 4;
+			HANDLE threads[NUM_THREADS];
+
+			GenerationData threadData[NUM_THREADS];
+
+			int first = 0;
+			for( int i=0; i<NUM_THREADS; i++ )
+			{
+				int last = first + NUM_CHUNKS / NUM_THREADS;
+				if( last > NUM_CHUNKS )
+					last = NUM_CHUNKS;
+
+				threadData[i].first = first;
+				threadData[i].last = last;
+				threadData[i].chunks = chunks;
+				threads[i] = CreateThread( NULL, 0, generateChunkFaces, &threadData[i], 0, NULL );
+
+				first = last;
+			}
+
+			WaitForMultipleObjects( NUM_THREADS, threads, TRUE, INFINITE );
+
+			for( int i=0; i<NUM_CHUNKS; i++ )
+			{
+				chunks[i].upload();
 			}
 
 			DebugShapes debugShapes;
@@ -158,23 +186,6 @@ int main( int argc, char* argv[] )
 				texture.bind();
 
 				const Frustum& frustum = graphics.getChunkCamera().getFrustum();
-
-				/*for( int y = 0; y<2; y++ )
-				{
-					for( int x = 0; x<2; x++ )
-					{
-						for( int z = 0; z<2; z++ )
-						{
-							glm::vec3 minPosition = glm::vec3( x, y, z ) * (float)CHUNK_SIZE;
-							glm::vec3 maxPosition = glm::vec3( x+1, y+1, z+1 ) * (float)CHUNK_SIZE;
-							if( frustum.aabbCollision( minPosition, maxPosition ) )
-							{
-								graphics.renderChunk( &chunks[y*2*2+x*2+z] );
-								drawnChunks++;
-							}
-						}
-					}
-				}*/
 
 				long startChunkRenderTime = SDL_GetTicks();
 				for( int x=0; x<CHUNK_WIDTH; x++ )

@@ -22,6 +22,7 @@ public:
 	void unload();
 
 	void calculatePositions();
+	void calculateFaces();
 	void noise( int x, int z );
 	void render();
 
@@ -40,7 +41,11 @@ private:
 	glm::vec4 positions[CHUNK_VOLUME];
 	glm::vec3 offset;
 	int activeBlocks;
-	int curIndex;
+
+	Vertex* vertices;
+	GLuint* indices;
+	int numVertices;
+	int numIndices;
 
 	GLuint vao;
 	GLuint vbo;
