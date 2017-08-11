@@ -4,8 +4,22 @@ FrustumPlane::FrustumPlane()
 {
 }
 
+FrustumPlane::FrustumPlane( const FrustumPlane& ref )
+	: normal( ref.normal ), point( ref.point ), d( ref.d )
+{
+}
+
 FrustumPlane::~FrustumPlane()
 {
+}
+
+FrustumPlane& FrustumPlane::operator=( const FrustumPlane& ref )
+{
+	normal = ref.normal;
+	point = ref.point;
+	d = ref.d;
+
+	return *this;
 }
 
 void FrustumPlane::setPlane3Points(const glm::vec3& first, const glm::vec3& second, const glm::vec3& third)

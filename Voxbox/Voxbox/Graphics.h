@@ -26,6 +26,7 @@ public:
 	void renderQuad( const glm::vec2& position, const glm::vec2& size, Texture* texture, float opacity );
 
 	Camera& getChunkCamera();
+	Camera& getTextCamera();
 
 private:
 	// rendering chunks

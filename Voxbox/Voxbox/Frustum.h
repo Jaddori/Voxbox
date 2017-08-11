@@ -7,7 +7,10 @@ class FrustumPlane
 {
 public:
 	FrustumPlane();
+	FrustumPlane( const FrustumPlane& ref );
 	~FrustumPlane();
+
+	FrustumPlane& operator=( const FrustumPlane& ref );
 
 	void setPlane3Points( const glm::vec3& first, const glm::vec3& second, const glm::vec3& third );
 	void setNormalAndPoint( const glm::vec3& normal, const glm::vec3& point );

@@ -130,14 +130,14 @@ void Graphics::unload()
 void Graphics::begin()
 {
 	chunkShader.bind();
-	chunkShader.setMat4( chunkViewMatrixLocation, chunkCamera.getViewMatrix() );
-	chunkShader.setMat4( chunkProjectionMatrixLocation, chunkCamera.getProjectionMatrix() );
+	chunkShader.setMat4( chunkViewMatrixLocation, chunkCamera.getFinalViewMatrix() );
+	chunkShader.setMat4( chunkProjectionMatrixLocation, chunkCamera.getFinalProjectionMatrix() );
 
 	textShader.bind();
-	textShader.setMat4( textProjectionMatrixLocation, textCamera.getProjectionMatrix() );
+	textShader.setMat4( textProjectionMatrixLocation, textCamera.getFinalProjectionMatrix() );
 
 	quadShader.bind();
-	quadShader.setMat4( quadProjectionMatrixLocation, textCamera.getProjectionMatrix() );
+	quadShader.setMat4( quadProjectionMatrixLocation, textCamera.getFinalProjectionMatrix() );
 }
 
 void Graphics::end()
@@ -239,4 +239,9 @@ void Graphics::renderQuad( const glm::vec2& position, const glm::vec2& size, Tex
 Camera& Graphics::getChunkCamera()
 {
 	return chunkCamera;
+}
+
+Camera& Graphics::getTextCamera()
+{
+	return textCamera;
 }

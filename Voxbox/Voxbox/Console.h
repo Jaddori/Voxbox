@@ -16,6 +16,7 @@ public:
 
 	bool load();
 	void unload();
+	void finalize();
 
 	void toggle();
 	void render( Graphics* graphics );
@@ -25,4 +26,7 @@ public:
 private:
 	Font font;
 	bool visible;
+
+	Array<LogMessage> finalMessages;
+	int finalThreshold;
 };

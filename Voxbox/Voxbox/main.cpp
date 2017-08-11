@@ -7,6 +7,9 @@
 #include "Graphics.h"
 #include "Console.h"
 #include "DebugShapes.h"
+#include "CoreData.h"
+
+#define THREAD_UPDATE_WAIT 1000
 
 struct GenerationData
 {
@@ -20,6 +23,57 @@ DWORD WINAPI generateChunkFaces( LPVOID args )
 
 	for( int i=data->first; i<data->last; i++ )
 		data->chunks[i].calculateFaces();
+
+	return 0;
+}
+
+struct ThreadData
+{
+	CoreData* coreData;
+	bool running;
+	HANDLE updateDone;
+	HANDLE renderDone;
+};
+
+DWORD WINAPI update( LPVOID args )
+{
+	ThreadData* data = (ThreadData*)args;
+
+	while( data->running )
+	{
+		DWORD result = WaitForSingleObject( data->renderDone, THREAD_UPDATE_WAIT );
+		if( result == WAIT_OBJECT_0 )
+		{
+			if( data->coreData->input->keyReleased( SDL_SCANCODE_ESCAPE ) )
+				data->running = false;
+
+			if( data->coreData->input->buttonDown( SDL_BUTTON_LEFT ) )
+			{
+				Point mouseDelta = data->coreData->input->getMouseDelta();
+				data->coreData->perspectiveCamera->updateDirection( mouseDelta.x, mouseDelta.y );
+			}
+
+			glm::vec3 cameraMovement;
+			if( data->coreData->input->keyDown( SDL_SCANCODE_W ) )
+				cameraMovement.z += 1.0f;
+			if( data->coreData->input->keyDown( SDL_SCANCODE_S ) )
+				cameraMovement.z -= 1.0f;
+			if( data->coreData->input->keyDown( SDL_SCANCODE_D ) )
+				cameraMovement.x += 1.0f;
+			if( data->coreData->input->keyDown( SDL_SCANCODE_A ) )
+				cameraMovement.x -= 1.0f;
+			if( glm::length( cameraMovement ) > 0 )
+				data->coreData->perspectiveCamera->updatePosition( cameraMovement );
+
+			if( data->coreData->input->keyReleased( SDL_SCANCODE_GRAVE ) )
+				data->coreData->console->toggle();
+
+			if( data->coreData->input->keyReleased( SDL_SCANCODE_SPACE ) )
+				LOG( VERBOSITY_DEBUG, "main.cpp - User pressed the spacebar." );
+
+			ReleaseSemaphore( data->updateDone, 1, NULL );
+		}
+	}
 
 	return 0;
 }
@@ -89,7 +143,7 @@ int main( int argc, char* argv[] )
 			const int NUM_THREADS = 4;
 			HANDLE threads[NUM_THREADS];
 
-			GenerationData threadData[NUM_THREADS];
+			GenerationData generationData[NUM_THREADS];
 
 			int first = 0;
 			for( int i=0; i<NUM_THREADS; i++ )
@@ -98,10 +152,10 @@ int main( int argc, char* argv[] )
 				if( last > NUM_CHUNKS )
 					last = NUM_CHUNKS;
 
-				threadData[i].first = first;
-				threadData[i].last = last;
-				threadData[i].chunks = chunks;
-				threads[i] = CreateThread( NULL, 0, generateChunkFaces, &threadData[i], 0, NULL );
+				generationData[i].first = first;
+				generationData[i].last = last;
+				generationData[i].chunks = chunks;
+				threads[i] = CreateThread( NULL, 0, generateChunkFaces, &generationData[i], 0, NULL );
 
 				first = last;
 			}
@@ -125,55 +179,44 @@ int main( int argc, char* argv[] )
 
 			Frustum cameraFrustum;
 
+			CoreData coreData;
+			coreData.perspectiveCamera = &graphics.getChunkCamera();
+			coreData.input = &input;
+			coreData.console = &console;
+			coreData.chunks = chunks;
+
+			ThreadData threadData;
+			threadData.coreData = &coreData;
+			threadData.running = true;
+			threadData.updateDone = CreateSemaphore( NULL, 0, 1, NULL );
+			threadData.renderDone = CreateSemaphore( NULL, 1, 1, NULL );
+			HANDLE updateThread = CreateThread( NULL, 0, update, &threadData, 0, NULL );
+
 			long fpsTimer = SDL_GetTicks();
 			int fps = 0;
 
-			bool running = true;
-			while( running )
+			while( threadData.running )
 			{
-				input.reset();
-
-				// events
-				SDL_Event e;
-				while( SDL_PollEvent( &e ) )
+				if( WaitForSingleObject( threadData.updateDone, INFINITE ) == WAIT_OBJECT_0 )
 				{
-					if( e.type == SDL_QUIT )
-						running = false;
+					input.reset();
 
-					input.update( &e );
-				}
-				
-				if( input.keyReleased( SDL_SCANCODE_ESCAPE ) )
-					running = false;
+					// events
+					SDL_Event e;
+					while( SDL_PollEvent( &e ) )
+					{
+						if( e.type == SDL_QUIT )
+							threadData.running = false;
 
-				if( input.buttonDown( SDL_BUTTON_LEFT ) )
-				{
-					Point mouseDelta = input.getMouseDelta();
-					graphics.getChunkCamera().updateDirection( mouseDelta.x, mouseDelta.y );
-				}
+						input.update( &e );
+					}
 
-				glm::vec3 cameraMovement;
-				if( input.keyDown( SDL_SCANCODE_W ) )
-					cameraMovement.z += 1.0f;
-				if( input.keyDown( SDL_SCANCODE_S ) )
-					cameraMovement.z -= 1.0f;
-				if( input.keyDown( SDL_SCANCODE_D ) )
-					cameraMovement.x += 1.0f;
-				if( input.keyDown( SDL_SCANCODE_A ) )
-					cameraMovement.x -= 1.0f;
-				if( glm::length( cameraMovement ) > 0 )
-					graphics.getChunkCamera().updatePosition( cameraMovement );
+					// finalize objects
+					graphics.getChunkCamera().finalize();
+					graphics.getTextCamera().finalize();
+					console.finalize();
 
-				if( input.keyReleased( SDL_SCANCODE_GRAVE ) )
-					console.toggle();
-
-				if( input.keyReleased( SDL_SCANCODE_SPACE ) )
-					LOG( VERBOSITY_DEBUG, "main.cpp - User pressed the spacebar." );
-
-				if( input.keyReleased( SDL_SCANCODE_F ) )
-				{
-					LOG( VERBOSITY_DEBUG, "main.cpp - Getting camera frustum." );
-					cameraFrustum = graphics.getChunkCamera().getFrustum();
+					ReleaseSemaphore( threadData.renderDone, 1, NULL );
 				}
 
 				// update
@@ -185,7 +228,7 @@ int main( int argc, char* argv[] )
 				graphics.begin();
 				texture.bind();
 
-				const Frustum& frustum = graphics.getChunkCamera().getFrustum();
+				const Frustum& frustum = graphics.getChunkCamera().getFinalFrustum();
 
 				long startChunkRenderTime = SDL_GetTicks();
 				for( int x=0; x<CHUNK_WIDTH; x++ )
@@ -208,7 +251,7 @@ int main( int argc, char* argv[] )
 				cameraFrustum.addDebugLines( debugShapes );
 
 				debugShapes.finalize();
-				debugShapes.render( graphics.getChunkCamera().getProjectionMatrix(), graphics.getChunkCamera().getViewMatrix() );
+				debugShapes.render( graphics.getChunkCamera().getFinalProjectionMatrix(), graphics.getChunkCamera().getFinalViewMatrix() );
 
 				console.render( &graphics );
 
@@ -217,7 +260,7 @@ int main( int argc, char* argv[] )
 				SDL_GL_SwapWindow( window );
 
 				long ticks = SDL_GetTicks();
-				if( ticks - fpsTimer > 1000 )
+				/*if( ticks - fpsTimer > 1000 )
 				{
 					printf( "Fps: %d\n", fps );
 
@@ -225,8 +268,11 @@ int main( int argc, char* argv[] )
 					fps = 0;
 				}
 				else
-					fps++;
+					fps++;*/
 			}
+
+			LOG( VERBOSITY_INFORMATION, "main.cpp - Waiting for update thread to finish." );
+			WaitForSingleObject( updateThread, INFINITE );
 
 			LOG( VERBOSITY_INFORMATION, "main.cpp - Deleting OpenGL context." );
 			SDL_GL_DeleteContext( context );

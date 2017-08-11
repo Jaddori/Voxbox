@@ -12,6 +12,18 @@ Camera::~Camera()
 {
 }
 
+void Camera::finalize()
+{
+	finalFrustum = getFrustum();
+
+	finalPosition = position;
+	finalDirection = direction;
+	finalUp = up;
+
+	finalViewMatrix = getViewMatrix();
+	finalProjectionMatrix = getProjectionMatrix();
+}
+
 void Camera::updatePosition( const glm::vec3& localMovement )
 {
 	// move backwards and forwards
@@ -140,4 +152,29 @@ const glm::vec3& Camera::getPosition() const
 const glm::vec3& Camera::getDirection() const
 {
 	return direction;
+}
+
+const Frustum& Camera::getFinalFrustum() const
+{
+	return finalFrustum;
+}
+
+const glm::vec3& Camera::getFinalPosition() const
+{
+	return finalPosition;
+}
+
+const glm::vec3& Camera::getFinalDirection() const
+{
+	return finalDirection;
+}
+
+const glm::mat4& Camera::getFinalViewMatrix() const
+{
+	return finalViewMatrix;
+}
+
+const glm::mat4& Camera::getFinalProjectionMatrix() const
+{
+	return finalProjectionMatrix;
 }

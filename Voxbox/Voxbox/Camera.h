@@ -10,6 +10,8 @@ public:
 	Camera();
 	~Camera();
 
+	void finalize();
+
 	void updatePosition( const glm::vec3& localMovement );
 	void updateDirection( int deltaX, int deltaY );
 	void updatePerspective( float width, float height );
@@ -19,10 +21,16 @@ public:
 	void setDirection( const glm::vec3& direction );
 
 	const Frustum& getFrustum();
-	const glm::mat4& getViewMatrix();
-	const glm::mat4& getProjectionMatrix() const;
 	const glm::vec3& getPosition() const;
 	const glm::vec3& getDirection() const;
+	const glm::mat4& getViewMatrix();
+	const glm::mat4& getProjectionMatrix() const;
+
+	const Frustum& getFinalFrustum() const;
+	const glm::vec3& getFinalPosition() const;
+	const glm::vec3& getFinalDirection() const;
+	const glm::mat4& getFinalViewMatrix() const;
+	const glm::mat4& getFinalProjectionMatrix() const;
 
 private:
 	Frustum frustum;
@@ -39,4 +47,14 @@ private:
 
 	bool dirtyViewMatrix;
 	bool dirtyFrustum;
+
+	// final states
+	Frustum finalFrustum;
+
+	glm::vec3 finalPosition;
+	glm::vec3 finalDirection;
+	glm::vec3 finalUp;
+
+	glm::mat4 finalViewMatrix;
+	glm::mat4 finalProjectionMatrix;
 };
