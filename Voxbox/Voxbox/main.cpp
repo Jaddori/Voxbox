@@ -79,9 +79,9 @@ int main( int argc, char* argv[] )
 				for( int z=0; z<CHUNK_DEPTH; z++ )
 				{
 					//chunks[x*10+z].noise( x*CHUNK_SIZE, z*CHUNK_SIZE );
-					chunks[x*CHUNK_WIDTH+z].calculatePositions();
-					chunks[x*CHUNK_WIDTH+z].upload();
+					//chunks[x*CHUNK_WIDTH+z].calculatePositions();
 					chunks[x*CHUNK_WIDTH+z].setOffset( glm::vec3( x, 0.0f, z ) );
+					chunks[x*CHUNK_WIDTH+z].upload();
 				}
 			}
 
@@ -192,7 +192,7 @@ int main( int argc, char* argv[] )
 				}
 				long endChunkRenderTime = SDL_GetTicks();
 
-				printf( "%d ms\n", endChunkRenderTime-startChunkRenderTime );
+				//printf( "%d ms\n", endChunkRenderTime-startChunkRenderTime );
 
 				cameraFrustum.addDebugLines( debugShapes );
 
@@ -208,7 +208,7 @@ int main( int argc, char* argv[] )
 				long ticks = SDL_GetTicks();
 				if( ticks - fpsTimer > 1000 )
 				{
-					//printf( "Fps: %d\n", fps );
+					printf( "Fps: %d\n", fps );
 
 					fpsTimer = ticks;
 					fps = 0;

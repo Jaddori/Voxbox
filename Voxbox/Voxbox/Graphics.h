@@ -26,7 +26,6 @@ public:
 	void renderQuad( const glm::vec2& position, const glm::vec2& size, Texture* texture, float opacity );
 
 	Camera& getChunkCamera();
-	GLuint getChunkVAO() const;
 
 private:
 	// rendering chunks
@@ -35,11 +34,6 @@ private:
 	GLint chunkViewMatrixLocation;
 	GLint chunkProjectionMatrixLocation;
 	GLint chunkOffsetLocation;
-
-	GLuint chunkVAO;
-	GLuint chunkVBO;
-	GLuint chunkIBO;
-	//GLuint chunkUBO;
 
 	// rendering text
 	Camera textCamera;

@@ -6,6 +6,12 @@
 #define CHUNK_SIZE 16
 #define CHUNK_VOLUME (CHUNK_SIZE*CHUNK_SIZE*CHUNK_SIZE)
 
+struct Vertex
+{
+	glm::vec3 position;
+	glm::vec2 uv;
+};
+
 class Chunk
 {
 public:
@@ -17,6 +23,7 @@ public:
 
 	void calculatePositions();
 	void noise( int x, int z );
+	void render();
 
 	void setOffset( const glm::vec3& offset );
 
@@ -25,15 +32,17 @@ public:
 	const glm::vec3& getOffset() const;
 	int getActiveBlocks() const;
 
-	GLuint getUniformBuffer() const;
-
 private:
 	inline int at( int x, int y, int z ) { return ( y*CHUNK_SIZE*CHUNK_SIZE + z*CHUNK_SIZE + x ); }
+	inline uint8_t block( int x, int y, int z ) { return blocks[at( x, y, z )]; }
 
 	uint8_t blocks[CHUNK_VOLUME];
 	glm::vec4 positions[CHUNK_VOLUME];
 	glm::vec3 offset;
 	int activeBlocks;
+	int curIndex;
 
-	GLuint uniformBuffer;
+	GLuint vao;
+	GLuint vbo;
+	GLuint ibo;
 };
