@@ -53,7 +53,7 @@ int main( int argc, char* argv[] )
 			else
 				printf( "Failed to load font.\n" );
 
-			Chunk chunks[8];
+			/*Chunk chunks[8];
 			for( int y=0; y<2; y++ )
 			{
 				for( int x=0; x<2; x++ )
@@ -63,6 +63,16 @@ int main( int argc, char* argv[] )
 						chunks[y*2*2+x*2+z].calculatePositions();
 						chunks[y*2*2+x*2+z].setOffset( glm::vec3( x, y, z ) );
 					}
+				}
+			}*/
+
+			Chunk* chunks = new Chunk[100];
+			for( int x=0; x<10; x++ )
+			{
+				for( int z=0; z<10; z++ )
+				{
+					chunks[x*10+z].calculatePositions();
+					chunks[x*10+z].setOffset( glm::vec3( x, 0.0f, z ) );
 				}
 			}
 
@@ -144,77 +154,40 @@ int main( int argc, char* argv[] )
 
 				const Frustum& frustum = graphics.getChunkCamera().getFrustum();
 
-				for( int y = 0; y<1; y++ )
+				int drawnChunks = 0;
+				/*for( int y = 0; y<2; y++ )
 				{
-					for( int x = 0; x<1; x++ )
+					for( int x = 0; x<2; x++ )
 					{
-						for( int z = 0; z<1; z++ )
+						for( int z = 0; z<2; z++ )
 						{
-							glm::vec3 chunkPosition( x*CHUNK_SIZE, y*CHUNK_SIZE, z*CHUNK_SIZE );
-							if( graphics.getChunkCamera().getFrustum().intersectCube( chunkPosition, CHUNK_SIZE ) )
+							glm::vec3 minPosition = glm::vec3( x, y, z ) * (float)CHUNK_SIZE;
+							glm::vec3 maxPosition = glm::vec3( x+1, y+1, z+1 ) * (float)CHUNK_SIZE;
+							if( frustum.aabbCollision( minPosition, maxPosition ) )
 							{
 								graphics.renderChunk( &chunks[y*2*2+x*2+z] );
-								printf("DARWIGN\n");
+								drawnChunks++;
 							}
-							else
-								printf("NOIT WARNIGN\n");
-							
-							/*DebugAABB aabb =
-							{
-								glm::vec3( x, y, z )*(float)CHUNK_SIZE,
-								glm::vec3( x+1.0f, y+1.0f, z+1.0f )*(float)CHUNK_SIZE,
-								glm::vec4( 0.0f, 1.0f, 0.0f, 1.0f )
-							};
+						}
+					}
+				}*/
 
-							debugShapes.addAABB( aabb );*/
+				for( int x=0; x<10; x++ )
+				{
+					for( int z=0; z<10; z++ )
+					{
+						glm::vec3 minPosition = glm::vec3( x, 0.0f, z ) * (float)CHUNK_SIZE;
+						glm::vec3 maxPosition = glm::vec3( x+1, 1, z+1 ) * (float)CHUNK_SIZE;
 
-							glm::vec4 green( 0.0f, 1.0f, 0.0f, 1.0f );
-							glm::vec4 red( 1.0f, 0.0f, 0.0f, 1.0f );
-
-							DebugLine line;
-							line.start = glm::vec3( x, y, z ) * (float)CHUNK_SIZE;
-							line.end = line.start + glm::vec3( 0.0f, 0.5f, 0.0f );
-							line.color = ( frustum.intersectPoint( line.start ) > Frustum::OUTSIDE ? green : red );
-
-							debugShapes.addLine( line );
-
-							line.start.x += CHUNK_SIZE;
-							line.end.x += CHUNK_SIZE;
-							line.color = ( frustum.intersectPoint( line.start ) > Frustum::OUTSIDE ? green : red );
-							debugShapes.addLine( line );
-
-							line.start.z += CHUNK_SIZE;
-							line.end.z += CHUNK_SIZE;
-							line.color = ( frustum.intersectPoint( line.start ) > Frustum::OUTSIDE ? green : red );
-							debugShapes.addLine( line );
-
-							line.start.x -= CHUNK_SIZE;
-							line.end.x -= CHUNK_SIZE;
-							line.color = ( frustum.intersectPoint( line.start ) > Frustum::OUTSIDE ? green : red );
-							debugShapes.addLine( line );
-
-							line.start = glm::vec3( x, y+1, z ) * (float)CHUNK_SIZE;
-							line.end = line.start + glm::vec3( 0.0f, 0.5f, 0.0f );
-							line.color = ( frustum.intersectPoint( line.start ) > Frustum::OUTSIDE ? green : red );
-							debugShapes.addLine( line );
-
-							line.start.x += CHUNK_SIZE;
-							line.end.x += CHUNK_SIZE;
-							line.color = ( frustum.intersectPoint( line.start ) > Frustum::OUTSIDE ? green : red );
-							debugShapes.addLine( line );
-
-							line.start.z += CHUNK_SIZE;
-							line.end.z += CHUNK_SIZE;
-							line.color = ( frustum.intersectPoint( line.start ) > Frustum::OUTSIDE ? green : red );
-							debugShapes.addLine( line );
-
-							line.start.x -= CHUNK_SIZE;
-							line.end.x -= CHUNK_SIZE;
-							line.color = ( frustum.intersectPoint( line.start ) > Frustum::OUTSIDE ? green : red );
-							debugShapes.addLine( line );
+						if( frustum.aabbCollision( minPosition, maxPosition ) )
+						{
+							graphics.renderChunk( &chunks[x*10+z] );
+							drawnChunks++;
 						}
 					}
 				}
+
+				printf( "Drawn chunks: %d\n", drawnChunks );
 
 				cameraFrustum.addDebugLines( debugShapes );
 
