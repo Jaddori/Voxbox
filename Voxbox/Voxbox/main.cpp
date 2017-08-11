@@ -184,9 +184,9 @@ int main( int argc, char* argv[] )
 						glm::vec3 minPosition = glm::vec3( x, 0.0f, z ) * (float)CHUNK_SIZE;
 						glm::vec3 maxPosition = glm::vec3( x+1, 1, z+1 ) * (float)CHUNK_SIZE;
 
-						//if( frustum.aabbCollision( minPosition, maxPosition ) )
+						if( frustum.aabbCollision( minPosition, maxPosition ) )
 						{
-							graphics.renderChunk( &chunks[x*10+z] );
+							graphics.renderChunk( &chunks[x*CHUNK_WIDTH+z] );
 						}
 					}
 				}

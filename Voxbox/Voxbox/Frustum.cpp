@@ -163,44 +163,11 @@ bool Frustum::pointCollision( glm::vec3& point ) const
 bool Frustum::aabbCollision( const glm::vec3& minPosition, const glm::vec3& maxPosition ) const
 {
 	bool collision = true; // box inside frustum
-	glm::vec3 topPositive = getPositiveVertex( minPosition, maxPosition, planes[0].getNormal() );
-	glm::vec3 topNegative = getNegativeVertex( minPosition, maxPosition, planes[0].getNormal() );
 
-	glm::vec3 botPositive = getPositiveVertex( minPosition, maxPosition, planes[1].getNormal() );
-	glm::vec3 botNegative = getNegativeVertex( minPosition, maxPosition, planes[1].getNormal() );
-
-	glm::vec3 leftPositive = getPositiveVertex( minPosition, maxPosition, planes[2].getNormal() );
-	glm::vec3 leftNegative = getNegativeVertex( minPosition, maxPosition, planes[2].getNormal() );
-
-	glm::vec3 rightPositive = getPositiveVertex( minPosition, maxPosition, planes[3].getNormal() );
-	glm::vec3 rightNegative = getNegativeVertex( minPosition, maxPosition, planes[3].getNormal() );
-
-	glm::vec3 nearPositive = getPositiveVertex( minPosition, maxPosition, planes[4].getNormal() );
-	glm::vec3 nearNegative = getNegativeVertex( minPosition, maxPosition, planes[4].getNormal() );
-
-	glm::vec3 farPositive = getPositiveVertex( minPosition, maxPosition, planes[5].getNormal() );
-	glm::vec3 farNegative = getNegativeVertex( minPosition, maxPosition, planes[5].getNormal() );
-
-	float topp = planes[0].distance(topPositive);
-	float botp = planes[1].distance(botPositive);
-	float leftp = planes[2].distance(leftPositive);
-	float rightp = planes[3].distance(rightPositive);
-	float nearp = planes[4].distance(nearPositive);
-	float farp = planes[5].distance(farPositive);
-
-	float topn = planes[0].distance(topNegative);
-	float botn = planes[1].distance(botNegative);
-	float leftn = planes[2].distance(leftNegative);
-	float rightn = planes[3].distance(rightNegative);
-	float nearn = planes[4].distance(nearNegative);
-	float farn = planes[5].distance(farNegative);
-
-	for( int i = 0; i < FRUSTUM_PLANE_AMOUNT; i++ )
+	for( int i = 0; i < FRUSTUM_PLANE_AMOUNT && collision; i++ )
 	{
 		if( planes[i].distance( getPositiveVertex( minPosition, maxPosition, planes[i].getNormal() ) ) < 0 )
-			return false; // outside
-		else if( planes[i].distance( getNegativeVertex( minPosition, maxPosition, planes[i].getNormal() ) ) < 0 )
-			collision = true; // box intersects frustum
+			collision = false; // outside
 	}
 	return collision;
 }
