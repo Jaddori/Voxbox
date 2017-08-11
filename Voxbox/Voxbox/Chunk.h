@@ -13,6 +13,7 @@ public:
 	~Chunk();
 
 	void calculatePositions();
+	void noise( int x, int z );
 
 	void setOffset( const glm::vec3& offset );
 

@@ -2,8 +2,8 @@
 
 Chunk::Chunk()
 {
-#if 0
-	memset( blocks, 1, CHUNK_VOLUME );
+#if 1
+	memset( blocks, 0, CHUNK_VOLUME );
 #else
 	for( int i=0; i<CHUNK_VOLUME; i++ )
 	{
@@ -52,6 +52,27 @@ void Chunk::calculatePositions()
 	}
 
 	LOG( VERBOSITY_INFORMATION, "Chunk.cpp - Calculating positions. Active blocks: %d.", activeBlocks );
+}
+
+void Chunk::noise( int x, int z )
+{
+	for( int blockX = 0; blockX < CHUNK_SIZE; blockX++ )
+	{
+		for( int blockZ = 0; blockZ < CHUNK_SIZE; blockZ++ )
+		{
+			float noiseValue = ( glm::perlin( glm::vec2( x+blockX, z+blockZ ) * 0.0137f ) + 1.0f ) * 0.5f;
+			int height = (int)( noiseValue * CHUNK_SIZE ) + 1;
+			if( height <= 0 )
+				height = 1;
+			else if( height > CHUNK_SIZE )
+				height = CHUNK_SIZE;
+
+			for( int blockY = 0; blockY < height; blockY++ )
+			{
+				blocks[at( blockX, blockY, blockZ )] = 1;
+			}
+		}
+	}
 }
 
 void Chunk::setOffset( const glm::vec3& o )

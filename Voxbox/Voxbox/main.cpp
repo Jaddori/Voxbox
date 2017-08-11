@@ -71,6 +71,7 @@ int main( int argc, char* argv[] )
 			{
 				for( int z=0; z<10; z++ )
 				{
+					chunks[x*10+z].noise( x*CHUNK_SIZE, z*CHUNK_SIZE );
 					chunks[x*10+z].calculatePositions();
 					chunks[x*10+z].setOffset( glm::vec3( x, 0.0f, z ) );
 				}

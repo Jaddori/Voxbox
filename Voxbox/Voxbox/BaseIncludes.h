@@ -12,8 +12,8 @@
 
 #define WINDOW_X SDL_WINDOWPOS_UNDEFINED
 #define WINDOW_Y SDL_WINDOWPOS_UNDEFINED
-#define WINDOW_WIDTH 640
-#define WINDOW_HEIGHT 480
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 720
 
 // Rendering
 #include "GL\glew.h"
@@ -28,6 +28,7 @@
 #include "glm.hpp"
 #include "gtc\type_ptr.hpp"
 #include "gtc\matrix_transform.hpp"
+#include "gtc\noise.hpp"
 
 const float PI = glm::pi<float>();
 const float EPSILON = glm::epsilon<float>();
