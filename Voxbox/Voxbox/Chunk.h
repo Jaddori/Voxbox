@@ -11,6 +11,9 @@ class Chunk
 public:
 	Chunk();
 	~Chunk();
+	
+	void upload();
+	void unload();
 
 	void calculatePositions();
 	void noise( int x, int z );
@@ -22,6 +25,8 @@ public:
 	const glm::vec3& getOffset() const;
 	int getActiveBlocks() const;
 
+	GLuint getUniformBuffer() const;
+
 private:
 	inline int at( int x, int y, int z ) { return ( y*CHUNK_SIZE*CHUNK_SIZE + z*CHUNK_SIZE + x ); }
 
@@ -29,4 +34,6 @@ private:
 	glm::vec4 positions[CHUNK_VOLUME];
 	glm::vec3 offset;
 	int activeBlocks;
+
+	GLuint uniformBuffer;
 };

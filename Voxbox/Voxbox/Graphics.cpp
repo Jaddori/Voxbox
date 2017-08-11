@@ -2,7 +2,7 @@
 
 Graphics::Graphics()
 	: chunkViewMatrixLocation( 0 ), chunkProjectionMatrixLocation( 0 ), chunkOffsetLocation( 0 ),
-	chunkVAO( 0 ), chunkVBO( 0 ), chunkIBO( 0 ), chunkUBO( 0 )
+	chunkVAO( 0 ), chunkVBO( 0 ), chunkIBO( 0 )//, chunkUBO( 0 )
 {
 	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Constructing." );
 }
@@ -104,10 +104,10 @@ bool Graphics::load()
 		GLuint blockIndex = glGetUniformBlockIndex( chunkShader.getProgram(), "blockPositions" );
 		glUniformBlockBinding( chunkShader.getProgram(), blockIndex, bindingPoint );
 
-		glGenBuffers( 1, &chunkUBO );
+		/*glGenBuffers( 1, &chunkUBO );
 		glBindBuffer( GL_UNIFORM_BUFFER, chunkUBO );
 		glBindBufferBase( GL_UNIFORM_BUFFER, bindingPoint, chunkUBO );
-		glBufferData( GL_UNIFORM_BUFFER, sizeof(glm::vec4)*CHUNK_VOLUME, nullptr, GL_DYNAMIC_DRAW );
+		glBufferData( GL_UNIFORM_BUFFER, sizeof(glm::vec4)*CHUNK_VOLUME, nullptr, GL_DYNAMIC_DRAW );*/
 
 		glBindVertexArray( 0 );
 	}
@@ -195,10 +195,10 @@ void Graphics::unload()
 		glDeleteVertexArrays( 1, &chunkVAO );
 		glDeleteBuffers( 1, &chunkVBO );
 		glDeleteBuffers( 1, &chunkIBO );
-		glDeleteBuffers( 1, &chunkUBO );
+		//glDeleteBuffers( 1, &chunkUBO );
 	}
 
-	chunkVAO = chunkVBO = chunkIBO = chunkUBO = 0;
+	chunkVAO = chunkVBO = chunkIBO = 0; //chunkUBO = 0;
 
 	if( textVAO )
 	{
@@ -242,10 +242,12 @@ void Graphics::renderChunk( Chunk* chunk )
 
 	glBindVertexArray( chunkVAO );
 
-	glBindBuffer( GL_UNIFORM_BUFFER, chunkUBO );
+	/*glBindBuffer( GL_UNIFORM_BUFFER, chunkUBO );
 	GLvoid* p = glMapBuffer( GL_UNIFORM_BUFFER, GL_WRITE_ONLY );
 	memcpy( p, chunk->getPositions(), sizeof(glm::vec4)*chunk->getActiveBlocks() );
-	glUnmapBuffer( GL_UNIFORM_BUFFER );
+	glUnmapBuffer( GL_UNIFORM_BUFFER );*/
+
+	glBindBuffer( GL_UNIFORM_BUFFER, chunk->getUniformBuffer() );
 
 	glDrawElementsInstanced( GL_TRIANGLES, 6*6, GL_UNSIGNED_INT, nullptr, chunk->getActiveBlocks() );
 
@@ -339,4 +341,9 @@ void Graphics::renderQuad( const glm::vec2& position, const glm::vec2& size, Tex
 Camera& Graphics::getChunkCamera()
 {
 	return chunkCamera;
+}
+
+GLuint Graphics::getChunkVAO() const
+{
+	return chunkVAO;
 }

@@ -1,8 +1,9 @@
 #include "Chunk.h"
 
 Chunk::Chunk()
+	: uniformBuffer( 0 )
 {
-#if 1
+#if 0
 	memset( blocks, 0, CHUNK_VOLUME );
 #else
 	for( int i=0; i<CHUNK_VOLUME; i++ )
@@ -14,6 +15,30 @@ Chunk::Chunk()
 
 Chunk::~Chunk()
 {
+}
+
+void Chunk::upload()
+{
+	if( uniformBuffer == 0 )
+	{
+		glGenBuffers( 1, &uniformBuffer );
+		glBindBuffer( GL_UNIFORM_BUFFER, uniformBuffer );
+		glBindBufferBase( GL_UNIFORM_BUFFER, 0, uniformBuffer );
+		glBufferData( GL_UNIFORM_BUFFER, sizeof(glm::vec4)*CHUNK_VOLUME, nullptr, GL_DYNAMIC_DRAW );
+	}
+
+	glBindBuffer( GL_UNIFORM_BUFFER, uniformBuffer );
+	GLvoid* p = glMapBuffer( GL_UNIFORM_BUFFER, GL_WRITE_ONLY );
+	memcpy( p, positions, sizeof(glm::vec4)*activeBlocks );
+	glUnmapBuffer( GL_UNIFORM_BUFFER );
+}
+
+void Chunk::unload()
+{
+	if( uniformBuffer > 0 )
+	{
+		glDeleteBuffers( 1, &uniformBuffer );
+	}
 }
 
 void Chunk::calculatePositions()
@@ -98,4 +123,9 @@ const glm::vec3& Chunk::getOffset() const
 int Chunk::getActiveBlocks() const
 {
 	return activeBlocks;
+}
+
+GLuint Chunk::getUniformBuffer() const
+{
+	return uniformBuffer;
 }

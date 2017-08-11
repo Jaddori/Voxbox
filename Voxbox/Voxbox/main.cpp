@@ -66,20 +66,24 @@ int main( int argc, char* argv[] )
 				}
 			}*/
 
-			Chunk* chunks = new Chunk[100];
-			for( int x=0; x<10; x++ )
-			{
-				for( int z=0; z<10; z++ )
-				{
-					chunks[x*10+z].noise( x*CHUNK_SIZE, z*CHUNK_SIZE );
-					chunks[x*10+z].calculatePositions();
-					chunks[x*10+z].setOffset( glm::vec3( x, 0.0f, z ) );
-				}
-			}
-
 			Graphics graphics;
 			graphics.load();
 			graphics.getChunkCamera().setPosition( glm::vec3( 0.0f, 0.0f, -10.0f ) );
+
+			const int CHUNK_WIDTH = 50;
+			const int CHUNK_DEPTH = 50;
+
+			Chunk* chunks = new Chunk[CHUNK_WIDTH*CHUNK_DEPTH];
+			for( int x=0; x<CHUNK_WIDTH; x++ )
+			{
+				for( int z=0; z<CHUNK_DEPTH; z++ )
+				{
+					//chunks[x*10+z].noise( x*CHUNK_SIZE, z*CHUNK_SIZE );
+					chunks[x*CHUNK_WIDTH+z].calculatePositions();
+					chunks[x*CHUNK_WIDTH+z].upload();
+					chunks[x*CHUNK_WIDTH+z].setOffset( glm::vec3( x, 0.0f, z ) );
+				}
+			}
 
 			DebugShapes debugShapes;
 			debugShapes.load();
@@ -155,7 +159,6 @@ int main( int argc, char* argv[] )
 
 				const Frustum& frustum = graphics.getChunkCamera().getFrustum();
 
-				int drawnChunks = 0;
 				/*for( int y = 0; y<2; y++ )
 				{
 					for( int x = 0; x<2; x++ )
@@ -173,22 +176,23 @@ int main( int argc, char* argv[] )
 					}
 				}*/
 
-				for( int x=0; x<10; x++ )
+				long startChunkRenderTime = SDL_GetTicks();
+				for( int x=0; x<CHUNK_WIDTH; x++ )
 				{
-					for( int z=0; z<10; z++ )
+					for( int z=0; z<CHUNK_DEPTH; z++ )
 					{
 						glm::vec3 minPosition = glm::vec3( x, 0.0f, z ) * (float)CHUNK_SIZE;
 						glm::vec3 maxPosition = glm::vec3( x+1, 1, z+1 ) * (float)CHUNK_SIZE;
 
-						if( frustum.aabbCollision( minPosition, maxPosition ) )
+						//if( frustum.aabbCollision( minPosition, maxPosition ) )
 						{
 							graphics.renderChunk( &chunks[x*10+z] );
-							drawnChunks++;
 						}
 					}
 				}
+				long endChunkRenderTime = SDL_GetTicks();
 
-				printf( "Drawn chunks: %d\n", drawnChunks );
+				printf( "%d ms\n", endChunkRenderTime-startChunkRenderTime );
 
 				cameraFrustum.addDebugLines( debugShapes );
 
