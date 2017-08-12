@@ -16,7 +16,7 @@ bool Console::load()
 	bool result = false;
 
 	LOG( VERBOSITY_INFORMATION, "Console.cpp - Loading font." );
-	if( font.load( "./assets/fonts/modern12.bin", "./assets/fonts/modern12.dds" ) )
+	if( font.load( "./assets/fonts/verdana12.bin", "./assets/fonts/verdana12.dds" ) )
 	{
 		font.upload();
 

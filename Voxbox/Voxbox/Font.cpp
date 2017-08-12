@@ -105,7 +105,7 @@ glm::vec4 Font::getUV( char c ) const
 {
 	assert( c >= 0 && c <= FONT_RANGE );
 	float s = (float)info.horizontalOffsets[c];
-	float t = (float)info.verticalOffsets[c];
+	float t = (float)info.verticalOffsets[c]-info.height;
 	float u = s + info.widths[c];
 	float v = t + info.height;
 	return glm::vec4( s, t, u, v ) / (float)info.bitmapSize;

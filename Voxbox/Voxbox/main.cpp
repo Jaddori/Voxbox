@@ -122,7 +122,7 @@ int main( int argc, char* argv[] )
 				texture.upload();
 
 			Font font;
-			if( font.load( "./assets/fonts/modern12.bin", "./assets/fonts/modern12.dds" ) )
+			if( font.load( "./assets/fonts/verdana12.bin", "./assets/fonts/verdana12.dds" ) )
 			{
 				font.upload();
 			}
@@ -250,7 +250,6 @@ int main( int argc, char* argv[] )
 				debugShapes.render( graphics.getChunkCamera().getProjectionMatrix(), graphics.getChunkCamera().getViewMatrix() );
 
 				console.render( &graphics );
-
 				graphics.end();
 
 				SDL_GL_SwapWindow( window );

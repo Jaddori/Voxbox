@@ -154,8 +154,6 @@ void Graphics::renderChunk( Chunk* chunk )
 
 void Graphics::renderText( Font* font, const char* text, const glm::vec2& position, const glm::vec4& color )
 {
-	const float NEGATIVE_PADDING = -5.0f;
-
 	glm::vec2 offset;
 
 	Glyph glyphs[GRAPHICS_MAX_GLYPHS];
@@ -185,8 +183,6 @@ void Graphics::renderText( Font* font, const char* text, const glm::vec2& positi
 			glyphs[index].color = color;
 
 			offset.x += glyphs[index].size.x;
-			if( c > FONT_FIRST )
-				offset.x += NEGATIVE_PADDING;
 
 			index++;
 		}
