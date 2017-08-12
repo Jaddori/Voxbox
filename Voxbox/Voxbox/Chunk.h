@@ -21,7 +21,6 @@ public:
 	void upload();
 	void unload();
 
-	void calculatePositions();
 	void calculateFaces();
 	void noise( int x, int z );
 	void render();
@@ -31,16 +30,16 @@ public:
 	const uint8_t* getBlocks() const;
 	const glm::vec4* getPositions() const;
 	const glm::vec3& getOffset() const;
-	int getActiveBlocks() const;
 
 private:
 	inline int at( int x, int y, int z ) { return ( y*CHUNK_SIZE*CHUNK_SIZE + z*CHUNK_SIZE + x ); }
 	inline uint8_t block( int x, int y, int z ) { return blocks[at( x, y, z )]; }
+	void addHorizontalFace( const glm::vec3& position, const glm::vec3& direction, bool invert );
+	void addVerticalFace( const glm::vec3& position, bool invert );
 
 	uint8_t blocks[CHUNK_VOLUME];
 	glm::vec4 positions[CHUNK_VOLUME];
 	glm::vec3 offset;
-	int activeBlocks;
 
 	Vertex* vertices;
 	GLuint* indices;

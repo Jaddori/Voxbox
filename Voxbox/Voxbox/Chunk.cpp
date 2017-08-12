@@ -4,12 +4,18 @@ Chunk::Chunk()
 	: vao( 0 ), vbo( 0 ), ibo( 0 ),
 	vertices( nullptr ), indices( nullptr )
 {
-#if 0
-	memset( blocks, 0, CHUNK_VOLUME );
-#else
+#if 1
 	for( int i=0; i<CHUNK_VOLUME; i++ )
 	{
-		blocks[i] = rand() % 2 + 1;
+		blocks[i] = rand() % 3;
+	}
+#else
+	memset( blocks, 0, CHUNK_VOLUME );
+	for( int y=0; y<CHUNK_SIZE; y++ )
+	{
+		blocks[at( 0, y, 0 )] = 1;
+		blocks[at( 3, y, 3 )] = 1;
+		blocks[at( 5, y, 5 )] = y % 3;
 	}
 #endif
 }
@@ -64,44 +70,6 @@ void Chunk::unload()
 	}
 }
 
-void Chunk::calculatePositions()
-{
-	activeBlocks = 0;
-	for( int y=0; y<CHUNK_SIZE; y++ )
-	{
-		for( int z=0; z<CHUNK_SIZE; z++ )
-		{
-			for( int x=0; x<CHUNK_SIZE; x++ )
-			{
-				uint8_t type = blocks[at( x, y, z )];
-				if( type > 0 )
-				{
-					bool vacantNeighbours = false;
-					if( x == 0 || blocks[at( x-1, y, z )] == 0 )
-						vacantNeighbours = true;
-					else if( x == CHUNK_SIZE-1 || blocks[at( x+1, y, z )] == 0 )
-						vacantNeighbours = true;
-					else if( y == 0 || blocks[at( x, y-1, z )] == 0 )
-						vacantNeighbours = true;
-					else if( y == CHUNK_SIZE-1 || blocks[at( x, y+1, z )] == 0 )
-						vacantNeighbours = true;
-					else if( z == 0 || blocks[at( x, y, z-1 )] == 0 )
-						vacantNeighbours = true;
-					else if( z == CHUNK_SIZE-1 || blocks[at( x, y, z+1 )] == 0 )
-						vacantNeighbours = true;
-
-					if( vacantNeighbours )
-					{
-						positions[activeBlocks++] = glm::vec4( x, y, z, type-1 );
-					}
-				}
-			}
-		}
-	}
-
-	LOG( VERBOSITY_INFORMATION, "Chunk.cpp - Calculating positions. Active blocks: %d.", activeBlocks );
-}
-
 void Chunk::calculateFaces()
 {
 	if( vertices == nullptr )
@@ -112,7 +80,6 @@ void Chunk::calculateFaces()
 
 	numVertices = 0;
 	numIndices = 0;
-	activeBlocks = 0;
 	for( int y=0; y<CHUNK_SIZE; y++ )
 	{
 		for( int z=0; z<CHUNK_SIZE; z++ )
@@ -125,162 +92,120 @@ void Chunk::calculateFaces()
 					// front
 					if( z == 0 || block( x, y, z-1 ) == 0 )
 					{
-						vertices[numVertices].position = glm::vec3( x, y, z ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices].uv = glm::vec2( 0.1f, 0.05f );
-
-						vertices[numVertices+1].position = glm::vec3( x, y+1.0f, z ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices+1].uv = glm::vec2( 0.1f, 0.0f );
-
-						vertices[numVertices+2].position = glm::vec3( x+1.0f, y, z ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices+2].uv = glm::vec2( 0.15f, 0.05f );
-
-						vertices[numVertices+3].position = glm::vec3( x+1.0f, y+1.0f, z ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices+3].uv = glm::vec2( 0.15f, 0.0f );
-
-						indices[numIndices] = numVertices;
-						indices[numIndices+1] = numVertices+1;
-						indices[numIndices+2] = numVertices+2;
-						indices[numIndices+3] = numVertices+1;
-						indices[numIndices+4] = numVertices+3;
-						indices[numIndices+5] = numVertices+2;
-
-						numVertices += 4;
-						numIndices += 6;
+						addHorizontalFace( glm::vec3( x, y, z ), glm::vec3( 1.0f, 0.0f, 0.0f ), false );
 					}
 
 					// back
 					if( z == CHUNK_SIZE-1 || block( x, y, z+1 ) == 0 )
 					{
-						vertices[numVertices].position = glm::vec3( x+1.0f, y, z+1.0f ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices].uv = glm::vec2( 0.1f, 0.05f );
-
-						vertices[numVertices+1].position = glm::vec3( x+1.0f, y+1.0f, z+1.0f ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices+1].uv = glm::vec2( 0.1f, 0.0f );
-
-						vertices[numVertices+2].position = glm::vec3( x, y, z+1.0f ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices+2].uv = glm::vec2( 0.15f, 0.05f );
-
-						vertices[numVertices+3].position = glm::vec3( x, y+1.0f, z+1.0f ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices+3].uv = glm::vec2( 0.15f, 0.0f );
-
-						indices[numIndices] = numVertices;
-						indices[numIndices+1] = numVertices+1;
-						indices[numIndices+2] = numVertices+2;
-						indices[numIndices+3] = numVertices+1;
-						indices[numIndices+4] = numVertices+3;
-						indices[numIndices+5] = numVertices+2;
-
-						numVertices += 4;
-						numIndices += 6;
+						addHorizontalFace( glm::vec3( x, y, z+1.0f ), glm::vec3( 1.0f, 0.0f, 0.0f ), true );
 					}
 
 					// left
 					if( x == 0 || block( x-1, y, z ) == 0 )
 					{
-						vertices[numVertices].position = glm::vec3( x, y, z+1.0f ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices].uv = glm::vec2( 0.1f, 0.05f );
-
-						vertices[numVertices+1].position = glm::vec3( x, y+1.0f, z+1.0f ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices+1].uv = glm::vec2( 0.1f, 0.0f );
-
-						vertices[numVertices+2].position = glm::vec3( x, y, z ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices+2].uv = glm::vec2( 0.15f, 0.05f );
-
-						vertices[numVertices+3].position = glm::vec3( x, y+1.0f, z ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices+3].uv = glm::vec2( 0.15f, 0.0f );
-
-						indices[numIndices] = numVertices;
-						indices[numIndices+1] = numVertices+1;
-						indices[numIndices+2] = numVertices+2;
-						indices[numIndices+3] = numVertices+1;
-						indices[numIndices+4] = numVertices+3;
-						indices[numIndices+5] = numVertices+2;
-
-						numVertices += 4;
-						numIndices += 6;
+						addHorizontalFace( glm::vec3( x, y, z ), glm::vec3( 0.0f, 0.0f, 1.0f ), true );
 					}
 
 					// right
 					if( x == CHUNK_SIZE-1 || block( x+1, y, z ) == 0 )
 					{
-						vertices[numVertices].position = glm::vec3( x+1.0f, y, z ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices].uv = glm::vec2( 0.1f, 0.05f );
-
-						vertices[numVertices+1].position = glm::vec3( x+1.0f, y+1.0f, z ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices+1].uv = glm::vec2( 0.1f, 0.0f );
-
-						vertices[numVertices+2].position = glm::vec3( x+1.0f, y, z+1.0f ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices+2].uv = glm::vec2( 0.15f, 0.05f );
-
-						vertices[numVertices+3].position = glm::vec3( x+1.0f, y+1.0f, z+1.0f ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices+3].uv = glm::vec2( 0.15f, 0.0f );
-
-						indices[numIndices] = numVertices;
-						indices[numIndices+1] = numVertices+1;
-						indices[numIndices+2] = numVertices+2;
-						indices[numIndices+3] = numVertices+1;
-						indices[numIndices+4] = numVertices+3;
-						indices[numIndices+5] = numVertices+2;
-
-						numVertices += 4;
-						numIndices += 6;
+						addHorizontalFace( glm::vec3( x+1.0f, y, z ), glm::vec3( 0.0f, 0.0f, 1.0f ), false );
 					}
 
 					// top
-					if( y == CHUNK_SIZE-1 || block( x, y+1, z-1 ) == 0 )
+					if( y == CHUNK_SIZE-1 || block( x, y+1, z ) == 0 )
 					{
-						vertices[numVertices].position = glm::vec3( x, y+1.0f, z ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices].uv = glm::vec2( 0.1f, 0.05f );
-
-						vertices[numVertices+1].position = glm::vec3( x, y+1.0f, z+1.0f ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices+1].uv = glm::vec2( 0.1f, 0.0f );
-
-						vertices[numVertices+2].position = glm::vec3( x+1.0f, y+1.0f, z ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices+2].uv = glm::vec2( 0.15f, 0.05f );
-
-						vertices[numVertices+3].position = glm::vec3( x+1.0f, y+1.0f, z+1.0f ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices+3].uv = glm::vec2( 0.15f, 0.0f );
-
-						indices[numIndices] = numVertices;
-						indices[numIndices+1] = numVertices+1;
-						indices[numIndices+2] = numVertices+2;
-						indices[numIndices+3] = numVertices+1;
-						indices[numIndices+4] = numVertices+3;
-						indices[numIndices+5] = numVertices+2;
-
-						numVertices += 4;
-						numIndices += 6;
+						addVerticalFace( glm::vec3( x, y+1.0f, z ), false );
 					}
 
 					// bottom
-					if( y == 0 || block( x, y-1, z-1 ) == 0 )
+					if( y == 0 || block( x, y-1, z ) == 0 )
 					{
-						vertices[numVertices].position = glm::vec3( x, y, z+1.0f ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices].uv = glm::vec2( 0.1f, 0.05f );
-
-						vertices[numVertices+1].position = glm::vec3( x, y, z ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices+1].uv = glm::vec2( 0.1f, 0.0f );
-
-						vertices[numVertices+2].position = glm::vec3( x+1.0f, y, z+1.0f ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices+2].uv = glm::vec2( 0.15f, 0.05f );
-
-						vertices[numVertices+3].position = glm::vec3( x+1.0f, y, z ) + offset * (float)CHUNK_SIZE;
-						vertices[numVertices+3].uv = glm::vec2( 0.15f, 0.0f );
-
-						indices[numIndices] = numVertices;
-						indices[numIndices+1] = numVertices+1;
-						indices[numIndices+2] = numVertices+2;
-						indices[numIndices+3] = numVertices+1;
-						indices[numIndices+4] = numVertices+3;
-						indices[numIndices+5] = numVertices+2;
-
-						numVertices += 4;
-						numIndices += 6;
+						addVerticalFace( glm::vec3( x, y, z ), true );
 					}
 				}
 			}
 		}
 	}
+}
+
+void Chunk::addHorizontalFace( const glm::vec3& position, const glm::vec3& direction, bool invert )
+{
+	glm::vec3 pos = position + offset * (float)CHUNK_SIZE;
+
+	vertices[numVertices].position = pos;
+	vertices[numVertices].uv = glm::vec2( 0.1f, 0.05f );
+
+	vertices[numVertices+1].position = pos + glm::vec3( 0.0f, 1.0f, 0.0f );
+	vertices[numVertices+1].uv = glm::vec2( 0.1f, 0.0f );
+
+	vertices[numVertices+2].position = pos + direction;
+	vertices[numVertices+2].uv = glm::vec2( 0.15f, 0.05f );
+
+	vertices[numVertices+3].position = pos + direction + glm::vec3( 0.0f, 1.0f, 0.0f );
+	vertices[numVertices+3].uv = glm::vec2( 0.15f, 0.0f );
+
+	if( invert )
+	{
+		indices[numIndices] = numVertices;
+		indices[numIndices+1] = numVertices+2;
+		indices[numIndices+2] = numVertices+1;
+		indices[numIndices+3] = numVertices+2;
+		indices[numIndices+4] = numVertices+3;
+		indices[numIndices+5] = numVertices+1;
+	}
+	else
+	{
+		indices[numIndices] = numVertices;
+		indices[numIndices+1] = numVertices+1;
+		indices[numIndices+2] = numVertices+2;
+		indices[numIndices+3] = numVertices+1;
+		indices[numIndices+4] = numVertices+3;
+		indices[numIndices+5] = numVertices+2;
+	}
+
+	numVertices += 4;
+	numIndices += 6;
+}
+
+void Chunk::addVerticalFace( const glm::vec3& position, bool invert )
+{
+	glm::vec3 pos = position + offset * (float)CHUNK_SIZE;
+
+	vertices[numVertices].position = pos;
+	vertices[numVertices].uv = glm::vec2( 0.1f, 0.05f );
+
+	vertices[numVertices+1].position = pos + glm::vec3( 0.0f, 0.0f, 1.0f );
+	vertices[numVertices+1].uv = glm::vec2( 0.1f, 0.0f );
+
+	vertices[numVertices+2].position = pos + glm::vec3( 1.0f, 0.0f, 0.0f );
+	vertices[numVertices+2].uv = glm::vec2( 0.15f, 0.05f );
+
+	vertices[numVertices+3].position = pos + glm::vec3( 1.0f, 0.0f, 1.0f );
+	vertices[numVertices+3].uv = glm::vec2( 0.15f, 0.0f );
+
+	if( invert )
+	{
+		indices[numIndices] = numVertices;
+		indices[numIndices+1] = numVertices+2;
+		indices[numIndices+2] = numVertices+1;
+		indices[numIndices+3] = numVertices+2;
+		indices[numIndices+4] = numVertices+3;
+		indices[numIndices+5] = numVertices+1;
+	}
+	else
+	{
+		indices[numIndices] = numVertices;
+		indices[numIndices+1] = numVertices+1;
+		indices[numIndices+2] = numVertices+2;
+		indices[numIndices+3] = numVertices+1;
+		indices[numIndices+4] = numVertices+3;
+		indices[numIndices+5] = numVertices+2;
+	}
+
+	numVertices += 4;
+	numIndices += 6;
 }
 
 void Chunk::noise( int x, int z )
@@ -330,13 +255,3 @@ const glm::vec3& Chunk::getOffset() const
 {
 	return offset;
 }
-
-int Chunk::getActiveBlocks() const
-{
-	return activeBlocks;
-}
-
-/*GLuint Chunk::getUniformBuffer() const
-{
-	return uniformBuffer;
-}*/

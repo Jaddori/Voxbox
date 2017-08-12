@@ -55,7 +55,7 @@ DWORD WINAPI update( LPVOID args )
 			if( data->coreData->input->keyReleased( SDL_SCANCODE_SPACE ) )
 				LOG( VERBOSITY_DEBUG, "main.cpp - User pressed the spacebar." );
 
-			DebugSphere sphere = { glm::vec3( 0.0f, 10.0f, 0.0f ), 2.0f, glm::vec4( 1.0f, 0.0f, 0.0f, 1.0f ) };
+			DebugSphere sphere = { glm::vec3( 0.0f, 0.0f, 0.0f ), 2.0f, glm::vec4( 1.0f, 0.0f, 0.0f, 1.0f ) };
 			data->coreData->debugShapes->addSphere( sphere );
 
 			ReleaseSemaphore( data->updateDone, 1, NULL );
@@ -94,7 +94,8 @@ int main( int argc, char* argv[] )
 			glEnable( GL_DEPTH_TEST );
 			glEnable( GL_CULL_FACE );
 			SDL_GL_SetSwapInterval( 1 );
-			srand( time( 0 ) );
+			//srand( time( 0 ) );
+			srand( 1337 );
 
 			Texture texture;
 			if( !texture.load( "./assets/textures/blocks.dds" ) )
