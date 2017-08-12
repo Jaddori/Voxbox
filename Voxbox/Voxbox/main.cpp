@@ -11,22 +11,6 @@
 
 #define THREAD_UPDATE_WAIT 1000
 
-struct GenerationData
-{
-	int first, last;
-	Chunk* chunks;
-};
-
-DWORD WINAPI generateChunkFaces( LPVOID args )
-{
-	GenerationData* data = (GenerationData*)args;
-
-	for( int i=data->first; i<data->last; i++ )
-		data->chunks[i].calculateFaces();
-
-	return 0;
-}
-
 struct ThreadData
 {
 	CoreData* coreData;
@@ -140,30 +124,9 @@ int main( int argc, char* argv[] )
 				}
 			}
 
-			const int NUM_THREADS = 4;
-			HANDLE threads[NUM_THREADS];
-
-			GenerationData generationData[NUM_THREADS];
-
-			int first = 0;
-			for( int i=0; i<NUM_THREADS; i++ )
-			{
-				int last = first + NUM_CHUNKS / NUM_THREADS;
-				if( last > NUM_CHUNKS )
-					last = NUM_CHUNKS;
-
-				generationData[i].first = first;
-				generationData[i].last = last;
-				generationData[i].chunks = chunks;
-				threads[i] = CreateThread( NULL, 0, generateChunkFaces, &generationData[i], 0, NULL );
-
-				first = last;
-			}
-
-			WaitForMultipleObjects( NUM_THREADS, threads, TRUE, INFINITE );
-
 			for( int i=0; i<NUM_CHUNKS; i++ )
 			{
+				chunks[i].calculateFaces();
 				chunks[i].upload();
 			}
 

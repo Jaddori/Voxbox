@@ -35,7 +35,7 @@ void Console::unload()
 
 void Console::finalize()
 {
-	finalMessages = Log::instance().getMessages();
+	finalMessages.fastCopy( Log::instance().getMessages() );
 	finalThreshold = Log::instance().getThreshold();
 }
 

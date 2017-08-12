@@ -3,9 +3,11 @@
 #include <fstream>
 #include "Array.h"
 #include <cassert>
+#include <Windows.h>
 
 #define LOG_START( file ) Log::instance().start( file )
 #define LOG_STOP() Log::instance().stop()
+#define LOG_FINALIZE() Log::instance().finalize()
 #define LOG( verbosity, fmt, ... ) \
 	{ \
 		char buffer[1024] = {}; \
@@ -63,4 +65,6 @@ private:
 	FILE* file;
 	Array<LogMessage> messages;
 	int threshold;
+
+	HANDLE mutex;
 };

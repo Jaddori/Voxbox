@@ -8,6 +8,8 @@ bool Log::start( const char* logfile )
 	{
 		addMessage( VERBOSITY_INFORMATION, "*** Log started ***" );
 	}
+
+	mutex = CreateMutex( NULL, FALSE, NULL );
 	
 	return ( file != nullptr );
 #else
@@ -21,6 +23,7 @@ void Log::stop()
 	assert( file );
 
 	addMessage( VERBOSITY_INFORMATION, "*** Log stopped ***" );
+	CloseHandle( mutex );
 	fclose( file );
 #endif
 }
@@ -29,6 +32,8 @@ void Log::addMessage( int verbosity, const char* message )
 {
 #if _DEBUG
 	assert( file );
+
+	WaitForSingleObject( mutex, INFINITE );
 
 	fprintf( file, "%s\n", message );
 	if( verbosity >= threshold )
@@ -39,6 +44,8 @@ void Log::addMessage( int verbosity, const char* message )
 	msg.verbosity = verbosity;
 
 	messages.add( msg );
+
+	ReleaseMutex( mutex );
 #endif
 }
 
