@@ -3,7 +3,6 @@
 #include "BaseIncludes.h"
 #include "DebugShapes.h"
 #include "Frustum.h"
-#include "Swap.h"
 
 class Camera
 {

@@ -164,16 +164,16 @@ void DebugShapes::unload()
 
 void DebugShapes::render( const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix )
 {
-	const int NUM_LINES = finalLines.getSize();
-	const int NUM_SPHERES = finalSpheres.getSize();
-	const int NUM_AABB = finalAABBs.getSize();
-	const int NUM_OBB = finalOBBs.getSize();
+	const int NUM_LINES = lines.getRead().getSize();
+	const int NUM_SPHERES = spheres.getRead().getSize();
+	const int NUM_AABB = AABBs.getRead().getSize();
+	const int NUM_OBB = OBBs.getRead().getSize();
 
 	if( NUM_LINES > 0 )
 	{
 		glBindVertexArray( lineVAO );
 		glBindBuffer( GL_ARRAY_BUFFER, lineVBO );
-		glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(DebugLine)*NUM_LINES, finalLines.getData() );
+		glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(DebugLine)*NUM_LINES, lines.getRead().getData() );
 
 		lineShader.bind();
 		lineShader.setMat4( lineProjectionMatrixLocation, projectionMatrix );
@@ -186,7 +186,7 @@ void DebugShapes::render( const glm::mat4& projectionMatrix, const glm::mat4& vi
 	{
 		glBindVertexArray( sphereVAO );
 		glBindBuffer( GL_ARRAY_BUFFER, sphereVBO );
-		glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(DebugSphere)*NUM_SPHERES, finalSpheres.getData() );
+		glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(DebugSphere)*NUM_SPHERES, spheres.getRead().getData() );
 
 		sphereShader.bind();
 		sphereShader.setMat4( sphereProjectionMatrixLocation, projectionMatrix );
@@ -199,7 +199,7 @@ void DebugShapes::render( const glm::mat4& projectionMatrix, const glm::mat4& vi
 	{
 		glBindVertexArray( aabbVAO );
 		glBindBuffer( GL_ARRAY_BUFFER, aabbVBO );
-		glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(DebugAABB)*NUM_AABB, finalAABBs.getData() );
+		glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(DebugAABB)*NUM_AABB, AABBs.getRead().getData() );
 
 		aabbShader.bind();
 		aabbShader.setMat4( aabbProjectionMatrixLocation, projectionMatrix );
@@ -212,7 +212,7 @@ void DebugShapes::render( const glm::mat4& projectionMatrix, const glm::mat4& vi
 	{
 		glBindVertexArray( obbVAO );
 		glBindBuffer( GL_ARRAY_BUFFER, obbVBO );
-		glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(DebugOBB)*NUM_OBB, finalOBBs.getData() );
+		glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(DebugOBB)*NUM_OBB, OBBs.getRead().getData() );
 
 		obbShader.bind();
 		obbShader.setMat4( obbProjectionMatrixLocation, projectionMatrix );
@@ -224,15 +224,15 @@ void DebugShapes::render( const glm::mat4& projectionMatrix, const glm::mat4& vi
 	// reset
 	glBindVertexArray( 0 );
 
-	finalLines.clear();
+	/*finalLines.clear();
 	finalSpheres.clear();
 	finalAABBs.clear();
-	finalOBBs.clear();
+	finalOBBs.clear();*/
 }
 
 void DebugShapes::finalize()
 {
-	finalLines.fastCopy( lines );
+	/*finalLines.fastCopy( lines );
 	finalSpheres.fastCopy( spheres );
 	finalAABBs.fastCopy( AABBs );
 	finalOBBs.fastCopy( OBBs );
@@ -240,25 +240,30 @@ void DebugShapes::finalize()
 	lines.clear();
 	spheres.clear();
 	AABBs.clear();
-	OBBs.clear();
+	OBBs.clear();*/
+
+	lines.swap();
+	spheres.swap();
+	AABBs.swap();
+	OBBs.swap();
 }
 
 void DebugShapes::addLine( const DebugLine& line )
 {
-	lines.add( line );
+	lines.getWrite().add( line );
 }
 
 void DebugShapes::addSphere( const DebugSphere& sphere )
 {
-	spheres.add( sphere );
+	spheres.getWrite().add( sphere );
 }
 
 void DebugShapes::addAABB( const DebugAABB& aabb )
 {
-	AABBs.add( aabb );
+	AABBs.getWrite().add( aabb );
 }
 
 void DebugShapes::addOBB( const DebugOBB& obb )
 {
-	OBBs.add( obb );
+	OBBs.getWrite().add( obb );
 }

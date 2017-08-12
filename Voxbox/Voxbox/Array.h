@@ -149,7 +149,7 @@ public:
 		return capacity;
 	}
 
-private:
+protected:
 	void expand( int newCapacity )
 	{
 		T* temp = new T[newCapacity];

@@ -55,6 +55,9 @@ DWORD WINAPI update( LPVOID args )
 			if( data->coreData->input->keyReleased( SDL_SCANCODE_SPACE ) )
 				LOG( VERBOSITY_DEBUG, "main.cpp - User pressed the spacebar." );
 
+			DebugSphere sphere = { glm::vec3( 0.0f, 10.0f, 0.0f ), 2.0f, glm::vec4( 1.0f, 0.0f, 0.0f, 1.0f ) };
+			data->coreData->debugShapes->addSphere( sphere );
+
 			ReleaseSemaphore( data->updateDone, 1, NULL );
 		}
 	}
@@ -147,6 +150,7 @@ int main( int argc, char* argv[] )
 			coreData.input = &input;
 			coreData.console = &console;
 			coreData.chunks = chunks;
+			coreData.debugShapes = &debugShapes;
 
 			ThreadData threadData;
 			threadData.coreData = &coreData;
@@ -178,6 +182,8 @@ int main( int argc, char* argv[] )
 					graphics.getChunkCamera().finalize();
 					graphics.getTextCamera().finalize();
 					console.finalize();
+					cameraFrustum.addDebugLines( debugShapes );
+					debugShapes.finalize();
 
 					ReleaseSemaphore( threadData.renderDone, 1, NULL );
 				}
@@ -211,9 +217,6 @@ int main( int argc, char* argv[] )
 
 				//printf( "%d ms\n", endChunkRenderTime-startChunkRenderTime );
 
-				cameraFrustum.addDebugLines( debugShapes );
-
-				debugShapes.finalize();
 				debugShapes.render( graphics.getChunkCamera().getProjectionMatrix(), graphics.getChunkCamera().getViewMatrix() );
 
 				console.render( &graphics );

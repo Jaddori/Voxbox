@@ -7,4 +7,5 @@ struct CoreData
 	Input* input;
 	Console* console;
 	Chunk* chunks;
+	DebugShapes* debugShapes;
 };

@@ -108,5 +108,8 @@
     <ClInclude Include="Swap.h">
       <Filter>Source Files\Core</Filter>
     </ClInclude>
+    <ClInclude Include="SwapArray.h">
+      <Filter>Source Files\Core</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

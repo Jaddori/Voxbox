@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Array.h"
+
 #define SWAP_WRITE 0
 #define SWAP_READ 1
 
@@ -88,6 +90,6 @@ public:
 		return data[SWAP_WRITE];
 	}
 
-private:
+protected:
 	T data[2];
 };

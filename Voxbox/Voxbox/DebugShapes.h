@@ -58,15 +58,10 @@ public:
 	void addOBB( const DebugOBB& obb );
 
 private:
-	Array<DebugLine> lines;
-	Array<DebugSphere> spheres;
-	Array<DebugAABB> AABBs;
-	Array<DebugOBB> OBBs;
-
-	Array<DebugLine> finalLines;
-	Array<DebugSphere> finalSpheres;
-	Array<DebugAABB> finalAABBs;
-	Array<DebugOBB> finalOBBs;
+	SwapArray<DebugLine> lines;
+	SwapArray<DebugSphere> spheres;
+	SwapArray<DebugAABB> AABBs;
+	SwapArray<DebugOBB> OBBs;
 
 	// line
 	Shader lineShader;
