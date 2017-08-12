@@ -139,6 +139,7 @@ int main( int argc, char* argv[] )
 				for( int z=0; z<CHUNK_DEPTH; z++ )
 				{
 					chunks[x*CHUNK_WIDTH+z].setOffset( glm::vec3( x, 0.0f, z ) );
+					chunks[x*CHUNK_WIDTH+z].noise( x*CHUNK_SIZE, z*CHUNK_SIZE );
 				}
 			}
 

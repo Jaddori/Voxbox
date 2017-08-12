@@ -5,13 +5,8 @@ Chunk::Chunk()
 	vertices( nullptr ), indices( nullptr ),
 	valid( false ), uploaded( false )
 {
-#if 1
-	for( int i=0; i<CHUNK_VOLUME; i++ )
-	{
-		blocks[i] = rand() % 3;
-	}
-#else
 	memset( blocks, 0, CHUNK_VOLUME );
+#if 0
 	for( int y=0; y<CHUNK_SIZE; y++ )
 	{
 		blocks[at( 0, y, 0 )] = 1;
