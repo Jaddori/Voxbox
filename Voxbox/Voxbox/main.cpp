@@ -191,7 +191,6 @@ int main( int argc, char* argv[] )
 				graphics.begin();
 				texture.bind();
 
-				//const Frustum& frustum = graphics.getChunkCamera().getFinalFrustum();
 				const Frustum& frustum = graphics.getChunkCamera().getFrustum();
 
 				long startChunkRenderTime = SDL_GetTicks();
@@ -215,8 +214,7 @@ int main( int argc, char* argv[] )
 				cameraFrustum.addDebugLines( debugShapes );
 
 				debugShapes.finalize();
-				//debugShapes.render( graphics.getChunkCamera().getFinalProjectionMatrix(), graphics.getChunkCamera().getFinalViewMatrix() );
-				debugShapes.render( graphics.getChunkCamera().getProjectionMatrix().getRead(), graphics.getChunkCamera().getViewMatrix().getRead() );
+				debugShapes.render( graphics.getChunkCamera().getProjectionMatrix(), graphics.getChunkCamera().getViewMatrix() );
 
 				console.render( &graphics );
 

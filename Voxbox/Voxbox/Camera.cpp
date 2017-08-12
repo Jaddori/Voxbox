@@ -126,27 +126,27 @@ void Camera::setDirection( const glm::vec3& d )
 	dirtyFrustum = true;
 }
 
-const Swap<Frustum>& Camera::getFrustum()
+const Frustum& Camera::getFrustum() const
 {
-	return frustum;
+	return frustum.getRead();
 }
 
-const Swap<glm::mat4>& Camera::getViewMatrix() const
+const glm::mat4& Camera::getViewMatrix() const
 {
-	return viewMatrix;
+	return viewMatrix.getRead();
 }
 
-const Swap<glm::mat4>& Camera::getProjectionMatrix() const
+const glm::mat4& Camera::getProjectionMatrix() const
 {
-	return projectionMatrix;
+	return projectionMatrix.getRead();
 }
 
-const Swap<glm::vec3>& Camera::getPosition() const
+const glm::vec3& Camera::getPosition() const
 {
-	return position;
+	return position.getRead();
 }
 
-const Swap<glm::vec3>& Camera::getDirection() const
+const glm::vec3& Camera::getDirection() const
 {
-	return direction;
+	return direction.getRead();
 }

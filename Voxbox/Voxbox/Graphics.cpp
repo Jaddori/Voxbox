@@ -130,14 +130,14 @@ void Graphics::unload()
 void Graphics::begin()
 {
 	chunkShader.bind();
-	chunkShader.setMat4( chunkViewMatrixLocation, chunkCamera.getViewMatrix().getRead() );
-	chunkShader.setMat4( chunkProjectionMatrixLocation, chunkCamera.getProjectionMatrix().getRead() );
+	chunkShader.setMat4( chunkViewMatrixLocation, chunkCamera.getViewMatrix() );
+	chunkShader.setMat4( chunkProjectionMatrixLocation, chunkCamera.getProjectionMatrix() );
 
 	textShader.bind();
-	textShader.setMat4( textProjectionMatrixLocation, textCamera.getProjectionMatrix().getRead() );
+	textShader.setMat4( textProjectionMatrixLocation, textCamera.getProjectionMatrix() );
 
 	quadShader.bind();
-	quadShader.setMat4( quadProjectionMatrixLocation, textCamera.getProjectionMatrix().getRead() );
+	quadShader.setMat4( quadProjectionMatrixLocation, textCamera.getProjectionMatrix() );
 }
 
 void Graphics::end()
