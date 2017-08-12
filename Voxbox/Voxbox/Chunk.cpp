@@ -2,7 +2,8 @@
 
 Chunk::Chunk()
 	: vao( 0 ), vbo( 0 ), ibo( 0 ),
-	vertices( nullptr ), indices( nullptr )
+	vertices( nullptr ), indices( nullptr ),
+	valid( false ), uploaded( false )
 {
 #if 1
 	for( int i=0; i<CHUNK_VOLUME; i++ )
@@ -58,6 +59,8 @@ void Chunk::upload()
 
 	delete[] vertices;
 	delete[] indices;
+
+	uploaded = true;
 }
 
 void Chunk::unload()
@@ -128,6 +131,8 @@ void Chunk::calculateFaces()
 			}
 		}
 	}
+
+	valid = true;
 }
 
 void Chunk::addHorizontalFace( const glm::vec3& position, const glm::vec3& direction, bool invert )
@@ -246,12 +251,17 @@ const uint8_t* Chunk::getBlocks() const
 	return blocks;
 }
 
-const glm::vec4* Chunk::getPositions() const
-{
-	return positions;
-}
-
 const glm::vec3& Chunk::getOffset() const
 {
 	return offset;
+}
+
+bool Chunk::getValid() const
+{
+	return valid;
+}
+
+bool Chunk::getUploaded() const
+{
+	return uploaded;
 }

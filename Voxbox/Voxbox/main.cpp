@@ -11,6 +11,20 @@
 
 #define THREAD_UPDATE_WAIT 1000
 
+DWORD WINAPI generateChunks( LPVOID args )
+{
+	CoreData* data = (CoreData*)args;
+
+	for( int i=0; i<100; i++ )
+	{
+		data->chunks[i].calculateFaces();
+		
+		Sleep( 100 );
+	}
+
+	return 0;
+}
+
 struct ThreadData
 {
 	CoreData* coreData;
@@ -128,11 +142,11 @@ int main( int argc, char* argv[] )
 				}
 			}
 
-			for( int i=0; i<NUM_CHUNKS; i++ )
+			/*for( int i=0; i<NUM_CHUNKS; i++ )
 			{
 				chunks[i].calculateFaces();
 				chunks[i].upload();
-			}
+			}*/
 
 			DebugShapes debugShapes;
 			debugShapes.load();
@@ -160,8 +174,12 @@ int main( int argc, char* argv[] )
 			threadData.renderDone = CreateSemaphore( NULL, 1, 1, NULL );
 			HANDLE updateThread = CreateThread( NULL, 0, update, &threadData, 0, NULL );
 
+			HANDLE generationThread = CreateThread( NULL, 0, generateChunks, &coreData, 0, NULL );
+
 			long fpsTimer = SDL_GetTicks();
 			int fps = 0;
+
+			int currentChunk = 0;
 
 			while( threadData.running )
 			{
@@ -186,6 +204,15 @@ int main( int argc, char* argv[] )
 					cameraFrustum.addDebugLines( debugShapes );
 					debugShapes.finalize();
 
+					if( currentChunk < NUM_CHUNKS )
+					{
+						if( chunks[currentChunk].getValid() )
+						{
+							chunks[currentChunk].upload();
+							currentChunk++;
+						}
+					}
+
 					ReleaseSemaphore( threadData.renderDone, 1, NULL );
 				}
 
@@ -205,12 +232,15 @@ int main( int argc, char* argv[] )
 				{
 					for( int z=0; z<CHUNK_DEPTH; z++ )
 					{
+						if( chunks[x*CHUNK_WIDTH+z].getUploaded() )
+						{
 						glm::vec3 minPosition = glm::vec3( x, 0.0f, z ) * (float)CHUNK_SIZE;
 						glm::vec3 maxPosition = glm::vec3( x+1, 1, z+1 ) * (float)CHUNK_SIZE;
 
 						if( frustum.aabbCollision( minPosition, maxPosition ) )
 						{
 							graphics.renderChunk( &chunks[x*CHUNK_WIDTH+z] );
+						}
 						}
 					}
 				}
@@ -227,15 +257,15 @@ int main( int argc, char* argv[] )
 				SDL_GL_SwapWindow( window );
 
 				long ticks = SDL_GetTicks();
-				/*if( ticks - fpsTimer > 1000 )
+				if( ticks - fpsTimer > 1000 )
 				{
-					printf( "Fps: %d\n", fps );
+					//printf( "Fps: %d\n", fps );
 
 					fpsTimer = ticks;
 					fps = 0;
 				}
 				else
-					fps++;*/
+					fps++;
 			}
 
 			LOG( VERBOSITY_INFORMATION, "main.cpp - Waiting for update thread to finish." );

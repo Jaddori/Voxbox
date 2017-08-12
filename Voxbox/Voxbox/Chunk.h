@@ -28,8 +28,9 @@ public:
 	void setOffset( const glm::vec3& offset );
 
 	const uint8_t* getBlocks() const;
-	const glm::vec4* getPositions() const;
 	const glm::vec3& getOffset() const;
+	bool getValid() const;
+	bool getUploaded() const;
 
 private:
 	inline int at( int x, int y, int z ) { return ( y*CHUNK_SIZE*CHUNK_SIZE + z*CHUNK_SIZE + x ); }
@@ -38,7 +39,6 @@ private:
 	void addVerticalFace( const glm::vec3& position, bool invert );
 
 	uint8_t blocks[CHUNK_VOLUME];
-	glm::vec4 positions[CHUNK_VOLUME];
 	glm::vec3 offset;
 
 	Vertex* vertices;
@@ -49,4 +49,7 @@ private:
 	GLuint vao;
 	GLuint vbo;
 	GLuint ibo;
+
+	bool valid;
+	bool uploaded;
 };
