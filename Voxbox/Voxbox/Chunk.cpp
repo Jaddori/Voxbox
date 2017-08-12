@@ -87,40 +87,42 @@ void Chunk::calculateFaces()
 				uint8_t type = block( x, y, z );
 				if( type > 0 )
 				{
+					glm::vec2 uvOrigin( (float)(type % 10)*0.1f, (float)(type / 10)*0.1f );
+
 					// front
 					if( z == 0 || block( x, y, z-1 ) == 0 )
 					{
-						addHorizontalFace( glm::vec3( x, y, z ), glm::vec3( 1.0f, 0.0f, 0.0f ), false );
+						addHorizontalFace( glm::vec3( x, y, z ), glm::vec3( 1.0f, 0.0f, 0.0f ), uvOrigin+CHUNK_FRONT_UV, false );
 					}
 
 					// back
 					if( z == CHUNK_SIZE-1 || block( x, y, z+1 ) == 0 )
 					{
-						addHorizontalFace( glm::vec3( x, y, z+1.0f ), glm::vec3( 1.0f, 0.0f, 0.0f ), true );
+						addHorizontalFace( glm::vec3( x, y, z+1.0f ), glm::vec3( 1.0f, 0.0f, 0.0f ), uvOrigin+CHUNK_BACK_UV, true );
 					}
 
 					// left
 					if( x == 0 || block( x-1, y, z ) == 0 )
 					{
-						addHorizontalFace( glm::vec3( x, y, z ), glm::vec3( 0.0f, 0.0f, 1.0f ), true );
+						addHorizontalFace( glm::vec3( x, y, z ), glm::vec3( 0.0f, 0.0f, 1.0f ), uvOrigin+CHUNK_LEFT_UV, true );
 					}
 
 					// right
 					if( x == CHUNK_SIZE-1 || block( x+1, y, z ) == 0 )
 					{
-						addHorizontalFace( glm::vec3( x+1.0f, y, z ), glm::vec3( 0.0f, 0.0f, 1.0f ), false );
+						addHorizontalFace( glm::vec3( x+1.0f, y, z ), glm::vec3( 0.0f, 0.0f, 1.0f ), uvOrigin+CHUNK_RIGHT_UV, false );
 					}
 
 					// top
 					if( y == CHUNK_SIZE-1 || block( x, y+1, z ) == 0 )
 					{
-						addVerticalFace( glm::vec3( x, y+1.0f, z ), false );
+						addVerticalFace( glm::vec3( x, y+1.0f, z ), uvOrigin+CHUNK_TOP_UV, false );
 					}
 
 					// bottom
 					if( y == 0 || block( x, y-1, z ) == 0 )
 					{
-						addVerticalFace( glm::vec3( x, y, z ), true );
+						addVerticalFace( glm::vec3( x, y, z ), uvOrigin+CHUNK_BOTTOM_UV, true );
 					}
 				}
 			}
@@ -130,21 +132,21 @@ void Chunk::calculateFaces()
 	valid = true;
 }
 
-void Chunk::addHorizontalFace( const glm::vec3& position, const glm::vec3& direction, bool invert )
+void Chunk::addHorizontalFace( const glm::vec3& position, const glm::vec3& direction, const glm::vec2& uvOffset, bool invert )
 {
 	glm::vec3 pos = position + offset * (float)CHUNK_SIZE;
 
 	vertices[numVertices].position = pos;
-	vertices[numVertices].uv = glm::vec2( 0.1f, 0.05f );
+	vertices[numVertices].uv = glm::vec2( 0.0f, 0.05f ) + uvOffset;
 
 	vertices[numVertices+1].position = pos + glm::vec3( 0.0f, 1.0f, 0.0f );
-	vertices[numVertices+1].uv = glm::vec2( 0.1f, 0.0f );
+	vertices[numVertices+1].uv = glm::vec2( 0.0f, 0.0f ) + uvOffset;
 
 	vertices[numVertices+2].position = pos + direction;
-	vertices[numVertices+2].uv = glm::vec2( 0.15f, 0.05f );
+	vertices[numVertices+2].uv = glm::vec2( 0.05f, 0.05f ) + uvOffset;
 
 	vertices[numVertices+3].position = pos + direction + glm::vec3( 0.0f, 1.0f, 0.0f );
-	vertices[numVertices+3].uv = glm::vec2( 0.15f, 0.0f );
+	vertices[numVertices+3].uv = glm::vec2( 0.05f, 0.0f ) + uvOffset;
 
 	if( invert )
 	{
@@ -169,21 +171,21 @@ void Chunk::addHorizontalFace( const glm::vec3& position, const glm::vec3& direc
 	numIndices += 6;
 }
 
-void Chunk::addVerticalFace( const glm::vec3& position, bool invert )
+void Chunk::addVerticalFace( const glm::vec3& position, const glm::vec2& uvOffset, bool invert )
 {
 	glm::vec3 pos = position + offset * (float)CHUNK_SIZE;
 
 	vertices[numVertices].position = pos;
-	vertices[numVertices].uv = glm::vec2( 0.1f, 0.05f );
+	vertices[numVertices].uv = glm::vec2( 0.0f, 0.05f ) + uvOffset;
 
 	vertices[numVertices+1].position = pos + glm::vec3( 0.0f, 0.0f, 1.0f );
-	vertices[numVertices+1].uv = glm::vec2( 0.1f, 0.0f );
+	vertices[numVertices+1].uv = glm::vec2( 0.0f, 0.0f ) + uvOffset;
 
 	vertices[numVertices+2].position = pos + glm::vec3( 1.0f, 0.0f, 0.0f );
-	vertices[numVertices+2].uv = glm::vec2( 0.15f, 0.05f );
+	vertices[numVertices+2].uv = glm::vec2( 0.05f, 0.05f ) + uvOffset;
 
 	vertices[numVertices+3].position = pos + glm::vec3( 1.0f, 0.0f, 1.0f );
-	vertices[numVertices+3].uv = glm::vec2( 0.15f, 0.0f );
+	vertices[numVertices+3].uv = glm::vec2( 0.05f, 0.0f ) + uvOffset;
 
 	if( invert )
 	{
@@ -223,7 +225,10 @@ void Chunk::noise( int x, int z )
 
 			for( int blockY = 0; blockY < height; blockY++ )
 			{
-				blocks[at( blockX, blockY, blockZ )] = 1;
+				if( blockY < CHUNK_STONE_THRESHOLD )
+					blocks[at( blockX, blockY, blockZ )] = 2;
+				else
+					blocks[at( blockX, blockY, blockZ )] = 1;
 			}
 		}
 	}
