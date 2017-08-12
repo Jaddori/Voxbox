@@ -170,6 +170,7 @@
     <ClInclude Include="Input.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="Swap.h" />
     <ClInclude Include="Texture.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

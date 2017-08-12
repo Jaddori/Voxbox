@@ -105,5 +105,8 @@
     <ClInclude Include="CoreData.h">
       <Filter>Source Files\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Swap.h">
+      <Filter>Source Files\Core</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
