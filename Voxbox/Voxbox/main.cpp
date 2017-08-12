@@ -15,12 +15,16 @@ DWORD WINAPI generateChunks( LPVOID args )
 {
 	CoreData* data = (CoreData*)args;
 
+	LOG( VERBOSITY_INFORMATION, "main.cpp - Starting chunk generation thread." );
+
 	for( int i=0; i<100; i++ )
 	{
 		data->chunks[i].calculateFaces();
 		
 		Sleep( 100 );
 	}
+
+	LOG( VERBOSITY_INFORMATION, "main.cpp - Chunk generation thread finished." );
 
 	return 0;
 }
@@ -217,8 +221,6 @@ int main( int argc, char* argv[] )
 					ReleaseSemaphore( threadData.renderDone, 1, NULL );
 				}
 
-				// update
-
 				// render
 				glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -228,26 +230,22 @@ int main( int argc, char* argv[] )
 
 				const Frustum& frustum = graphics.getChunkCamera().getFrustum();
 
-				long startChunkRenderTime = SDL_GetTicks();
 				for( int x=0; x<CHUNK_WIDTH; x++ )
 				{
 					for( int z=0; z<CHUNK_DEPTH; z++ )
 					{
 						if( chunks[x*CHUNK_WIDTH+z].getUploaded() )
 						{
-						glm::vec3 minPosition = glm::vec3( x, 0.0f, z ) * (float)CHUNK_SIZE;
-						glm::vec3 maxPosition = glm::vec3( x+1, 1, z+1 ) * (float)CHUNK_SIZE;
+							glm::vec3 minPosition = glm::vec3( x, 0.0f, z ) * (float)CHUNK_SIZE;
+							glm::vec3 maxPosition = glm::vec3( x+1, 1, z+1 ) * (float)CHUNK_SIZE;
 
-						if( frustum.aabbCollision( minPosition, maxPosition ) )
-						{
-							graphics.renderChunk( &chunks[x*CHUNK_WIDTH+z] );
-						}
+							if( frustum.aabbCollision( minPosition, maxPosition ) )
+							{
+								graphics.renderChunk( &chunks[x*CHUNK_WIDTH+z] );
+							}
 						}
 					}
 				}
-				long endChunkRenderTime = SDL_GetTicks();
-
-				//printf( "%d ms\n", endChunkRenderTime-startChunkRenderTime );
 
 				debugShapes.render( graphics.getChunkCamera().getProjectionMatrix(), graphics.getChunkCamera().getViewMatrix() );
 

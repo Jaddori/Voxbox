@@ -5,6 +5,7 @@
 
 #define CHUNK_SIZE 16
 #define CHUNK_VOLUME (CHUNK_SIZE*CHUNK_SIZE*CHUNK_SIZE)
+#define CHUNK_NOISE_MULTIPLIER 0.0137f
 
 struct Vertex
 {

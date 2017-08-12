@@ -214,7 +214,7 @@ void Chunk::noise( int x, int z )
 	{
 		for( int blockZ = 0; blockZ < CHUNK_SIZE; blockZ++ )
 		{
-			float noiseValue = ( glm::perlin( glm::vec2( x+blockX, z+blockZ ) * 0.0137f ) + 1.0f ) * 0.5f;
+			float noiseValue = ( glm::perlin( glm::vec2( x+blockX, z+blockZ ) * CHUNK_NOISE_MULTIPLIER ) + 1.0f ) * 0.5f;
 			int height = (int)( noiseValue * CHUNK_SIZE ) + 1;
 			if( height <= 0 )
 				height = 1;
