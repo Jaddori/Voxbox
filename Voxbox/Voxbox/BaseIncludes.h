@@ -34,6 +34,9 @@
 const float PI = glm::pi<float>();
 const float EPSILON = glm::epsilon<float>();
 
+// Lua
+#include "lua.hpp"
+
 // Core
 #include "Log.h"
 #include "Array.h"

@@ -23,6 +23,9 @@
     <Filter Include="Source Files\Core">
       <UniqueIdentifier>{7f197beb-a365-47e2-90d7-eb6c9e296593}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Lua">
+      <UniqueIdentifier>{6a94925c-6b8e-44dd-93f4-66ae8b7b5632}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -60,6 +63,9 @@
     </ClCompile>
     <ClCompile Include="Frustum.cpp">
       <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaBinds.cpp">
+      <Filter>Source Files\Lua</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -110,6 +116,9 @@
     </ClInclude>
     <ClInclude Include="SwapArray.h">
       <Filter>Source Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaBinds.h">
+      <Filter>Source Files\Lua</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

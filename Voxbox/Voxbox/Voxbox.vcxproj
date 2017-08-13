@@ -152,6 +152,7 @@
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Log.cpp" />
+    <ClCompile Include="LuaBinds.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -169,6 +170,7 @@
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Log.h" />
+    <ClInclude Include="LuaBinds.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Swap.h" />
     <ClInclude Include="SwapArray.h" />

@@ -8,6 +8,7 @@
 #include "Console.h"
 #include "DebugShapes.h"
 #include "CoreData.h"
+#include "LuaBinds.h"
 
 #define THREAD_UPDATE_WAIT 1000
 #define CHUNK_WIDTH 10
@@ -185,6 +186,12 @@ int main( int argc, char* argv[] )
 			coreData.chunks = chunks;
 			coreData.graphics = &graphics;
 			coreData.debugShapes = &debugShapes;
+
+			LuaBinds luaBinds;
+			luaBinds.bind( &coreData );
+			luaBinds.load();
+			luaBinds.unload();
+			luaBinds.update();
 
 			ThreadData threadData;
 			threadData.coreData = &coreData;
