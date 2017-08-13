@@ -116,7 +116,7 @@ const FontInfo& Font::getInfo() const
 	return info;
 }
 
-const Texture& Font::getTexture() const
+Texture* Font::getTexture()
 {
-	return texture;
+	return &texture;
 }

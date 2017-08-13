@@ -37,7 +37,7 @@ public:
 	glm::vec4 getUV( char c ) const;
 
 	const FontInfo& getInfo() const;
-	const Texture& getTexture() const;
+	Texture* getTexture();
 
 private:
 	FontInfo info;

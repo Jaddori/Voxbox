@@ -173,12 +173,6 @@ void Graphics::begin()
 	chunkShader.bind();
 	chunkShader.setMat4( chunkViewMatrixLocation, chunkCamera.getViewMatrix() );
 	chunkShader.setMat4( chunkProjectionMatrixLocation, chunkCamera.getProjectionMatrix() );
-
-	textShader.bind();
-	textShader.setMat4( textProjectionMatrixLocation, textCamera.getProjectionMatrix() );
-
-	quadShader.bind();
-	quadShader.setMat4( quadProjectionMatrixLocation, textCamera.getProjectionMatrix() );
 }
 
 void Graphics::end()
@@ -191,10 +185,10 @@ void Graphics::end()
 	glBindVertexArray( billboardVAO );
 	glBindBuffer( GL_ARRAY_BUFFER, billboardVBO );
 
-	const int COLLECTION_COUNT = billboards.getSize();
-	for( int curCollection = 0; curCollection < COLLECTION_COUNT; curCollection++ )
+	const int BILLBOARD_COLLECTION_COUNT = billboardCollections.getSize();
+	for( int curCollection = 0; curCollection < BILLBOARD_COLLECTION_COUNT; curCollection++ )
 	{
-		BillboardCollection& collection = billboards[curCollection];
+		BillboardCollection& collection = billboardCollections[curCollection];
 
 		if( collection.texture )
 			collection.texture->bind();
@@ -219,6 +213,83 @@ void Graphics::end()
 	}
 
 	glBindVertexArray( 0 );
+
+	// render quads
+	quadShader.bind();
+	quadShader.setMat4( quadProjectionMatrixLocation, textCamera.getProjectionMatrix() );
+
+	glBindVertexArray( quadVAO );
+	glBindBuffer( GL_ARRAY_BUFFER, quadVBO );
+
+	glDisable( GL_DEPTH_TEST );
+	glEnable( GL_BLEND );
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+	const int QUAD_COLLECTION_COUNT = quadCollections.getSize();
+	for( int curCollection = 0; curCollection < QUAD_COLLECTION_COUNT; curCollection++ )
+	{
+		QuadCollection& collection = quadCollections[curCollection];
+
+		if( collection.texture )
+			collection.texture->bind();
+		else
+			glBindTexture( GL_TEXTURE_2D, 0 );
+
+		const int QUAD_COUNT = collection.quads.getSize();
+		int offset = 0;
+		while( offset < QUAD_COUNT )
+		{
+			int count = QUAD_COUNT - offset;
+			if( count > GRAPHICS_MAX_QUADS )
+				count = GRAPHICS_MAX_QUADS;
+
+			glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(Quad)*count, collection.quads.getData() + offset );
+			glDrawArrays( GL_POINTS, 0, count );
+
+			offset += count;
+		}
+
+		collection.quads.clear();
+	}
+
+	// render text
+	textShader.bind();
+	textShader.setMat4( textProjectionMatrixLocation, textCamera.getProjectionMatrix() );
+
+	glBindVertexArray( textVAO );
+	glBindBuffer( GL_ARRAY_BUFFER, textVBO );
+
+	const int GLYPH_COLLECTION_COUNT = glyphCollections.getSize();
+	for( int curCollection = 0; curCollection < GLYPH_COLLECTION_COUNT; curCollection++ )
+	{
+		GlyphCollection& collection = glyphCollections[curCollection];
+
+		if( collection.texture )
+			collection.texture->bind();
+		else
+			glBindTexture( GL_TEXTURE_2D, 0 );
+
+		const int GLYPH_COUNT = collection.glyphs.getSize();
+		int offset = 0;
+		while( offset < GLYPH_COUNT )
+		{
+			int count = GLYPH_COUNT - offset;
+			if( count > GRAPHICS_MAX_GLYPHS )
+				count = GRAPHICS_MAX_GLYPHS;
+
+			glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(Glyph)*count, collection.glyphs.getData()+offset );
+			glDrawArrays( GL_POINTS, 0, count );
+
+			offset += count;
+		}
+
+		collection.glyphs.clear();
+	}
+
+	glBindVertexArray( 0 );
+
+	glDisable( GL_BLEND );
+	glEnable( GL_DEPTH_TEST );
 }
 
 void Graphics::renderChunk( Chunk* chunk )
@@ -231,14 +302,27 @@ void Graphics::renderChunk( Chunk* chunk )
 
 void Graphics::renderText( Font* font, const char* text, const glm::vec2& position, const glm::vec4& color )
 {
+	const int GLYPH_COLLECTION_COUNT = glyphCollections.getSize();
+	int collectionIndex = -1;
+	for( int i=0; i<GLYPH_COLLECTION_COUNT && collectionIndex < 0; i++ )
+		if( glyphCollections[i].texture == font->getTexture() )
+			collectionIndex = i;
+
+	if( collectionIndex < 0 ) // this is a new texture
+	{
+		GlyphCollection& collection = glyphCollections.append();
+		collection.texture = font->getTexture();
+
+		collectionIndex = GLYPH_COLLECTION_COUNT;
+	}
+
+	GlyphCollection& collection = glyphCollections[collectionIndex];
+
 	glm::vec2 offset;
-
-	Glyph glyphs[GRAPHICS_MAX_GLYPHS];
-
 	int index = 0;
 
 	const char* cur = text;
-	while( *cur && index < GRAPHICS_MAX_GLYPHS )
+	while( *cur )
 	{
 		if( *cur == '\n' )
 		{
@@ -253,40 +337,26 @@ void Graphics::renderText( Font* font, const char* text, const glm::vec2& positi
 		{
 			char c = *cur - FONT_FIRST;
 
-			glyphs[index].position = position + offset;
-			glyphs[index].uv = font->getUV( c );
-			glyphs[index].size.x = font->getWidth( c );
-			glyphs[index].size.y = font->getHeight();
-			glyphs[index].color = color;
+			Glyph& glyph = collection.glyphs.append();
 
-			offset.x += glyphs[index].size.x;
+			glyph.position = position + offset;
+			glyph.uv = font->getUV( c );
+			glyph.size.x = font->getWidth( c );
+			glyph.size.y = font->getHeight();
+			glyph.color = color;
+
+			offset.x += glyph.size.x;
 
 			index++;
 		}
 
 		*cur++;
 	}
-
-	textShader.bind();
-	font->getTexture().bind();
-
-	glDisable( GL_DEPTH_TEST );
-	glEnable( GL_BLEND );
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
-	glBindVertexArray( textVAO );
-	glBindBuffer( GL_ARRAY_BUFFER, textVBO );
-	glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(Glyph)*index, glyphs );
-	glDrawArrays( GL_POINTS, 0, index );
-	glBindVertexArray( 0 );
-
-	glDisable( GL_BLEND );
-	glEnable( GL_DEPTH_TEST );
 }
 
-void Graphics::renderQuad( const glm::vec2& position, const glm::vec2& size, Texture* texture, float opacity )
+void Graphics::renderQuad( const glm::vec2& position, const glm::vec4& uv, const glm::vec2& size, float opacity, Texture* texture  )
 {
-	quadShader.bind();
+	/*quadShader.bind();
 
 	if( texture )
 		texture->bind();
@@ -306,28 +376,50 @@ void Graphics::renderQuad( const glm::vec2& position, const glm::vec2& size, Tex
 	glBindVertexArray( 0 );
 
 	glDisable( GL_BLEND );
-	glEnable( GL_DEPTH_TEST );
-}
+	glEnable( GL_DEPTH_TEST );*/
 
-void Graphics::renderBillboard( const glm::vec3& position, const glm::vec4& uv, const glm::vec2& size, bool spherical, Texture* texture )
-{
-	const int BILLBOARD_COUNT = billboards.getSize();
+	const int QUAD_COUNT = quadCollections.getSize();
 
 	int index = -1;
-	for( int i=0; i<BILLBOARD_COUNT && index < 0; i++ )
-		if( billboards[i].texture == texture )
+	for( int i=0; i<QUAD_COUNT && index < 0; i++ )
+		if( quadCollections[i].texture == texture )
 			index = i;
 
 	if( index < 0 ) // this is a new texture
 	{
-		BillboardCollection& collection = billboards.append();
+		QuadCollection& collection = quadCollections.append();
+		collection.texture = texture;
+		collection.quads.expand( GRAPHICS_MAX_QUADS );
+
+		index = QUAD_COUNT;
+	}
+
+	Quad& quad = quadCollections[index].quads.append();
+	quad.position = position;
+	quad.uv = uv;
+	quad.size = size;
+	quad.opacity = opacity;
+}
+
+void Graphics::renderBillboard( const glm::vec3& position, const glm::vec4& uv, const glm::vec2& size, bool spherical, Texture* texture )
+{
+	const int BILLBOARD_COUNT = billboardCollections.getSize();
+
+	int index = -1;
+	for( int i=0; i<BILLBOARD_COUNT && index < 0; i++ )
+		if( billboardCollections[i].texture == texture )
+			index = i;
+
+	if( index < 0 ) // this is a new texture
+	{
+		BillboardCollection& collection = billboardCollections.append();
 		collection.texture = texture;
 		collection.billboards.expand( GRAPHICS_MAX_BILLBOARDS );
 
 		index = BILLBOARD_COUNT;
 	}
 
-	Billboard& billboard = billboards[index].billboards.append();
+	Billboard& billboard = billboardCollections[index].billboards.append();
 	billboard.position = position;
 	billboard.uv = uv;
 	billboard.size = size;

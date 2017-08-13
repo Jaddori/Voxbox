@@ -58,7 +58,7 @@ void Console::render( Graphics* graphics )
 		};
 
 		// draw background
-		graphics->renderQuad( glm::vec2( 0.0f, 0.0f ), glm::vec2( CONSOLE_WIDTH, CONSOLE_HEIGHT ), nullptr, CONSOLE_OPACITY );
+		graphics->renderQuad( glm::vec2( 0.0f, 0.0f ), glm::vec4( 0.0f ), glm::vec2( CONSOLE_WIDTH, CONSOLE_HEIGHT ), CONSOLE_OPACITY, nullptr );
 
 		// draw messages
 		float yoffset = 256.0f;

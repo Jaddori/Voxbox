@@ -18,12 +18,24 @@ struct Glyph
 	glm::vec4 color;
 };
 
+struct GlyphCollection
+{
+	Texture* texture;
+	Array<Glyph> glyphs;
+};
+
 struct Quad
 {
 	glm::vec2 position;
 	glm::vec4 uv;
 	glm::vec2 size;
 	float opacity;
+};
+
+struct QuadCollection
+{
+	Texture* texture;
+	Array<Quad> quads;
 };
 
 struct Billboard
@@ -54,7 +66,7 @@ public:
 
 	void renderChunk( Chunk* chunk );
 	void renderText( Font* font, const char* text, const glm::vec2& position, const glm::vec4& color );
-	void renderQuad( const glm::vec2& position, const glm::vec2& size, Texture* texture, float opacity );
+	void renderQuad( const glm::vec2& position, const glm::vec4& uv, const glm::vec2& size, float opacity, Texture* texture );
 	void renderBillboard( const glm::vec3& position, const glm::vec4& uv, const glm::vec2& size, bool spherical, Texture* texture );
 
 	Camera& getChunkCamera();
@@ -76,12 +88,16 @@ private:
 	GLuint textVAO;
 	GLuint textVBO;
 
+	Array<GlyphCollection> glyphCollections;
+
 	// rendering quads
 	Shader quadShader;
 	GLint quadProjectionMatrixLocation;
 
 	GLuint quadVAO;
 	GLuint quadVBO;
+
+	Array<QuadCollection> quadCollections;
 
 	// rendering billboards
 	Shader billboardShader;
@@ -91,5 +107,5 @@ private:
 	GLuint billboardVAO;
 	GLuint billboardVBO;
 
-	Array<BillboardCollection> billboards;
+	Array<BillboardCollection> billboardCollections;
 };
