@@ -21,7 +21,7 @@ struct Glyph
 struct GlyphCollection
 {
 	Texture* texture;
-	Array<Glyph> glyphs;
+	Array<Glyph> glyphs[2];
 };
 
 struct Quad
@@ -60,28 +60,34 @@ public:
 
 	bool load();
 	void unload();
+	void finalize();
 
-	void begin();
-	void end();
+	void render();
 
-	void renderChunk( Chunk* chunk );
-	void renderText( Font* font, const char* text, const glm::vec2& position, const glm::vec4& color );
-	void renderQuad( const glm::vec2& position, const glm::vec4& uv, const glm::vec2& size, float opacity, Texture* texture );
-	void renderBillboard( const glm::vec3& position, const glm::vec4& uv, const glm::vec2& size, bool spherical, Texture* texture );
+	void queueChunk( Chunk* chunk );
+	void queueText( Font* font, const char* text, const glm::vec2& position, const glm::vec4& color );
+	void queueQuad( const glm::vec2& position, const glm::vec4& uv, const glm::vec2& size, float opacity, Texture* texture );
+	void queueBillboard( const glm::vec3& position, const glm::vec4& uv, const glm::vec2& size, bool spherical, Texture* texture );
 
-	Camera& getChunkCamera();
-	Camera& getTextCamera();
+	Camera& getPerspectiveCamera();
+	Camera& getOrthographicCamera();
 
 private:
+	Camera perspectiveCamera;
+	Camera orthographicCamera;
+	int writeIndex;
+	int readIndex;
+
 	// rendering chunks
-	Camera chunkCamera;
 	Shader chunkShader;
-	GLint chunkViewMatrixLocation;
+	Texture blockAtlas;
 	GLint chunkProjectionMatrixLocation;
+	GLint chunkViewMatrixLocation;
 	GLint chunkOffsetLocation;
 
+	Array<Chunk*> chunks[2];
+	
 	// rendering text
-	Camera textCamera;
 	Shader textShader;
 	GLint textProjectionMatrixLocation;
 

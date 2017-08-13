@@ -10,6 +10,9 @@
 #include "CoreData.h"
 
 #define THREAD_UPDATE_WAIT 1000
+#define CHUNK_WIDTH 10
+#define CHUNK_DEPTH 10
+#define NUM_CHUNKS (CHUNK_WIDTH * CHUNK_DEPTH)
 
 DWORD WINAPI generateChunks( LPVOID args )
 {
@@ -76,6 +79,27 @@ DWORD WINAPI update( LPVOID args )
 			DebugSphere sphere = { glm::vec3( 0.0f, 0.0f, 0.0f ), 2.0f, glm::vec4( 1.0f, 0.0f, 0.0f, 1.0f ) };
 			data->coreData->debugShapes->addSphere( sphere );
 
+			const Frustum& frustum = data->coreData->perspectiveCamera->getFrustum();
+
+			for( int x=0; x<CHUNK_WIDTH; x++ )
+			{
+				for( int z=0; z<CHUNK_DEPTH; z++ )
+				{
+					if( data->coreData->chunks[x*CHUNK_WIDTH+z].getUploaded() )
+					{
+						glm::vec3 minPosition = glm::vec3( x, 0.0f, z ) * (float)CHUNK_SIZE;
+						glm::vec3 maxPosition = glm::vec3( x+1, 1, z+1 ) * (float)CHUNK_SIZE;
+
+						if( frustum.aabbCollision( minPosition, maxPosition ) )
+						{
+							data->coreData->graphics->queueChunk( &data->coreData->chunks[x*CHUNK_WIDTH+z] );
+						}
+					}
+				}
+			}
+
+			data->coreData->console->render( data->coreData->graphics );
+
 			ReleaseSemaphore( data->updateDone, 1, NULL );
 		}
 	}
@@ -131,11 +155,8 @@ int main( int argc, char* argv[] )
 
 			Graphics graphics;
 			graphics.load();
-			graphics.getChunkCamera().setPosition( glm::vec3( 0.0f, 0.0f, -10.0f ) );
+			graphics.getPerspectiveCamera().setPosition( glm::vec3( 0.0f, 0.0f, -10.0f ) );
 
-			const int CHUNK_WIDTH = 10;
-			const int CHUNK_DEPTH = 10;
-			const int NUM_CHUNKS = CHUNK_WIDTH * CHUNK_DEPTH;
 			Chunk* chunks = new Chunk[NUM_CHUNKS];
 
 			for( int x=0; x<CHUNK_WIDTH; x++ )
@@ -147,12 +168,6 @@ int main( int argc, char* argv[] )
 				}
 			}
 
-			/*for( int i=0; i<NUM_CHUNKS; i++ )
-			{
-				chunks[i].calculateFaces();
-				chunks[i].upload();
-			}*/
-
 			DebugShapes debugShapes;
 			debugShapes.load();
 			debugShapes.upload();
@@ -163,13 +178,12 @@ int main( int argc, char* argv[] )
 
 			Input input;
 
-			Frustum cameraFrustum;
-
 			CoreData coreData;
-			coreData.perspectiveCamera = &graphics.getChunkCamera();
+			coreData.perspectiveCamera = &graphics.getPerspectiveCamera();
 			coreData.input = &input;
 			coreData.console = &console;
 			coreData.chunks = chunks;
+			coreData.graphics = &graphics;
 			coreData.debugShapes = &debugShapes;
 
 			ThreadData threadData;
@@ -203,10 +217,8 @@ int main( int argc, char* argv[] )
 					}
 
 					// finalize objects
-					graphics.getChunkCamera().finalize();
-					graphics.getTextCamera().finalize();
+					graphics.finalize();
 					console.finalize();
-					cameraFrustum.addDebugLines( debugShapes );
 					debugShapes.finalize();
 
 					if( currentChunk < NUM_CHUNKS )
@@ -225,32 +237,10 @@ int main( int argc, char* argv[] )
 				glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-				graphics.begin();
-				texture.bind();
+				debugShapes.render( graphics.getPerspectiveCamera().getProjectionMatrix(), graphics.getPerspectiveCamera().getViewMatrix() );
 
-				const Frustum& frustum = graphics.getChunkCamera().getFrustum();
-
-				for( int x=0; x<CHUNK_WIDTH; x++ )
-				{
-					for( int z=0; z<CHUNK_DEPTH; z++ )
-					{
-						if( chunks[x*CHUNK_WIDTH+z].getUploaded() )
-						{
-							glm::vec3 minPosition = glm::vec3( x, 0.0f, z ) * (float)CHUNK_SIZE;
-							glm::vec3 maxPosition = glm::vec3( x+1, 1, z+1 ) * (float)CHUNK_SIZE;
-
-							if( frustum.aabbCollision( minPosition, maxPosition ) )
-							{
-								graphics.renderChunk( &chunks[x*CHUNK_WIDTH+z] );
-							}
-						}
-					}
-				}
-
-				debugShapes.render( graphics.getChunkCamera().getProjectionMatrix(), graphics.getChunkCamera().getViewMatrix() );
-
-				console.render( &graphics );
-				graphics.end();
+				//console.render( &graphics );
+				graphics.render();
 
 				SDL_GL_SwapWindow( window );
 

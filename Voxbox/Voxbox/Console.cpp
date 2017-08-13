@@ -58,7 +58,7 @@ void Console::render( Graphics* graphics )
 		};
 
 		// draw background
-		graphics->renderQuad( glm::vec2( 0.0f, 0.0f ), glm::vec4( 0.0f ), glm::vec2( CONSOLE_WIDTH, CONSOLE_HEIGHT ), CONSOLE_OPACITY, nullptr );
+		graphics->queueQuad( glm::vec2( 0.0f, 0.0f ), glm::vec4( 0.0f ), glm::vec2( CONSOLE_WIDTH, CONSOLE_HEIGHT ), CONSOLE_OPACITY, nullptr );
 
 		// draw messages
 		float yoffset = 256.0f;
@@ -72,7 +72,7 @@ void Console::render( Graphics* graphics )
 				yoffset -= textBounds.y;
 				if( yoffset >= 0.0f )
 				{
-					graphics->renderText( &font, message.message, glm::vec2( 8.0f, yoffset ), TEXT_COLORS[message.verbosity] );
+					graphics->queueText( &font, message.message, glm::vec2( 8.0f, yoffset ), TEXT_COLORS[message.verbosity] );
 				}
 			}
 		}

@@ -5,7 +5,8 @@ Graphics::Graphics()
 	textProjectionMatrixLocation( 0 ), textVAO( 0 ), textVBO( 0 ),
 	quadProjectionMatrixLocation( 0 ), quadVAO( 0 ), quadVBO( 0 ),
 	billboardProjectionMatrixLocation( 0 ), billboardViewMatrixLocation( 0 ),
-	billboardVAO( 0 ), billboardVBO( 0 )
+	billboardVAO( 0 ), billboardVBO( 0 ),
+	writeIndex( 0 ), readIndex( 1 )
 {
 	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Constructing." );
 }
@@ -22,8 +23,8 @@ bool Graphics::load()
 	bool result = false;
 
 	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Initializing cameras." );
-	chunkCamera.updatePerspective( WINDOW_WIDTH, WINDOW_HEIGHT );
-	textCamera.updateOrthographic( WINDOW_WIDTH, WINDOW_HEIGHT );
+	perspectiveCamera.updatePerspective( WINDOW_WIDTH, WINDOW_HEIGHT );
+	orthographicCamera.updateOrthographic( WINDOW_WIDTH, WINDOW_HEIGHT );
 
 	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Loading chunk shader." );
 	if( chunkShader.load( "./assets/shaders/chunk.vs",
@@ -37,6 +38,17 @@ bool Graphics::load()
 	else
 	{
 		LOG( VERBOSITY_ERROR, "Graphics.cpp - Failed to load chunk shader." );
+		result = false;
+	}
+
+	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Loading block atlas." );
+	if( blockAtlas.load( "./assets/textures/blocks.dds" ) )
+	{
+		blockAtlas.upload();
+	}
+	else
+	{
+		LOG( VERBOSITY_ERROR, "Graphics.cpp - Failed to load block atlas." );
 		result = false;
 	}
 
@@ -168,19 +180,44 @@ void Graphics::unload()
 	billboardVAO = billboardVBO = 0;
 }
 
-void Graphics::begin()
+void Graphics::finalize()
 {
-	chunkShader.bind();
-	chunkShader.setMat4( chunkViewMatrixLocation, chunkCamera.getViewMatrix() );
-	chunkShader.setMat4( chunkProjectionMatrixLocation, chunkCamera.getProjectionMatrix() );
+	// finalize cameras
+	perspectiveCamera.finalize();
+	orthographicCamera.finalize();
+
+	// swap index
+	writeIndex = ( writeIndex + 1 ) % 2;
+	readIndex = ( readIndex + 1 ) % 2;
+
+	// swap chunks
+	chunks[writeIndex].clear();
+
+	// swap glyphs
+	const int GLYPH_COLLECTION_COUNT = glyphCollections.getSize();
+	for( int i=0; i<GLYPH_COLLECTION_COUNT; i++ )
+		glyphCollections[i].glyphs[writeIndex].clear();
 }
 
-void Graphics::end()
+void Graphics::render()
 {
+	// render chunks
+	chunkShader.bind();
+	chunkShader.setMat4( chunkProjectionMatrixLocation, perspectiveCamera.getProjectionMatrix() );
+	chunkShader.setMat4( chunkViewMatrixLocation, perspectiveCamera.getViewMatrix() );
+
+	blockAtlas.bind();
+
+	const int CHUNK_COUNT = chunks[readIndex].getSize();
+	for( int i=0; i<CHUNK_COUNT; i++ )
+		chunks[readIndex][i]->render();
+
+	glBindTexture( GL_TEXTURE_2D, 0 ); // prevent binding leaks
+
 	// render billboards
 	billboardShader.bind();
-	billboardShader.setMat4( billboardProjectionMatrixLocation, chunkCamera.getProjectionMatrix() );
-	billboardShader.setMat4( billboardViewMatrixLocation, chunkCamera.getViewMatrix() );
+	billboardShader.setMat4( billboardProjectionMatrixLocation, perspectiveCamera.getProjectionMatrix() );
+	billboardShader.setMat4( billboardViewMatrixLocation, perspectiveCamera.getViewMatrix() );
 
 	glBindVertexArray( billboardVAO );
 	glBindBuffer( GL_ARRAY_BUFFER, billboardVBO );
@@ -216,7 +253,7 @@ void Graphics::end()
 
 	// render quads
 	quadShader.bind();
-	quadShader.setMat4( quadProjectionMatrixLocation, textCamera.getProjectionMatrix() );
+	quadShader.setMat4( quadProjectionMatrixLocation, orthographicCamera.getProjectionMatrix() );
 
 	glBindVertexArray( quadVAO );
 	glBindBuffer( GL_ARRAY_BUFFER, quadVBO );
@@ -254,7 +291,7 @@ void Graphics::end()
 
 	// render text
 	textShader.bind();
-	textShader.setMat4( textProjectionMatrixLocation, textCamera.getProjectionMatrix() );
+	textShader.setMat4( textProjectionMatrixLocation, orthographicCamera.getProjectionMatrix() );
 
 	glBindVertexArray( textVAO );
 	glBindBuffer( GL_ARRAY_BUFFER, textVBO );
@@ -269,7 +306,7 @@ void Graphics::end()
 		else
 			glBindTexture( GL_TEXTURE_2D, 0 );
 
-		const int GLYPH_COUNT = collection.glyphs.getSize();
+		const int GLYPH_COUNT = collection.glyphs[readIndex].getSize();
 		int offset = 0;
 		while( offset < GLYPH_COUNT )
 		{
@@ -277,13 +314,11 @@ void Graphics::end()
 			if( count > GRAPHICS_MAX_GLYPHS )
 				count = GRAPHICS_MAX_GLYPHS;
 
-			glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(Glyph)*count, collection.glyphs.getData()+offset );
+			glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(Glyph)*count, collection.glyphs[readIndex].getData()+offset );
 			glDrawArrays( GL_POINTS, 0, count );
 
 			offset += count;
 		}
-
-		collection.glyphs.clear();
 	}
 
 	glBindVertexArray( 0 );
@@ -292,15 +327,12 @@ void Graphics::end()
 	glEnable( GL_DEPTH_TEST );
 }
 
-void Graphics::renderChunk( Chunk* chunk )
+void Graphics::queueChunk( Chunk* chunk )
 {
-	chunkShader.bind();
-	//chunkShader.setVec3( chunkOffsetLocation, chunk->getOffset() );
-
-	chunk->render();
+	chunks[writeIndex].add( chunk );
 }
 
-void Graphics::renderText( Font* font, const char* text, const glm::vec2& position, const glm::vec4& color )
+void Graphics::queueText( Font* font, const char* text, const glm::vec2& position, const glm::vec4& color )
 {
 	const int GLYPH_COLLECTION_COUNT = glyphCollections.getSize();
 	int collectionIndex = -1;
@@ -337,7 +369,7 @@ void Graphics::renderText( Font* font, const char* text, const glm::vec2& positi
 		{
 			char c = *cur - FONT_FIRST;
 
-			Glyph& glyph = collection.glyphs.append();
+			Glyph& glyph = collection.glyphs[writeIndex].append();
 
 			glyph.position = position + offset;
 			glyph.uv = font->getUV( c );
@@ -354,30 +386,8 @@ void Graphics::renderText( Font* font, const char* text, const glm::vec2& positi
 	}
 }
 
-void Graphics::renderQuad( const glm::vec2& position, const glm::vec4& uv, const glm::vec2& size, float opacity, Texture* texture  )
+void Graphics::queueQuad( const glm::vec2& position, const glm::vec4& uv, const glm::vec2& size, float opacity, Texture* texture  )
 {
-	/*quadShader.bind();
-
-	if( texture )
-		texture->bind();
-	else
-		glBindTexture( GL_TEXTURE_2D, 0 );
-
-	Quad quad = { position, glm::vec4( 0.0f, 0.0f, 1.0f, 1.0f ), size, opacity };
-
-	glDisable( GL_DEPTH_TEST );
-	glEnable( GL_BLEND );
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
-	glBindVertexArray( quadVAO );
-	glBindBuffer( GL_ARRAY_BUFFER, quadVBO );
-	glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(Quad), &quad );
-	glDrawArrays( GL_POINTS, 0, 1 );
-	glBindVertexArray( 0 );
-
-	glDisable( GL_BLEND );
-	glEnable( GL_DEPTH_TEST );*/
-
 	const int QUAD_COUNT = quadCollections.getSize();
 
 	int index = -1;
@@ -401,7 +411,7 @@ void Graphics::renderQuad( const glm::vec2& position, const glm::vec4& uv, const
 	quad.opacity = opacity;
 }
 
-void Graphics::renderBillboard( const glm::vec3& position, const glm::vec4& uv, const glm::vec2& size, bool spherical, Texture* texture )
+void Graphics::queueBillboard( const glm::vec3& position, const glm::vec4& uv, const glm::vec2& size, bool spherical, Texture* texture )
 {
 	const int BILLBOARD_COUNT = billboardCollections.getSize();
 
@@ -426,12 +436,12 @@ void Graphics::renderBillboard( const glm::vec3& position, const glm::vec4& uv, 
 	billboard.spherical = ( spherical ? 1.0f : 0.0f );
 }
 
-Camera& Graphics::getChunkCamera()
+Camera& Graphics::getPerspectiveCamera()
 {
-	return chunkCamera;
+	return perspectiveCamera;
 }
 
-Camera& Graphics::getTextCamera()
+Camera& Graphics::getOrthographicCamera()
 {
-	return textCamera;
+	return orthographicCamera;
 }

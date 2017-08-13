@@ -223,25 +223,10 @@ void DebugShapes::render( const glm::mat4& projectionMatrix, const glm::mat4& vi
 
 	// reset
 	glBindVertexArray( 0 );
-
-	/*finalLines.clear();
-	finalSpheres.clear();
-	finalAABBs.clear();
-	finalOBBs.clear();*/
 }
 
 void DebugShapes::finalize()
 {
-	/*finalLines.fastCopy( lines );
-	finalSpheres.fastCopy( spheres );
-	finalAABBs.fastCopy( AABBs );
-	finalOBBs.fastCopy( OBBs );
-
-	lines.clear();
-	spheres.clear();
-	AABBs.clear();
-	OBBs.clear();*/
-
 	lines.swap();
 	spheres.swap();
 	AABBs.swap();
