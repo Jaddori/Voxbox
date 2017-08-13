@@ -1,7 +1,11 @@
 #include "Graphics.h"
 
 Graphics::Graphics()
-	: chunkViewMatrixLocation( 0 ), chunkProjectionMatrixLocation( 0 ), chunkOffsetLocation( 0 )
+	: chunkViewMatrixLocation( 0 ), chunkProjectionMatrixLocation( 0 ), chunkOffsetLocation( 0 ),
+	textProjectionMatrixLocation( 0 ), textVAO( 0 ), textVBO( 0 ),
+	quadProjectionMatrixLocation( 0 ), quadVAO( 0 ), quadVBO( 0 ),
+	billboardProjectionMatrixLocation( 0 ), billboardViewMatrixLocation( 0 ),
+	billboardVAO( 0 ), billboardVBO( 0 )
 {
 	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Constructing." );
 }
@@ -175,14 +179,46 @@ void Graphics::begin()
 
 	quadShader.bind();
 	quadShader.setMat4( quadProjectionMatrixLocation, textCamera.getProjectionMatrix() );
-
-	billboardShader.bind();
-	billboardShader.setMat4( billboardProjectionMatrixLocation, chunkCamera.getProjectionMatrix() );
-	billboardShader.setMat4( billboardViewMatrixLocation, chunkCamera.getViewMatrix() );
 }
 
 void Graphics::end()
 {
+	// render billboards
+	billboardShader.bind();
+	billboardShader.setMat4( billboardProjectionMatrixLocation, chunkCamera.getProjectionMatrix() );
+	billboardShader.setMat4( billboardViewMatrixLocation, chunkCamera.getViewMatrix() );
+
+	glBindVertexArray( billboardVAO );
+	glBindBuffer( GL_ARRAY_BUFFER, billboardVBO );
+
+	const int COLLECTION_COUNT = billboards.getSize();
+	for( int curCollection = 0; curCollection < COLLECTION_COUNT; curCollection++ )
+	{
+		BillboardCollection& collection = billboards[curCollection];
+
+		if( collection.texture )
+			collection.texture->bind();
+		else
+			glBindTexture( GL_TEXTURE_2D, 0 );
+
+		const int BILLBOARD_COUNT = collection.billboards.getSize();
+		int offset = 0;
+		while( offset < BILLBOARD_COUNT )
+		{
+			int count = BILLBOARD_COUNT - offset;
+			if( count > GRAPHICS_MAX_BILLBOARDS )
+				count = GRAPHICS_MAX_BILLBOARDS;
+			
+			glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(Billboard)*count, collection.billboards.getData()+offset );
+			glDrawArrays( GL_POINTS, 0, count );
+
+			offset += count;
+		}
+
+		collection.billboards.clear();
+	}
+
+	glBindVertexArray( 0 );
 }
 
 void Graphics::renderChunk( Chunk* chunk )
@@ -273,22 +309,29 @@ void Graphics::renderQuad( const glm::vec2& position, const glm::vec2& size, Tex
 	glEnable( GL_DEPTH_TEST );
 }
 
-void Graphics::renderBillboard( const glm::vec3& position, const glm::vec4& uv, const glm::vec2& size, Texture* texture )
+void Graphics::renderBillboard( const glm::vec3& position, const glm::vec4& uv, const glm::vec2& size, bool spherical, Texture* texture )
 {
-	billboardShader.bind();
+	const int BILLBOARD_COUNT = billboards.getSize();
 
-	if( texture )
-		texture->bind();
-	else
-		glBindTexture( GL_TEXTURE_2D, 0 );
+	int index = -1;
+	for( int i=0; i<BILLBOARD_COUNT && index < 0; i++ )
+		if( billboards[i].texture == texture )
+			index = i;
 
-	Billboard billboard = { position, uv, size, 1.0f };
+	if( index < 0 ) // this is a new texture
+	{
+		BillboardCollection& collection = billboards.append();
+		collection.texture = texture;
+		collection.billboards.expand( GRAPHICS_MAX_BILLBOARDS );
 
-	glBindVertexArray( billboardVAO );
-	glBindBuffer( GL_ARRAY_BUFFER, billboardVBO );
-	glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(Billboard), &billboard );
-	glDrawArrays( GL_POINTS, 0, 1 );
-	glBindVertexArray( 0 );
+		index = BILLBOARD_COUNT;
+	}
+
+	Billboard& billboard = billboards[index].billboards.append();
+	billboard.position = position;
+	billboard.uv = uv;
+	billboard.size = size;
+	billboard.spherical = ( spherical ? 1.0f : 0.0f );
 }
 
 Camera& Graphics::getChunkCamera()

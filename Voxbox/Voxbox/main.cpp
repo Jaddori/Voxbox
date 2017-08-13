@@ -249,8 +249,6 @@ int main( int argc, char* argv[] )
 
 				debugShapes.render( graphics.getChunkCamera().getProjectionMatrix(), graphics.getChunkCamera().getViewMatrix() );
 
-				graphics.renderBillboard( glm::vec3( 0.0f ), glm::vec4( 0.1f, 0.0f, 0.15f, 0.05f ), glm::vec2( 2.0f ), &texture );
-
 				console.render( &graphics );
 				graphics.end();
 

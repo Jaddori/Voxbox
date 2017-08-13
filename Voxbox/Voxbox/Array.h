@@ -149,7 +149,6 @@ public:
 		return capacity;
 	}
 
-protected:
 	void expand( int newCapacity )
 	{
 		T* temp = new T[newCapacity];
@@ -158,11 +157,12 @@ protected:
 			temp[i] = data[i];
 
 		capacity = newCapacity;
-		
+
 		delete[] data;
 		data = temp;
 	}
 
+protected:
 	T* data;
 	int size, capacity;
 };

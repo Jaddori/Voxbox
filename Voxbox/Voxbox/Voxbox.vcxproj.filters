@@ -61,9 +61,6 @@
     <ClCompile Include="Frustum.cpp">
       <Filter>Source Files\Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="Billboard.cpp">
-      <Filter>Source Files\Rendering</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -113,9 +110,6 @@
     </ClInclude>
     <ClInclude Include="SwapArray.h">
       <Filter>Source Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Billboard.h">
-      <Filter>Source Files\Rendering</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
