@@ -1,5 +1,5 @@
 -Clean up main
--Add logging facilities
 -Lua support
 -Regions
--Frustum culling
+-Billboards
+-Threading facilities

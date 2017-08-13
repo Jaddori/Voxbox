@@ -8,6 +8,7 @@
 
 #define GRAPHICS_MAX_GLYPHS 128
 #define GRAPHICS_MAX_QUADS 128
+#define GRAPHICS_MAX_BILLBOARDS 128
 
 class Graphics
 {
@@ -24,6 +25,7 @@ public:
 	void renderChunk( Chunk* chunk );
 	void renderText( Font* font, const char* text, const glm::vec2& position, const glm::vec4& color );
 	void renderQuad( const glm::vec2& position, const glm::vec2& size, Texture* texture, float opacity );
+	void renderBillboard( const glm::vec3& position, const glm::vec4& uv, const glm::vec2& size, Texture* texture );
 
 	Camera& getChunkCamera();
 	Camera& getTextCamera();
@@ -43,7 +45,6 @@ private:
 
 	GLuint textVAO;
 	GLuint textVBO;
-	//GLuint textIBO;
 
 	// rendering quads
 	Shader quadShader;
@@ -51,6 +52,14 @@ private:
 
 	GLuint quadVAO;
 	GLuint quadVBO;
+
+	// rendering billboards
+	Shader billboardShader;
+	GLint billboardProjectionMatrixLocation;
+	GLint billboardViewMatrixLocation;
+
+	GLuint billboardVAO;
+	GLuint billboardVBO;
 };
 
 struct Glyph
@@ -67,4 +76,12 @@ struct Quad
 	glm::vec4 uv;
 	glm::vec2 size;
 	float opacity;
+};
+
+struct Billboard
+{
+	glm::vec3 position;
+	glm::vec4 uv;
+	glm::vec2 size;
+	float spherical;
 };

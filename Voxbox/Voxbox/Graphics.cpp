@@ -99,6 +99,36 @@ bool Graphics::load()
 		glBindVertexArray( 0 );
 	}
 
+	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Loading billboard shader." );
+	if( billboardShader.load( "./assets/shaders/billboard.vs",
+								"./assets/shaders/billboard.gs",
+								"./assets/shaders/billboard.fs" ) )
+	{
+		LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Retrieving uniform locations from billboard shader." );
+		billboardProjectionMatrixLocation = billboardShader.getLocation( "projectionMatrix" );
+		billboardViewMatrixLocation = billboardShader.getLocation( "viewMatrix" );
+
+		LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Generating vertex data for billboard shader." );
+		glGenVertexArrays( 1, &billboardVAO );
+		glBindVertexArray( billboardVAO );
+
+		glEnableVertexAttribArray( 0 );
+		glEnableVertexAttribArray( 1 );
+		glEnableVertexAttribArray( 2 );
+		glEnableVertexAttribArray( 3 );
+
+		glGenBuffers( 1, &billboardVBO );
+		glBindBuffer( GL_ARRAY_BUFFER, billboardVBO );
+		glBufferData( GL_ARRAY_BUFFER, sizeof(Billboard)*GRAPHICS_MAX_BILLBOARDS, nullptr, GL_STREAM_DRAW );
+
+		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof(Billboard), 0 );
+		glVertexAttribPointer( 1, 4, GL_FLOAT, GL_FALSE, sizeof(Billboard), (void*)(sizeof(GLfloat)*3) );
+		glVertexAttribPointer( 2, 2, GL_FLOAT, GL_FALSE, sizeof(Billboard), (void*)(sizeof(GLfloat)*7 ) );
+		glVertexAttribPointer( 3, 1, GL_FLOAT, GL_FALSE, sizeof(Billboard), (void*)( sizeof(GLfloat)*9) );
+
+		glBindVertexArray( 0 );
+	}
+
 	return result;
 }
 
@@ -113,10 +143,9 @@ void Graphics::unload()
 	{
 		glDeleteVertexArrays( 1, &textVAO );
 		glDeleteBuffers( 1, &textVBO );
-		//glDeleteBuffers( 1, &textIBO );
 	}
 
-	textVAO = textVBO = 0; //textIBO = 0;
+	textVAO = textVBO = 0;
 
 	if( quadVAO )
 	{
@@ -125,6 +154,14 @@ void Graphics::unload()
 	}
 
 	quadVAO = quadVBO = 0;
+
+	if( billboardVAO )
+	{
+		glDeleteVertexArrays( 1, &billboardVAO );
+		glDeleteBuffers( 1, &billboardVBO );
+	}
+
+	billboardVAO = billboardVBO = 0;
 }
 
 void Graphics::begin()
@@ -138,6 +175,10 @@ void Graphics::begin()
 
 	quadShader.bind();
 	quadShader.setMat4( quadProjectionMatrixLocation, textCamera.getProjectionMatrix() );
+
+	billboardShader.bind();
+	billboardShader.setMat4( billboardProjectionMatrixLocation, chunkCamera.getProjectionMatrix() );
+	billboardShader.setMat4( billboardViewMatrixLocation, chunkCamera.getViewMatrix() );
 }
 
 void Graphics::end()
@@ -230,6 +271,24 @@ void Graphics::renderQuad( const glm::vec2& position, const glm::vec2& size, Tex
 
 	glDisable( GL_BLEND );
 	glEnable( GL_DEPTH_TEST );
+}
+
+void Graphics::renderBillboard( const glm::vec3& position, const glm::vec4& uv, const glm::vec2& size, Texture* texture )
+{
+	billboardShader.bind();
+
+	if( texture )
+		texture->bind();
+	else
+		glBindTexture( GL_TEXTURE_2D, 0 );
+
+	Billboard billboard = { position, uv, size, 1.0f };
+
+	glBindVertexArray( billboardVAO );
+	glBindBuffer( GL_ARRAY_BUFFER, billboardVBO );
+	glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(Billboard), &billboard );
+	glDrawArrays( GL_POINTS, 0, 1 );
+	glBindVertexArray( 0 );
 }
 
 Camera& Graphics::getChunkCamera()
