@@ -67,6 +67,9 @@
     <ClCompile Include="LuaBinds.cpp">
       <Filter>Source Files\Lua</Filter>
     </ClCompile>
+    <ClCompile Include="LuaCore.cpp">
+      <Filter>Source Files\Lua</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -118,6 +121,9 @@
       <Filter>Source Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="LuaBinds.h">
+      <Filter>Source Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaCore.h">
       <Filter>Source Files\Lua</Filter>
     </ClInclude>
   </ItemGroup>

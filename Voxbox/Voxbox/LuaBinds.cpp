@@ -79,6 +79,8 @@ bool LuaBinds::bind( CoreData* coreData )
 		}
 	}
 
+	LuaCore::bind( lua, coreData );
+
 	return valid;
 }
 

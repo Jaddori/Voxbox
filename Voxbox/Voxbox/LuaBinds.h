@@ -2,6 +2,7 @@
 
 #include "BaseIncludes.h"
 #include "CoreData.h"
+#include "LuaCore.h"
 
 #define LUA_MAIN_SCRIPT "./assets/scripts/main.lua"
 

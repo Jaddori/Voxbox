@@ -3,6 +3,10 @@ require("./assets/scripts/worker")
 w1 = Worker:create()
 w2 = Worker:create()
 
+print = function(str)
+	log( VERBOSITY_DEBUG, str )
+end
+
 function load()
 	print( "LUA LOAD" )
 	
