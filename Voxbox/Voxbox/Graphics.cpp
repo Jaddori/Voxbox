@@ -8,40 +8,40 @@ Graphics::Graphics()
 	billboardVAO( 0 ), billboardVBO( 0 ),
 	writeIndex( 0 ), readIndex( 1 )
 {
-	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Constructing." );
+	LOG_INFO( "Constructing." );
 }
 
 Graphics::~Graphics()
 {
-	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Destructing." );
+	LOG_INFO( "Destructing." );
 }
 
 bool Graphics::load( Assets* assets )
 {
-	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Loading." );
+	LOG_INFO( "Loading." );
 
 	bool result = false;
 
-	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Initializing cameras." );
+	LOG_INFO( "Initializing cameras." );
 	perspectiveCamera.updatePerspective( WINDOW_WIDTH, WINDOW_HEIGHT );
 	orthographicCamera.updateOrthographic( WINDOW_WIDTH, WINDOW_HEIGHT );
 
-	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Loading chunk shader." );
+	LOG_INFO( "Loading chunk shader." );
 	if( chunkShader.load( "./assets/shaders/chunk.vs",
 							nullptr,
 							"./assets/shaders/chunk.fs" ) )
 	{
-		LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Retrieving uniform locations from chunk shader." );
+		LOG_INFO( "Retrieving uniform locations from chunk shader." );
 		chunkViewMatrixLocation = chunkShader.getLocation( "viewMatrix" );
 		chunkProjectionMatrixLocation = chunkShader.getLocation( "projectionMatrix" );
 	}
 	else
 	{
-		LOG( VERBOSITY_ERROR, "Graphics.cpp - Failed to load chunk shader." );
+		LOG_ERROR( "Failed to load chunk shader." );
 		result = false;
 	}
 
-	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Loading block atlas." );
+	LOG_INFO( "Loading block atlas." );
 	/*if( blockAtlas.load( "./assets/textures/blocks.dds" ) )
 	{
 		blockAtlas.upload();
@@ -54,19 +54,19 @@ bool Graphics::load( Assets* assets )
 	blockAtlas = assets->loadTexture( "./assets/textures/blocks.dds" );
 	if( blockAtlas == nullptr )
 	{
-		LOG_ERROR( "Graphics.cpp - Failed to load block atlas." );
+		LOG_ERROR( "Failed to load block atlas." );
 		result = false;
 	}
 
-	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Loading text shader." );
+	LOG_INFO( "Loading text shader." );
 	if( textShader.load( "./assets/shaders/text.vs",
 							"./assets/shaders/text.gs",
 							"./assets/shaders/text.fs" ) )
 	{
-		LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Retrieving uniform locations from text shader." );
+		LOG_INFO( "Retrieving uniform locations from text shader." );
 		textProjectionMatrixLocation = textShader.getLocation( "projectionMatrix" );
 
-		LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Generating vertex data for text shader." );
+		LOG_INFO( "Generating vertex data for text shader." );
 		glGenVertexArrays( 1, &textVAO );
 		glBindVertexArray( textVAO );
 
@@ -88,19 +88,19 @@ bool Graphics::load( Assets* assets )
 	}
 	else
 	{
-		LOG( VERBOSITY_ERROR, "Graphics.cpp - Failed to load text shader." );
+		LOG_ERROR( "Failed to load text shader." );
 		result = false;
 	}
 
-	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Loading quad shader." );
+	LOG_INFO( "Loading quad shader." );
 	if( quadShader.load( "./assets/shaders/quad.vs",
 							"./assets/shaders/quad.gs",
 							"./assets/shaders/quad.fs" ) )
 	{
-		LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Retrieving uniform locations from text shader." );
+		LOG_INFO( "Retrieving uniform locations from text shader." );
 		quadProjectionMatrixLocation = quadShader.getLocation( "projectionMatrix" );
 
-		LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Generating vertex data for quad shader." );
+		LOG_INFO( "Generating vertex data for quad shader." );
 		glGenVertexArrays( 1, &quadVAO );
 		glBindVertexArray( quadVAO );
 
@@ -122,20 +122,20 @@ bool Graphics::load( Assets* assets )
 	}
 	else
 	{
-		LOG_ERROR( "Graphics.cpp - Failed to load quad shader." );
+		LOG_ERROR( "Failed to load quad shader." );
 		result = false;
 	}
 
-	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Loading billboard shader." );
+	LOG_INFO( "Loading billboard shader." );
 	if( billboardShader.load( "./assets/shaders/billboard.vs",
 								"./assets/shaders/billboard.gs",
 								"./assets/shaders/billboard.fs" ) )
 	{
-		LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Retrieving uniform locations from billboard shader." );
+		LOG_INFO( "Retrieving uniform locations from billboard shader." );
 		billboardProjectionMatrixLocation = billboardShader.getLocation( "projectionMatrix" );
 		billboardViewMatrixLocation = billboardShader.getLocation( "viewMatrix" );
 
-		LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Generating vertex data for billboard shader." );
+		LOG_INFO( "Generating vertex data for billboard shader." );
 		glGenVertexArrays( 1, &billboardVAO );
 		glBindVertexArray( billboardVAO );
 
@@ -157,7 +157,7 @@ bool Graphics::load( Assets* assets )
 	}
 	else
 	{
-		LOG_ERROR( "Graphics.cpp - Failed to load billboard shader." );
+		LOG_ERROR( "Failed to load billboard shader." );
 		result = false;
 	}
 
@@ -166,7 +166,7 @@ bool Graphics::load( Assets* assets )
 
 void Graphics::unload()
 {
-	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Unloading." );
+	LOG_INFO( "Unloading." );
 
 	chunkShader.unload();
 	textShader.unload();

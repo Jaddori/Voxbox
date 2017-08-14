@@ -2,17 +2,17 @@
 
 DebugShapes::DebugShapes()
 {
-	LOG( VERBOSITY_INFORMATION, "DebugShapes.cpp - Constructing." );
+	LOG_INFO( "Constructing." );
 }
 
 DebugShapes::~DebugShapes()
 {
-	LOG( VERBOSITY_INFORMATION, "DebugShapes.cpp - Destructing." );
+	LOG_INFO( "Destructing." );
 }
 
 bool DebugShapes::load()
 {
-	LOG( VERBOSITY_INFORMATION, "DebugShapes.cpp - Loading shaders." );
+	LOG_INFO( "Loading shaders." );
 
 	bool result = false;
 
@@ -20,15 +20,15 @@ bool DebugShapes::load()
 							"./assets/shaders/debug_line.gs",
 							"./assets/shaders/debug_shape.fs" ) )
 	{
-		 LOG( VERBOSITY_ERROR, "DebugShapes.cpp - Failed to load debug line shader." );
-		 result = false;
+		LOG_ERROR( "Failed to load line shader." );
+		result = false;
 	}
 
 	if( !sphereShader.load( "./assets/shaders/debug_sphere.vs",
 							"./assets/shaders/debug_sphere.gs",
 							"./assets/shaders/debug_shape.fs" ) )
 	{
-		LOG( VERBOSITY_ERROR, "DebugShapes.cpp - Failed to load debug sphere shader." );
+		LOG_ERROR( "Failed to load sphere shader." );
 		result = false;
 	}
 
@@ -36,7 +36,7 @@ bool DebugShapes::load()
 							"./assets/shaders/debug_aabb.gs",
 							"./assets/shaders/debug_shape.fs" ) )
 	{
-		LOG( VERBOSITY_ERROR, "DebugShapes.cpp - Failed to load debug aabb shader." );
+		LOG_ERROR( "Failed to load AABB shader." );
 		result = false;
 	}
 
@@ -44,7 +44,7 @@ bool DebugShapes::load()
 							"./assets/shaders/debug_obb.gs",
 							"./assets/shaders/debug_shape.fs" ) )
 	{
-		LOG( VERBOSITY_ERROR, "DebugShapes.cpp - Failed to load debug obb shader." );
+		LOG_ERROR( "Failed to load OBB shader." );
 		result = false;
 	}
 
@@ -53,7 +53,7 @@ bool DebugShapes::load()
 
 void DebugShapes::upload()
 {
-	LOG( VERBOSITY_INFORMATION, "DebugShapes.cpp - Uploading shaders." );
+	LOG_INFO( "Uploading shaders." );
 
 	if( lineShader.getValid() )
 	{

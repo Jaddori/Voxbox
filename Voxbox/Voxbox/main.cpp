@@ -19,7 +19,7 @@ DWORD WINAPI generateChunks( LPVOID args )
 {
 	CoreData* data = (CoreData*)args;
 
-	LOG( VERBOSITY_INFORMATION, "main.cpp - Starting chunk generation thread." );
+	LOG_INFO( "Starting chunk generation thread." );
 
 	for( int i=0; i<100; i++ )
 	{
@@ -28,7 +28,7 @@ DWORD WINAPI generateChunks( LPVOID args )
 		Sleep( 100 );
 	}
 
-	LOG( VERBOSITY_INFORMATION, "main.cpp - Chunk generation thread finished." );
+	LOG_INFO( "Chunk generation thread finished." );
 
 	return 0;
 }
@@ -72,11 +72,8 @@ DWORD WINAPI update( LPVOID args )
 			if( glm::length( cameraMovement ) > 0 )
 				data->coreData->perspectiveCamera->updatePosition( cameraMovement );
 
-			/*if( data->coreData->input->keyReleased( SDL_SCANCODE_GRAVE ) )
-				data->coreData->console->toggle();*/
-
 			if( data->coreData->input->keyReleased( SDL_SCANCODE_SPACE ) )
-				LOG( VERBOSITY_DEBUG, "main.cpp - User pressed the spacebar." );
+				LOG_DEBUG( "User pressed the spacebar." );
 
 			DebugSphere sphere = { glm::vec3( 0.0f, 0.0f, 0.0f ), 2.0f, glm::vec4( 1.0f, 0.0f, 0.0f, 1.0f ) };
 			data->coreData->debugShapes->addSphere( sphere );
@@ -118,21 +115,21 @@ int main( int argc, char* argv[] )
 	SDL_Window* window = SDL_CreateWindow( "Voxbox", WINDOW_X, WINDOW_Y, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL );
 	if( window )
 	{
-		LOG( VERBOSITY_INFORMATION, "main.cpp - Window created." );
+		LOG_INFO( "Window created." );
 
 		SDL_GLContext context = SDL_GL_CreateContext( window );
 		if( context )
 		{
-			LOG( VERBOSITY_INFORMATION, "main.cpp - OpenGL context created." );
+			LOG_INFO( "OpenGL context created." );
 
 			glewExperimental = GL_TRUE;
 			if( glewInit() == GLEW_OK )
 			{
-				LOG( VERBOSITY_INFORMATION, "main.cpp - GLEW initialized." );
+				LOG_INFO( "GLEW initialized." );
 			}
 			else
 			{
-				LOG( VERBOSITY_ERROR, "main.cpp - Failed to intialized GLEW." );
+				LOG_ERROR( "Failed to initialize GLEW." );
 				return -1;
 			}
 
@@ -248,14 +245,14 @@ int main( int argc, char* argv[] )
 					fps++;
 			}
 
-			LOG( VERBOSITY_INFORMATION, "main.cpp - Waiting for update thread to finish." );
+			LOG_INFO( "Waiting for update thread to finish." );
 			WaitForSingleObject( updateThread, INFINITE );
 
-			LOG( VERBOSITY_INFORMATION, "main.cpp - Deleting OpenGL context." );
+			LOG_INFO( "Deleting OpenGL context." );
 			SDL_GL_DeleteContext( context );
 		}
 
-		LOG( VERBOSITY_INFORMATION, "main.cpp - Destroying window." );
+		LOG_INFO( "Destroying window." );
 		SDL_DestroyWindow( window );
 	}
 

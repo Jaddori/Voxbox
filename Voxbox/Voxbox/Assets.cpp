@@ -45,19 +45,19 @@ void Assets::upload()
 
 Texture* Assets::loadTexture( const char* path )
 {
-	LOG_ASSERT( path != nullptr, "Assets.cpp - Trying to load texture from invalid path." );
+	LOG_ASSERT( path != nullptr, "Trying to load texture from invalid path." );
 
 	Texture* result = nullptr;
 
 	uint64_t hash = hashPath( path );
 
-	LOG_INFO( "Assets.cpp - Loading texture from %s", path );
-	LOG_INFO( "Assets.cpp - Hash = %ul", hash );
+	LOG_INFO( "Loading texture from %s", path );
+	LOG_INFO( "Hash = %lu", hash );
 
 	int index = findAsset( textureHashes, hash );
 	if( index < 0 ) // this is a new path
 	{
-		LOG_INFO( "Assets.cpp - Hash not found. Loading new." );
+		LOG_INFO( "Hash not found. Loading new." );
 
 		result = new Texture();
 		if( result->load( path ) )
@@ -68,13 +68,13 @@ Texture* Assets::loadTexture( const char* path )
 		}
 		else
 		{
-			LOG_WARNING( "Assets.cpp - Failed to load texture." );
+			LOG_WARNING( "Failed to load texture." );
 			delete result;
 		}
 	}
 	else
 	{
-		LOG_INFO( "Assets.cpp - Hash found. Returning existing texture." );
+		LOG_INFO( "Hash found. Returning existing texture." );
 		result = textures[index];
 	}
 
@@ -83,7 +83,7 @@ Texture* Assets::loadTexture( const char* path )
 
 void Assets::unloadTexture( Texture* texture )
 {
-	LOG_ASSERT( texture != nullptr, "Assets.cpp - Trying to unload nullptr texture." );
+	LOG_ASSERT( texture != nullptr, "Trying to unload nullptr texture." );
 
 	int index = -1;
 	const int TEXTURE_COUNT = textures.getSize();
@@ -93,7 +93,7 @@ void Assets::unloadTexture( Texture* texture )
 
 	if( index >= 0 )
 	{
-		LOG_INFO( "Assets.cpp - Unloading texture." );
+		LOG_INFO( "Unloading texture." );
 
 		textures[index]->unload();
 		textureHashes[index] = 0;
@@ -108,25 +108,25 @@ void Assets::unloadTexture( Texture* texture )
 			uploadTextures[index] = nullptr;
 	}
 	else
-		LOG_WARNING( "Assets.cpp - Trying to unload texture. But texture not found." );
+		LOG_WARNING( "Trying to unload texture. But texture not found." );
 }
 
 Font* Assets::loadFont( const char* infoPath, const char* texturePath )
 {
-	LOG_ASSERT( infoPath != nullptr, "Assets.cpp - Trying to load font info from invalid path." );
-	LOG_ASSERT( texturePath != nullptr, "Assets.cpp - Trying to load font texture from invalid path." );
+	LOG_ASSERT( infoPath != nullptr, "Trying to load font info from invalid path." );
+	LOG_ASSERT( texturePath != nullptr, "Trying to load font texture from invalid path." );
 
 	Font* result = nullptr;
 
 	uint64_t hash = hashPath( infoPath );
 
-	LOG_INFO( "Assets.cpp - Loading font from %s", infoPath );
-	LOG_INFO( "Assets.cpp - Hash = %ul", hash );
+	LOG_INFO( "Loading font from %s", infoPath );
+	LOG_INFO( "Hash = %ul", hash );
 
 	int index = findAsset( fontHashes, hash );
 	if( index < 0 ) // this is a new path
 	{
-		LOG_INFO( "Assets.cpp - Hash not found. Loading new." );
+		LOG_INFO( "Hash not found. Loading new." );
 
 		result = new Font();
 		if( result->load( infoPath, texturePath ) )
@@ -137,13 +137,13 @@ Font* Assets::loadFont( const char* infoPath, const char* texturePath )
 		}
 		else
 		{
-			LOG_WARNING( "Assets.cpp - Failed to load font." );
+			LOG_WARNING( "Failed to load font." );
 			delete result;
 		}
 	}
 	else
 	{
-		LOG_INFO( "Assets.cpp - Hash found. Returning existing font." );
+		LOG_INFO( "Hash found. Returning existing font." );
 		result = fonts[index];
 	}
 
@@ -152,7 +152,7 @@ Font* Assets::loadFont( const char* infoPath, const char* texturePath )
 
 void Assets::unloadFont( Font* font )
 {
-	LOG_ASSERT( font != nullptr, "Assets.cpp - Trying to unload nullptr font." );
+	LOG_ASSERT( font != nullptr, "Trying to unload nullptr font." );
 
 	int index = -1;
 	const int FONT_COUNT = fonts.getSize();
@@ -162,7 +162,7 @@ void Assets::unloadFont( Font* font )
 
 	if( index >= 0 )
 	{
-		LOG_INFO( "Assets.cpp - Unloading font." );
+		LOG_INFO( "Unloading font." );
 
 		fonts[index]->unload();
 		fontHashes[index] = 0;
@@ -177,5 +177,5 @@ void Assets::unloadFont( Font* font )
 			uploadFonts[index] = nullptr;
 	}
 	else
-		LOG_WARNING( "Assets.cpp - Trying to unload font. But font not found." );
+		LOG_WARNING( "Trying to unload font. But font not found." );
 }

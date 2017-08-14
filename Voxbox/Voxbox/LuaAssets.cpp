@@ -45,8 +45,8 @@ namespace LuaAssets
 
 	int loadTexture( lua_State* lua )
 	{
-		LOG_ASSERT_ARGS( "LuaAssets.cpp", 1 );
-		LOG_EXPECT_STRING( "LuaAssets.cpp", 1 );
+		LOG_ASSERT_ARGS( 1 );
+		LOG_EXPECT_STRING( 1 );
 
 		int result = 0;
 
@@ -70,8 +70,8 @@ namespace LuaAssets
 
 	int unloadTexture( lua_State* lua )
 	{
-		LOG_ASSERT_ARGS( "LuaAssets.cpp", 1 );
-		LOG_EXPECT_TABLE( "LuaAssets.cpp", 1 );
+		LOG_ASSERT_ARGS( 1 );
+		LOG_EXPECT_TABLE( 1 );
 
 		Texture* texture = getTexture( lua, 1 );
 		g_coreData->assets->unloadTexture( texture );
@@ -81,9 +81,9 @@ namespace LuaAssets
 
 	int loadFont( lua_State* lua )
 	{
-		LOG_ASSERT_ARGS( "LuaAssets.cpp", 2 );
-		LOG_EXPECT_STRING( "LuaAssets.cpp", 1 );
-		LOG_EXPECT_STRING( "LuaAssets.cpp", 2 );
+		LOG_ASSERT_ARGS( 2 );
+		LOG_EXPECT_STRING( 1 );
+		LOG_EXPECT_STRING( 2 );
 
 		int result = 0;
 
@@ -107,8 +107,8 @@ namespace LuaAssets
 
 	int unloadFont( lua_State* lua )
 	{
-		LOG_ASSERT_ARGS( "LuaAssets.cpp", 1 );
-		LOG_EXPECT_TABLE( "LuaAssets.cpp", 1 );
+		LOG_ASSERT_ARGS( 1 );
+		LOG_EXPECT_TABLE( 1 );
 
 		Font* font = getFont( lua, 1 );
 		g_coreData->assets->unloadFont( font );
@@ -118,9 +118,9 @@ namespace LuaAssets
 
 	int getWidth( lua_State* lua )
 	{
-		LOG_ASSERT_ARGS( "Assets.cpp", 2 );
-		LOG_EXPECT_TABLE( "Assets.cpp", 1 );
-		LOG_EXPECT_STRING( "Assets.cpp", 1 );
+		LOG_ASSERT_ARGS( 2 );
+		LOG_EXPECT_TABLE( 1 );
+		LOG_EXPECT_STRING( 1 );
 
 		Font* font = getFont( lua, 1 );
 		const char* c = lua_tostring( lua, 2 );
@@ -131,9 +131,9 @@ namespace LuaAssets
 
 	int getHorizontalOffset( lua_State* lua )
 	{
-		LOG_ASSERT_ARGS( "LuaAssets.cpp", 2 );
-		LOG_EXPECT_TABLE( "LuaAssets.cpp", 1 );
-		LOG_EXPECT_STRING( "LuaAssets.cpp", 2 );
+		LOG_ASSERT_ARGS( 2 );
+		LOG_EXPECT_TABLE( 1 );
+		LOG_EXPECT_STRING( 2 );
 
 		Font* font = getFont( lua, 1 );
 		const char* c = lua_tostring( lua, 2 );
@@ -144,9 +144,9 @@ namespace LuaAssets
 
 	int getVerticalOffset( lua_State* lua )
 	{
-		LOG_ASSERT_ARGS( "LuaAssets.cpp", 2 );
-		LOG_EXPECT_TABLE( "LuaAssets.cpp", 1 );
-		LOG_EXPECT_STRING( "LuaAssets.cpp", 2 );
+		LOG_ASSERT_ARGS( 2 );
+		LOG_EXPECT_TABLE( 1 );
+		LOG_EXPECT_STRING( 2 );
 
 		Font* font = getFont( lua, 1 );
 		const char* c = lua_tostring( lua, 2 );
@@ -157,9 +157,9 @@ namespace LuaAssets
 
 	int getUV( lua_State* lua )
 	{
-		LOG_ASSERT_ARGS( "LuaAssets.cpp", 2 );
-		LOG_EXPECT_TABLE( "LuaAssets.cpp", 1 );
-		LOG_EXPECT_STRING( "LuaAssets.cpp", 2 );
+		LOG_ASSERT_ARGS( 2 );
+		LOG_EXPECT_TABLE( 1 );
+		LOG_EXPECT_STRING( 2 );
 
 		Font* font = getFont( lua, 1 );
 		const char* c = lua_tostring( lua, 2 );

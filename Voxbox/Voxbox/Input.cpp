@@ -7,12 +7,12 @@ Input::Input()
 	memset( buttons, 0, INPUT_MAX_BUTTONS );
 	memset( prevButtons, 0, INPUT_MAX_BUTTONS );
 
-	LOG( VERBOSITY_INFORMATION, "Input.cpp - Constructing." );
+	LOG_INFO( "Constructing." );
 }
 
 Input::~Input()
 {
-	LOG( VERBOSITY_INFORMATION, "Input.cpp - Destructing." );
+	LOG_INFO( "Destructing." );
 }
 
 void Input::reset()

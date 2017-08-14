@@ -32,7 +32,7 @@ end
 
 function console.render()
 	if console.visible then
-		queueQuad( console.position, console.size, console.uv, console.opacity )
+		Graphics.queueQuad( console.position, console.size, console.uv, console.opacity )
 		
 		local threshold = Log.getThreshold()
 		local messages, verbosities = Log.getMessages()
@@ -40,7 +40,7 @@ function console.render()
 		
 		for i=#messages, 0, -1 do
 			if verbosities[i] >= threshold then
-				queueText( console.font, messages[i], {8, yoffset}, CONSOLE_COLORS[verbosities[i]+1] )
+				Graphics.queueText( console.font, messages[i], {8, yoffset}, CONSOLE_COLORS[verbosities[i]+1] )
 				yoffset = yoffset - console.font.height
 				
 				if yoffset <= 0.0 then break end

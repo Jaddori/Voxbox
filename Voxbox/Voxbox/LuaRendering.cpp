@@ -8,10 +8,20 @@ namespace LuaRendering
 
 	void bind( lua_State* lua, CoreData* coreData )
 	{
-		lua_register( lua, "queueChunk", queueChunk );
-		lua_register( lua, "queueText", queueText );
-		lua_register( lua, "queueQuad", queueQuad );
-		lua_register( lua, "queueBillboard", queueBillboard );
+		luaL_newmetatable( lua, "graphicsMeta" );
+		luaL_Reg graphicsRegs[] =
+		{
+			{ "queueChunk",			queueChunk },
+			{ "queueText",			queueText },
+			{ "queueQuad",			queueQuad },
+			{ "queueBillboard",		queueBillboard },
+			{ NULL, NULL }
+		};
+
+		luaL_setfuncs( lua, graphicsRegs, 0 );
+		lua_pushvalue( lua, -1 );
+		lua_setfield( lua, -2, "__index" );
+		lua_setglobal( lua, "Graphics" );
 
 		g_coreData = coreData;
 	}
@@ -23,17 +33,17 @@ namespace LuaRendering
 
 	int queueText( lua_State* lua )
 	{
-		LOG_ASSERT_ARGS( "LuaRendering.cpp", 4 );
-		LOG_EXPECT_TABLE( "LuaRendering.cpp", 1 );
-		LOG_EXPECT_STRING( "LuaRendering.cpp", 2 );
-		LOG_EXPECT_TABLE( "LuaRendering.cpp", 3 );
-		LOG_EXPECT_TABLE( "LuaRendering.cpp", 4 );
+		LOG_ASSERT_ARGS( 4 );
+		LOG_EXPECT_TABLE( 1 );
+		LOG_EXPECT_STRING( 2 );
+		LOG_EXPECT_TABLE( 3 );
+		LOG_EXPECT_TABLE( 4 );
 
 		Font* font = getFont( lua, 1 );
 		const char* text = lua_tostring( lua, 2 );
 
-		LOG_ASSERT( font != nullptr, "LuaRendering.cpp - Font is nullptr in queueText." );
-		LOG_ASSERT( text != nullptr, "LuaRendering.cpp - Text is nullptr in queueText." );
+		LOG_ASSERT( font != nullptr, "Font is nullptr in queueText." );
+		LOG_ASSERT( text != nullptr, "Text is nullptr in queueText." );
 
 		// get position
 		glm::vec2 position;
@@ -61,13 +71,13 @@ namespace LuaRendering
 	int queueQuad( lua_State* lua )
 	{
 		int args = lua_gettop( lua );
-		LOG_ASSERT( args >= 4, "LuaRendering.cpp - Expected at least 4 arguments to queueQuad." );
-		LOG_EXPECT_TABLE( "LuaRendering.cpp", 1 );
-		LOG_EXPECT_TABLE( "LuaRendering.cpp", 2 );
-		LOG_EXPECT_TABLE( "LuaRendering.cpp", 3 );
-		LOG_EXPECT_NUMBER( "LuaRendering.cpp", 4 );
+		LOG_ASSERT( args >= 4, "Expected at least 4 arguments to queueQuad." );
+		LOG_EXPECT_TABLE( 1 );
+		LOG_EXPECT_TABLE( 2 );
+		LOG_EXPECT_TABLE( 3 );
+		LOG_EXPECT_NUMBER( 4 );
 		if( args == 5 )
-			LOG_EXPECT_TABLE( "LuaRendering.cpp", 5 );
+			LOG_EXPECT_TABLE( 5 );
 
 		// get position
 		glm::vec2 position;

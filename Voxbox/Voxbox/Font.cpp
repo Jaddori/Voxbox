@@ -18,13 +18,13 @@ bool Font::load( const char* infoPath, const char* texturePath )
 		fread( &info, sizeof(info), 1, file );
 		fclose( file );
 
-		LOG( VERBOSITY_INFORMATION, "Font.cpp - Loaded font from \"%s\".", infoPath );
+		LOG_INFO( "Loaded font from \"%s\".", infoPath );
 
 		result = texture.load( texturePath );
 	}
 	else
 	{
-		LOG( VERBOSITY_WARNING, "Font.cpp - Failed to load font from \"%s\".", infoPath );
+		LOG_WARNING( "Failed to load font from \"%s\".", infoPath );
 	}
 
 	return result;
@@ -85,25 +85,25 @@ int Font::getHeight() const
 
 int Font::getWidth( char c ) const
 {
-	assert( c >= 0 && c <= FONT_RANGE );
+	LOG_ASSERT( c >= 0 && c <= FONT_RANGE, "Character outside font range in getWidth." );
 	return info.widths[c];
 }
 
 int Font::getHorizontalOffset( char c ) const
 {
-	assert( c >= 0 && c <= FONT_RANGE );
+	LOG_ASSERT( c >= 0 && c <= FONT_RANGE, "Character outside font range in getHorizontalOffset." );
 	return info.horizontalOffsets[c];
 }
 
 int Font::getVerticalOffset( char c ) const
 {
-	assert( c >= 0 && c <= FONT_RANGE );
+	LOG_ASSERT( c >= 0 && c <= FONT_RANGE, "Character outside font range in getVerticalOffset." );
 	return info.verticalOffsets[c];
 }
 
 glm::vec4 Font::getUV( char c ) const
 {
-	assert( c >= 0 && c <= FONT_RANGE );
+	LOG_ASSERT( c >= 0 && c <= FONT_RANGE, "Character outside font range in getUV." );
 	float s = (float)info.horizontalOffsets[c];
 	float t = (float)info.verticalOffsets[c]-info.height;
 	float u = s + info.widths[c];

@@ -22,7 +22,7 @@ Chunk::~Chunk()
 
 void Chunk::upload()
 {
-	LOG_ASSERT( vertices != nullptr && indices != nullptr, "Chunk.cpp - Trying to upload chunk without generating faces first." );
+	LOG_ASSERT( vertices != nullptr && indices != nullptr, "Trying to upload chunk without generating faces first." );
 
 	if( vao == 0 )
 	{

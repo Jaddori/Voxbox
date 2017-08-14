@@ -11,7 +11,7 @@
 #define LOG( verbosity, fmt, ... ) \
 	{ \
 		char buffer[1024] = {}; \
-		snprintf( buffer, 1024, fmt, __VA_ARGS__ ); \
+		snprintf( buffer, 1024, __FUNCTION__ " - " fmt, __VA_ARGS__ ); \
 		Log::instance().addMessage( verbosity, buffer ); \
 	}
 #define LOG_ASSERT( condition, fmt, ... ) \
@@ -30,17 +30,17 @@
 #define LOG_ERROR( fmt, ... ) LOG( VERBOSITY_ERROR, fmt, __VA_ARGS__ )
 #define LOG_DEBUG( fmt, ... ) LOG( VERBOSITY_DEBUG, fmt, __VA_ARGS__ )
 
-#define LOG_ASSERT_ARGS( from, expected ) \
+#define LOG_ASSERT_ARGS( expected ) \
 	{ \
 		int args = lua_gettop( lua ); \
-		LOG_ASSERT( args == expected, from " - Expected " #expected " argument(s) to " __FUNCTION__ ", got %d", args ); \
+		LOG_ASSERT( args == expected, "Expected " #expected " argument(s) to " __FUNCTION__ ", got %d", args ); \
 	}
 
-#define LOG_EXPECT_BOOL( from, num ) LOG_ASSERT( lua_isboolean( lua, num ), from " - Expected bool argument to " __FUNCTION__ )
-#define LOG_EXPECT_NUMBER( from, num ) LOG_ASSERT( lua_isnumber( lua, num ), from " - Expected number argument to " __FUNCTION__ )
-#define LOG_EXPECT_STRING( from, num ) LOG_ASSERT( lua_isstring( lua, num ), from " - Expected string argument to " __FUNCTION__ )
-#define LOG_EXPECT_USERDATA( from, num ) LOG_ASSERT( lua_isuserdata( lua, num ), from " - Expected userdata argument to " __FUNCTION__ )
-#define LOG_EXPECT_TABLE( from, num ) LOG_ASSERT( lua_istable( lua, num ), from " - Expected table argument #" #num " to " __FUNCTION__ )
+#define LOG_EXPECT_BOOL( num ) LOG_ASSERT( lua_isboolean( lua, num ), "Expected bool argument #" #num " to " __FUNCTION__ )
+#define LOG_EXPECT_NUMBER( num ) LOG_ASSERT( lua_isnumber( lua, num ),"Expected number argument #" #num " to " __FUNCTION__ )
+#define LOG_EXPECT_STRING( num ) LOG_ASSERT( lua_isstring( lua, num ),"Expected string argument #" #num " to " __FUNCTION__ )
+#define LOG_EXPECT_USERDATA( num ) LOG_ASSERT( lua_isuserdata( lua, num ), "Expected userdata argument #" #num " to " __FUNCTION__ )
+#define LOG_EXPECT_TABLE( num ) LOG_ASSERT( lua_istable( lua, num ), "Expected table argument #" #num " to " __FUNCTION__ )
 
 enum
 {

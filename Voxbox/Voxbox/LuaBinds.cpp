@@ -30,19 +30,21 @@ bool LuaBinds::bind( CoreData* coreData )
 	LuaRendering::bind( lua, coreData );
 
 	// load main script
+	LOG_INFO( "Loading main script." );
 	if( luaL_loadfile( lua, LUA_MAIN_SCRIPT ) != 0 )
 	{
-		LOG( VERBOSITY_ERROR, "LuaBinds.cpp - Failed to load main script." );
-		LOG( VERBOSITY_ERROR, "%s", lua_tostring( lua, -1 ) );
+		LOG_ERROR( "Failed to load main script." );
+		LOG_ERROR( "%s", lua_tostring( lua, -1 ) );
 		valid = false;
 	}
 	else
 	{
 		// run main script
+		LOG_INFO( "Running main script." );
 		if( lua_pcall( lua, 0, 0, 0 ) != 0 )
 		{
-			LOG( VERBOSITY_ERROR, "LuaBinds.cpp - Failed to run main script." );
-			LOG( VERBOSITY_ERROR, "%s", lua_tostring( lua, -1 ) );
+			LOG_ERROR( "Failed to run main script." );
+			LOG_ERROR( "%s", lua_tostring( lua, -1 ) );
 			valid = false;
 		}
 		else
@@ -51,7 +53,7 @@ bool LuaBinds::bind( CoreData* coreData )
 			lua_getglobal( lua, "load" );
 			if( !lua_isfunction( lua, -1 ) )
 			{
-				LOG( VERBOSITY_ERROR, "LuaBinds.cpp - Failed to find load function." );
+				LOG_ERROR( "Failed to find load function." );
 				valid = false;
 			}
 			else
@@ -61,7 +63,7 @@ bool LuaBinds::bind( CoreData* coreData )
 			lua_getglobal( lua, "unload" );
 			if( !lua_isfunction( lua, -1 ) )
 			{
-				LOG( VERBOSITY_ERROR, "LuaBinds.cpp - Failed to find unload function." );
+				LOG_ERROR( "Failed to find unload function." );
 				valid = false;
 			}
 			else
@@ -71,7 +73,7 @@ bool LuaBinds::bind( CoreData* coreData )
 			lua_getglobal( lua, "update" );
 			if( !lua_isfunction( lua, -1 ) )
 			{
-				LOG( VERBOSITY_ERROR, "LuaBinds.cpp - Failed to find update function." );
+				LOG_ERROR( "Failed to find update function." );
 				valid = false;
 			}
 			else
@@ -81,7 +83,7 @@ bool LuaBinds::bind( CoreData* coreData )
 			lua_getglobal( lua, "render" );
 			if( !lua_isfunction( lua, -1 ) )
 			{
-				LOG( VERBOSITY_ERROR, "LuaBinds.cpp - Failed to find render function." );
+				LOG_ERROR( "Failed to find render function." );
 				valid = false;
 			}
 			else
@@ -99,12 +101,12 @@ bool LuaBinds::getValid() const
 
 void LuaBinds::run( int functionReference )
 {
-	LOG_ASSERT( valid, "LuaBinds.cpp - Trying to run function with invalid state." );
+	LOG_ASSERT( valid, "Trying to run function with invalid state." );
 
 	lua_rawgeti( lua, LUA_REGISTRYINDEX, functionReference );
 	if( lua_pcall( lua, 0, 0, 0 ) != 0 )
 	{
-		LOG_ERROR( "LuaBinds.cpp - Failed to run function reference." );
+		LOG_ERROR( "Failed to run function reference." );
 		LOG_ERROR( "%s", lua_tostring( lua, -1 ) );
 		valid = false;
 	}
