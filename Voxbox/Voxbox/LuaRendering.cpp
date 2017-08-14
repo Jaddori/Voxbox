@@ -48,20 +48,20 @@ namespace LuaRendering
 		// get position
 		glm::vec2 position;
 		lua_rawgeti( lua, 3, 1 );
-		position.x = lua_tonumber( lua, -1 );
+		position.x = (float)lua_tonumber( lua, -1 );
 		lua_rawgeti( lua, 3, 2 );
-		position.y = lua_tonumber( lua, -1 );
+		position.y = (float)lua_tonumber( lua, -1 );
 
 		// get color
 		glm::vec4 color;
 		lua_rawgeti( lua, 4, 1 );
-		color.r = lua_tonumber( lua, -1 );
+		color.r = (float)lua_tonumber( lua, -1 );
 		lua_rawgeti( lua, 4, 2 );
-		color.g = lua_tonumber( lua, -1 );
+		color.g = (float)lua_tonumber( lua, -1 );
 		lua_rawgeti( lua, 4, 3 );
-		color.b = lua_tonumber( lua, -1 );
+		color.b = (float)lua_tonumber( lua, -1 );
 		lua_rawgeti( lua, 4, 4 );
-		color.a = lua_tonumber( lua, -1 );
+		color.a = (float)lua_tonumber( lua, -1 );
 
 		g_coreData->graphics->queueText( font, text, position, color );
 
@@ -82,30 +82,30 @@ namespace LuaRendering
 		// get position
 		glm::vec2 position;
 		lua_rawgeti( lua, 1, 1 );
-		position.x = lua_tonumber( lua, -1 );
+		position.x = (float)lua_tonumber( lua, -1 );
 		lua_rawgeti( lua, 1, 2 );
-		position.y = lua_tonumber( lua, -1 );
+		position.y = (float)lua_tonumber( lua, -1 );
 
 		// get size
 		glm::vec2 size;
 		lua_rawgeti( lua, 2, 1 );
-		size.x = lua_tonumber( lua, -1 );
+		size.x = (float)lua_tonumber( lua, -1 );
 		lua_rawgeti( lua, 2, 2 );
-		size.y = lua_tonumber( lua, -1 );
+		size.y = (float)lua_tonumber( lua, -1 );
 
 		// get uv
 		glm::vec4 uv;
 		lua_rawgeti( lua, 3, 1 );
-		uv.x = lua_tonumber( lua, -1 );
+		uv.x = (float)lua_tonumber( lua, -1 );
 		lua_rawgeti( lua, 3, 2 );
-		uv.y = lua_tonumber( lua, -1 );
+		uv.y = (float)lua_tonumber( lua, -1 );
 		lua_rawgeti( lua, 3, 3 );
-		uv.z = lua_tonumber( lua, -1 );
+		uv.z = (float)lua_tonumber( lua, -1 );
 		lua_rawgeti( lua, 3, 4 );
-		uv.w = lua_tonumber( lua, -1 );
+		uv.w = (float)lua_tonumber( lua, -1 );
 
 		// get opacity
-		float opacity = lua_tonumber( lua, 4 );
+		float opacity = (float)lua_tonumber( lua, 4 );
 
 		// get texture
 		Texture* texture = nullptr;

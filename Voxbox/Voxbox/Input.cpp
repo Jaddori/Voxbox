@@ -137,12 +137,12 @@ Point Input::getMouseDelta() const
 	return result;
 }
 
-float Input::getMouseWheel() const
+int Input::getMouseWheel() const
 {
 	return mouseWheel;
 }
 
-float Input::getMouseWheelDelta() const
+int Input::getMouseWheelDelta() const
 {
 	return ( prevMouseWheel - mouseWheel );
 }

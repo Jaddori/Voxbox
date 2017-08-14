@@ -49,7 +49,7 @@ Texture* Assets::loadTexture( const char* path )
 
 	Texture* result = nullptr;
 
-	uint64_t hash = hashPath( path );
+	ulong hash = hashPath( path );
 
 	LOG_INFO( "Loading texture from %s", path );
 	LOG_INFO( "Hash = %lu", hash );
@@ -118,7 +118,7 @@ Font* Assets::loadFont( const char* infoPath, const char* texturePath )
 
 	Font* result = nullptr;
 
-	uint64_t hash = hashPath( infoPath );
+	ulong hash = hashPath( infoPath );
 
 	LOG_INFO( "Loading font from %s", infoPath );
 	LOG_INFO( "Hash = %ul", hash );

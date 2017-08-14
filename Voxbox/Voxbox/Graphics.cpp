@@ -398,8 +398,8 @@ void Graphics::queueText( Font* font, const char* text, const glm::vec2& positio
 
 			glyph.position = position + offset;
 			glyph.uv = font->getUV( c );
-			glyph.size.x = font->getWidth( c );
-			glyph.size.y = font->getHeight();
+			glyph.size.x = (float)font->getWidth( c );
+			glyph.size.y = (float)font->getHeight();
 			glyph.color = color;
 
 			offset.x += glyph.size.x;

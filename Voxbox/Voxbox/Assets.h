@@ -4,6 +4,8 @@
 #include "Font.h"
 #include "Texture.h"
 
+typedef unsigned long ulong;
+
 class Assets
 {
 public:
@@ -31,7 +33,7 @@ private:
 		return index;
 	}
 
-	int findAsset( const Array<uint64_t>& container, uint64_t hash )
+	int findAsset( const Array<ulong>& container, ulong hash )
 	{
 		int index = -1;
 		const int COUNT = container.getSize();
@@ -41,9 +43,9 @@ private:
 		return index;
 	}
 
-	inline uint64_t hashPath( const char* path )
+	inline ulong hashPath( const char* path )
 	{
-		uint64_t hash = 5381;
+		ulong hash = 5381;
 		int c;
 
 		while (c = *path++)
@@ -54,9 +56,9 @@ private:
 
 	Array<Texture*> textures;
 	Array<Texture*> uploadTextures;
-	Array<uint64_t> textureHashes;
+	Array<ulong> textureHashes;
 
 	Array<Font*> fonts;
 	Array<Font*> uploadFonts;
-	Array<uint64_t> fontHashes;
+	Array<ulong> fontHashes;
 };

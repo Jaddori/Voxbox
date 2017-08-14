@@ -27,22 +27,6 @@ function console.load()
 	console.input.position = {0,CONSOLE_HEIGHT+CONSOLE_INPUT_OFFSET}
 	console.input.size = {CONSOLE_WIDTH,CONSOLE_INPUT_HEIGHT}
 	console.input.text = ""
-	
-	console.input.execute = function()
-		log( VERBOSITY_DEBUG, console.input.text )
-		
-		local chunk, errorMessage = load( console.input.text )
-		if errorMessage then
-			log( VERBOSITY_ERROR, errorMessage )
-		else
-			local success, errorMessage = pcall(chunk)
-			if not success then
-				log( VERBOSITY_ERROR, errorMessage )
-			end
-		end
-		
-		console.input.text = ""
-	end
 end
 
 function console.unload()
@@ -51,7 +35,6 @@ end
 function console.update()
 	if Input.keyReleased( Keys.Console ) then
 		console.visible = not console.visible
-		print("SETTING FALSE")
 	end
 	
 	if console.visible then
@@ -63,7 +46,19 @@ function console.update()
 		
 		if Input.keyReleased( Keys.Enter ) then
 			if console.input.text:len() > 0 then
-				console.input.execute()
+				log( VERBOSITY_DEBUG, console.input.text )
+		
+				local chunk, errorMessage = load( console.input.text )
+				if errorMessage then
+					log( VERBOSITY_ERROR, errorMessage )
+				else
+					local success, errorMessage = pcall(chunk)
+					if not success then
+						log( VERBOSITY_ERROR, errorMessage )
+					end
+				end
+				
+				console.input.text = ""
 			end
 		end
 	end
