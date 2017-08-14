@@ -50,7 +50,7 @@ bool LuaBinds::bind( CoreData* coreData )
 		else
 		{
 			// get load function
-			lua_getglobal( lua, "load" );
+			lua_getglobal( lua, "mainLoad" );
 			if( !lua_isfunction( lua, -1 ) )
 			{
 				LOG_ERROR( "Failed to find load function." );
@@ -60,7 +60,7 @@ bool LuaBinds::bind( CoreData* coreData )
 				loadFunctionReference = luaL_ref( lua, LUA_REGISTRYINDEX );
 
 			// get unload function
-			lua_getglobal( lua, "unload" );
+			lua_getglobal( lua, "mainUnload" );
 			if( !lua_isfunction( lua, -1 ) )
 			{
 				LOG_ERROR( "Failed to find unload function." );
@@ -70,7 +70,7 @@ bool LuaBinds::bind( CoreData* coreData )
 				unloadFunctionReference = luaL_ref( lua, LUA_REGISTRYINDEX );
 
 			// get update function
-			lua_getglobal( lua, "update" );
+			lua_getglobal( lua, "mainUpdate" );
 			if( !lua_isfunction( lua, -1 ) )
 			{
 				LOG_ERROR( "Failed to find update function." );
@@ -80,7 +80,7 @@ bool LuaBinds::bind( CoreData* coreData )
 				updateFunctionReference = luaL_ref( lua, LUA_REGISTRYINDEX );
 
 			// get render function
-			lua_getglobal( lua, "render" );
+			lua_getglobal( lua, "mainRender" );
 			if( !lua_isfunction( lua, -1 ) )
 			{
 				LOG_ERROR( "Failed to find render function." );

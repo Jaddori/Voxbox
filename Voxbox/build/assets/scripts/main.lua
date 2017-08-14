@@ -1,18 +1,18 @@
 require("./assets/scripts/worker")
 require("./assets/scripts/console")
 
-function load()
+function mainLoad()
 	console.load()
 end
 
-function unload()
+function mainUnload()
 	console.unload()
 end
 
-function update()
+function mainUpdate()
 	console.update()
 end
 
-function render()
+function mainRender()
 	console.render()
 end
