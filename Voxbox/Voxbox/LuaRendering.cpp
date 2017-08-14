@@ -1,5 +1,7 @@
 #include "LuaRendering.h"
 
+using namespace LuaAssets;
+
 namespace LuaRendering
 {
 	static CoreData* g_coreData;
@@ -21,10 +23,17 @@ namespace LuaRendering
 
 	int queueText( lua_State* lua )
 	{
-		LOG_ASSERT( lua_gettop( lua ) == 4, "LuaRendering.cpp - Bad arguments to queueText." );
+		LOG_ASSERT_ARGS( "LuaRendering.cpp", 4 );
+		LOG_EXPECT_TABLE( "LuaRendering.cpp", 1 );
+		LOG_EXPECT_STRING( "LuaRendering.cpp", 2 );
+		LOG_EXPECT_TABLE( "LuaRendering.cpp", 3 );
+		LOG_EXPECT_TABLE( "LuaRendering.cpp", 4 );
 
-		Font* font = (Font*)lua_touserdata( lua, 1 );
+		Font* font = getFont( lua, 1 );
 		const char* text = lua_tostring( lua, 2 );
+
+		LOG_ASSERT( font != nullptr, "LuaRendering.cpp - Font is nullptr in queueText." );
+		LOG_ASSERT( text != nullptr, "LuaRendering.cpp - Text is nullptr in queueText." );
 
 		// get position
 		glm::vec2 position;
@@ -52,7 +61,13 @@ namespace LuaRendering
 	int queueQuad( lua_State* lua )
 	{
 		int args = lua_gettop( lua );
-		LOG_ASSERT( args >= 4, "LuaRendering.cpp - Bad arguments to queueQuad." );
+		LOG_ASSERT( args >= 4, "LuaRendering.cpp - Expected at least 4 arguments to queueQuad." );
+		LOG_EXPECT_TABLE( "LuaRendering.cpp", 1 );
+		LOG_EXPECT_TABLE( "LuaRendering.cpp", 2 );
+		LOG_EXPECT_TABLE( "LuaRendering.cpp", 3 );
+		LOG_EXPECT_NUMBER( "LuaRendering.cpp", 4 );
+		if( args == 5 )
+			LOG_EXPECT_TABLE( "LuaRendering.cpp", 5 );
 
 		// get position
 		glm::vec2 position;
@@ -61,23 +76,23 @@ namespace LuaRendering
 		lua_rawgeti( lua, 1, 2 );
 		position.y = lua_tonumber( lua, -1 );
 
-		// get uv
-		glm::vec4 uv;
-		lua_rawgeti( lua, 2, 1 );
-		uv.x = lua_tonumber( lua, -1 );
-		lua_rawgeti( lua, 2, 2 );
-		uv.y = lua_tonumber( lua, -1 );
-		lua_rawgeti( lua, 2, 3 );
-		uv.z = lua_tonumber( lua, -1 );
-		lua_rawgeti( lua, 2, 4 );
-		uv.w = lua_tonumber( lua, -1 );
-
 		// get size
 		glm::vec2 size;
-		lua_rawgeti( lua, 3, 1 );
+		lua_rawgeti( lua, 2, 1 );
 		size.x = lua_tonumber( lua, -1 );
-		lua_rawgeti( lua, 3, 2 );
+		lua_rawgeti( lua, 2, 2 );
 		size.y = lua_tonumber( lua, -1 );
+
+		// get uv
+		glm::vec4 uv;
+		lua_rawgeti( lua, 3, 1 );
+		uv.x = lua_tonumber( lua, -1 );
+		lua_rawgeti( lua, 3, 2 );
+		uv.y = lua_tonumber( lua, -1 );
+		lua_rawgeti( lua, 3, 3 );
+		uv.z = lua_tonumber( lua, -1 );
+		lua_rawgeti( lua, 3, 4 );
+		uv.w = lua_tonumber( lua, -1 );
 
 		// get opacity
 		float opacity = lua_tonumber( lua, 4 );
@@ -87,7 +102,7 @@ namespace LuaRendering
 		if( args == 5 )
 			texture = (Texture*)lua_touserdata( lua, 5 );
 
-		g_coreData->graphics->queueQuad( position, uv, size, opacity, texture );
+		g_coreData->graphics->queueQuad( position, size, uv, opacity, texture );
 
 		return 0;
 	}

@@ -146,7 +146,6 @@
     <ClCompile Include="Assets.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Chunk.cpp" />
-    <ClCompile Include="Console.cpp" />
     <ClCompile Include="DebugShapes.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="Frustum.cpp" />
@@ -169,7 +168,6 @@
     <ClInclude Include="BaseIncludes.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Chunk.h" />
-    <ClInclude Include="Console.h" />
     <ClInclude Include="CoreData.h" />
     <ClInclude Include="DebugShapes.h" />
     <ClInclude Include="Font.h" />

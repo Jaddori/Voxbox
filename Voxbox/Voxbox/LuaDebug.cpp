@@ -35,9 +35,9 @@ namespace LuaDebug
 
 	int log( lua_State* lua )
 	{
-		assert( lua_gettop( lua ) == 2 );
-		assert( lua_isnumber( lua, 1 ) );
-		assert( lua_isstring( lua, 2 ) );
+		LOG_ASSERT_ARGS( "LuaDebug.cpp", 2 );
+		LOG_EXPECT_NUMBER( "LuaDebug.cpp", 1 );
+		LOG_EXPECT_STRING( "LuaDebug.cpp", 2 );
 
 		int verbosity = (int)lua_tonumber( lua, 1 );
 		const char* str = lua_tostring( lua, 2 );

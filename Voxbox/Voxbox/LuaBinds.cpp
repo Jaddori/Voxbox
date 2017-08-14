@@ -19,6 +19,16 @@ bool LuaBinds::bind( CoreData* coreData )
 {
 	valid = true;
 
+	lua_pushnumber( lua, WINDOW_WIDTH );
+	lua_setglobal( lua, "WINDOW_WIDTH" );
+	lua_pushnumber( lua, WINDOW_HEIGHT );
+	lua_setglobal( lua, "WINDOW_HEIGHT" );
+
+	LuaAssets::bind( lua, coreData );
+	LuaDebug::bind( lua, coreData );
+	LuaInput::bind( lua, coreData );
+	LuaRendering::bind( lua, coreData );
+
 	// load main script
 	if( luaL_loadfile( lua, LUA_MAIN_SCRIPT ) != 0 )
 	{
@@ -78,11 +88,6 @@ bool LuaBinds::bind( CoreData* coreData )
 				renderFunctionReference = luaL_ref( lua, LUA_REGISTRYINDEX );
 		}
 	}
-
-	LuaAssets::bind( lua, coreData );
-	LuaDebug::bind( lua, coreData );
-	LuaInput::bind( lua, coreData );
-	LuaRendering::bind( lua, coreData );
 
 	return valid;
 }

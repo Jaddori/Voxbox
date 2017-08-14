@@ -1,4 +1,5 @@
 #include "LuaAssets.h"
+#include "Assets.h"
 
 namespace LuaAssets
 {
@@ -6,16 +7,186 @@ namespace LuaAssets
 
 	void bind( lua_State* lua, CoreData* coreData )
 	{
-		g_coreData = coreData;
-	}
+		luaL_newmetatable( lua, "assetsMeta" );
+		luaL_Reg assetsRegs[] =
+		{
+			{ "loadTexture",	loadTexture },
+			{ "unloadTexture",	unloadTexture },
+			{ "loadFont",		loadFont },
+			{ "unloadFont",		unloadFont },
+			{ NULL, NULL }
+		};
 
-	int loadFont( lua_State* lua )
-	{
-		return 0;
+		luaL_setfuncs( lua, assetsRegs, 0 );
+		lua_pushvalue( lua, -1 );
+		lua_setfield( lua, -2, "__index" );
+		lua_setglobal( lua, "Assets" );
+
+		/*luaL_newmetatable( lua, "textureMeta" );
+		lua_pushvalue( lua, -1 );
+		lua_setfield( lua, -2, "__index" );
+		lua_setglobal( lua, "Texture" );*/
+
+		luaL_newmetatable( lua, "fontMeta" );
+		luaL_Reg fontRegs[] =
+		{
+			{ "getWidth",				getWidth },
+			{ "getHorizontalOffset",	getHorizontalOffset },
+			{ "getVerticalOffset",		getVerticalOffset },
+			{ "getUV",					getUV },
+			{ NULL, NULL }
+		};
+		lua_pushvalue( lua, -1 );
+		lua_setfield( lua, -2, "__index" );
+		lua_setglobal( lua, "Font" );
+
+		g_coreData = coreData;
 	}
 
 	int loadTexture( lua_State* lua )
 	{
+		LOG_ASSERT_ARGS( "LuaAssets.cpp", 1 );
+		LOG_EXPECT_STRING( "LuaAssets.cpp", 1 );
+
+		int result = 0;
+
+		const char* path = lua_tostring( lua, 1 );
+		Texture* texture = g_coreData->assets->loadTexture( path );
+		if( texture )
+		{
+			lua_newtable( lua );
+			lua_pushlightuserdata( lua, texture );
+			lua_setfield( lua, -2, "__self" );
+			lua_pushnumber( lua, texture->getWidth() );
+			lua_setfield( lua, -2, "width" );
+			lua_pushnumber( lua, texture->getHeight() );
+			lua_setfield( lua, -2, "height" );
+
+			result = 1;
+		}
+
+		return result;
+	}
+
+	int unloadTexture( lua_State* lua )
+	{
+		LOG_ASSERT_ARGS( "LuaAssets.cpp", 1 );
+		LOG_EXPECT_TABLE( "LuaAssets.cpp", 1 );
+
+		Texture* texture = getTexture( lua, 1 );
+		g_coreData->assets->unloadTexture( texture );
+
 		return 0;
+	}
+
+	int loadFont( lua_State* lua )
+	{
+		LOG_ASSERT_ARGS( "LuaAssets.cpp", 2 );
+		LOG_EXPECT_STRING( "LuaAssets.cpp", 1 );
+		LOG_EXPECT_STRING( "LuaAssets.cpp", 2 );
+
+		int result = 0;
+
+		const char* infoPath = lua_tostring( lua, 1 );
+		const char* texturePath = lua_tostring( lua, 2 );
+		Font* font = g_coreData->assets->loadFont( infoPath, texturePath );
+		if( font )
+		{
+			lua_newtable( lua );
+			lua_pushlightuserdata( lua, font );
+			lua_setfield( lua, -2, "__self" );
+			lua_pushnumber( lua, font->getHeight() );
+			lua_setfield( lua, -2, "height" );
+			luaL_setmetatable( lua, "fontMeta" );
+
+			result = 1;
+		}
+
+		return result;
+	}
+
+	int unloadFont( lua_State* lua )
+	{
+		LOG_ASSERT_ARGS( "LuaAssets.cpp", 1 );
+		LOG_EXPECT_TABLE( "LuaAssets.cpp", 1 );
+
+		Font* font = getFont( lua, 1 );
+		g_coreData->assets->unloadFont( font );
+
+		return 0;
+	}
+
+	int getWidth( lua_State* lua )
+	{
+		LOG_ASSERT_ARGS( "Assets.cpp", 2 );
+		LOG_EXPECT_TABLE( "Assets.cpp", 1 );
+		LOG_EXPECT_STRING( "Assets.cpp", 1 );
+
+		Font* font = getFont( lua, 1 );
+		const char* c = lua_tostring( lua, 2 );
+		lua_pushnumber( lua, font->getWidth( c[0] ) );
+
+		return 1;
+	}
+
+	int getHorizontalOffset( lua_State* lua )
+	{
+		LOG_ASSERT_ARGS( "LuaAssets.cpp", 2 );
+		LOG_EXPECT_TABLE( "LuaAssets.cpp", 1 );
+		LOG_EXPECT_STRING( "LuaAssets.cpp", 2 );
+
+		Font* font = getFont( lua, 1 );
+		const char* c = lua_tostring( lua, 2 );
+		lua_pushnumber( lua, font->getHorizontalOffset( c[0] ) );
+
+		return 1;
+	}
+
+	int getVerticalOffset( lua_State* lua )
+	{
+		LOG_ASSERT_ARGS( "LuaAssets.cpp", 2 );
+		LOG_EXPECT_TABLE( "LuaAssets.cpp", 1 );
+		LOG_EXPECT_STRING( "LuaAssets.cpp", 2 );
+
+		Font* font = getFont( lua, 1 );
+		const char* c = lua_tostring( lua, 2 );
+		lua_pushnumber( lua, font->getVerticalOffset( c[0] ) );
+
+		return 1;
+	}
+
+	int getUV( lua_State* lua )
+	{
+		LOG_ASSERT_ARGS( "LuaAssets.cpp", 2 );
+		LOG_EXPECT_TABLE( "LuaAssets.cpp", 1 );
+		LOG_EXPECT_STRING( "LuaAssets.cpp", 2 );
+
+		Font* font = getFont( lua, 1 );
+		const char* c = lua_tostring( lua, 2 );
+
+		glm::vec4 uv = font->getUV( c[0] );
+		lua_newtable( lua );
+		lua_pushnumber( lua, uv.x );
+		lua_rawseti( lua, -2, 1 );
+		lua_pushnumber( lua, uv.y );
+		lua_rawseti( lua, -2, 2 );
+		lua_pushnumber( lua, uv.z );
+		lua_rawseti( lua, -2, 3 );
+		lua_pushnumber( lua, uv.w );
+		lua_rawseti( lua, -2, 4 );
+
+		return 1;
+	}
+
+	Texture* getTexture( lua_State* lua, int index )
+	{
+		lua_getfield( lua, index, "__self" );
+		return (Texture*)lua_touserdata( lua, -1 );
+	}
+
+	Font* getFont( lua_State* lua, int index )
+	{
+		lua_getfield( lua, index, "__self" );
+		return (Font*)lua_touserdata( lua, -1 );
 	}
 }

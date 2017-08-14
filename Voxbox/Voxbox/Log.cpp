@@ -36,6 +36,7 @@ void Log::addMessage( int verbosity, const char* message )
 	WaitForSingleObject( mutex, INFINITE );
 
 	fprintf( file, "%s\n", message );
+	fflush( file );
 	if( verbosity >= threshold )
 		printf( "%s\n", message );
 

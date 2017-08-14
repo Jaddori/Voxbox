@@ -6,7 +6,7 @@ namespace LuaInput
 
 	void bind( lua_State* lua, CoreData* coreData )
 	{
-		lua_register( lua, "keyDown", keyDown );
+		/*lua_register( lua, "keyDown", keyDown );
 		lua_register( lua, "keyUp", keyUp );
 		lua_register( lua, "keyPressed", keyPressed );
 		lua_register( lua, "keyReleased", keyReleased );
@@ -16,7 +16,43 @@ namespace LuaInput
 		lua_register( lua, "buttonPressed", buttonPressed );
 		lua_register( lua, "buttonReleased", buttonReleased );
 
-		lua_register( lua, "mousePosition", mousePosition );
+		lua_register( lua, "mousePosition", mousePosition );*/
+
+		luaL_newmetatable( lua, "inputMeta" );
+		luaL_Reg regs[] =
+		{
+			{ "keyDown",		keyDown },
+			{ "keyUp",			keyUp },
+			{ "keyPressed",		keyPressed },
+			{ "keyReleased",	keyReleased },
+			
+			{ "buttonDown",		buttonDown },
+			{ "buttonUp",		buttonUp },
+			{ "buttonPressed",	buttonPressed },
+			{ "buttonReleased", buttonReleased },
+
+			{ "mousePosition",	mousePosition },
+			{ NULL, NULL }
+		};
+
+		luaL_setfuncs( lua, regs, 0 );
+		lua_pushvalue( lua, -1 );
+		lua_setfield( lua, -2, "__index" );
+		lua_setglobal( lua, "Input" );
+
+		lua_newtable( lua );
+		lua_pushnumber( lua, SDL_SCANCODE_GRAVE );
+		lua_setfield( lua, -2, "Console" );
+		lua_setglobal( lua, "Keys" );
+
+		lua_newtable( lua );
+		lua_pushnumber( lua, SDL_BUTTON_LEFT );
+		lua_setfield( lua, -2, "Left" );
+		lua_pushnumber( lua, SDL_BUTTON_RIGHT );
+		lua_setfield( lua, -2, "Right" );
+		lua_pushnumber( lua, SDL_BUTTON_MIDDLE );
+		lua_setfield( lua, -2, "Middle" );
+		lua_setglobal( lua, "Buttons" );
 
 		g_coreData = coreData;
 	}

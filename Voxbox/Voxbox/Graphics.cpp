@@ -411,7 +411,7 @@ void Graphics::queueText( Font* font, const char* text, const glm::vec2& positio
 	}
 }
 
-void Graphics::queueQuad( const glm::vec2& position, const glm::vec4& uv, const glm::vec2& size, float opacity, Texture* texture  )
+void Graphics::queueQuad( const glm::vec2& position, const glm::vec2& size, const glm::vec4& uv, float opacity, Texture* texture  )
 {
 	const int QUAD_COLLECTION_COUNT = quadCollections.getSize();
 
@@ -432,8 +432,8 @@ void Graphics::queueQuad( const glm::vec2& position, const glm::vec4& uv, const 
 
 	Quad& quad = quadCollections[index].quads[writeIndex].append();
 	quad.position = position;
-	quad.uv = uv;
 	quad.size = size;
+	quad.uv = uv;
 	quad.opacity = opacity;
 }
 

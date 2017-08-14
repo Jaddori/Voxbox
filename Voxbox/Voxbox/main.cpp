@@ -5,7 +5,6 @@
 #include "Chunk.h"
 #include "Font.h"
 #include "Graphics.h"
-#include "Console.h"
 #include "DebugShapes.h"
 #include "CoreData.h"
 #include "LuaBinds.h"
@@ -73,8 +72,8 @@ DWORD WINAPI update( LPVOID args )
 			if( glm::length( cameraMovement ) > 0 )
 				data->coreData->perspectiveCamera->updatePosition( cameraMovement );
 
-			if( data->coreData->input->keyReleased( SDL_SCANCODE_GRAVE ) )
-				data->coreData->console->toggle();
+			/*if( data->coreData->input->keyReleased( SDL_SCANCODE_GRAVE ) )
+				data->coreData->console->toggle();*/
 
 			if( data->coreData->input->keyReleased( SDL_SCANCODE_SPACE ) )
 				LOG( VERBOSITY_DEBUG, "main.cpp - User pressed the spacebar." );
@@ -101,7 +100,7 @@ DWORD WINAPI update( LPVOID args )
 				}
 			}
 
-			data->coreData->console->render( data->coreData->graphics );
+			data->luaBinds->update();
 			data->luaBinds->render();
 
 			ReleaseSemaphore( data->updateDone, 1, NULL );
@@ -164,16 +163,11 @@ int main( int argc, char* argv[] )
 			debugShapes.load();
 			debugShapes.upload();
 
-			Console console;
-			console.load();
-			//console.setVisible( true );
-
 			Input input;
 
 			CoreData coreData;
 			coreData.perspectiveCamera = &graphics.getPerspectiveCamera();
 			coreData.input = &input;
-			coreData.console = &console;
 			coreData.chunks = chunks;
 			coreData.graphics = &graphics;
 			coreData.debugShapes = &debugShapes;
@@ -181,6 +175,7 @@ int main( int argc, char* argv[] )
 
 			LuaBinds luaBinds;
 			luaBinds.bind( &coreData );
+			luaBinds.load();
 
 			ThreadData threadData;
 			threadData.coreData = &coreData;
@@ -216,7 +211,6 @@ int main( int argc, char* argv[] )
 					// finalize objects
 					assets.upload();
 					graphics.finalize();
-					console.finalize();
 					debugShapes.finalize();
 
 					if( currentChunk < NUM_CHUNKS )

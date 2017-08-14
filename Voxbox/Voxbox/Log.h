@@ -30,6 +30,18 @@
 #define LOG_ERROR( fmt, ... ) LOG( VERBOSITY_ERROR, fmt, __VA_ARGS__ )
 #define LOG_DEBUG( fmt, ... ) LOG( VERBOSITY_DEBUG, fmt, __VA_ARGS__ )
 
+#define LOG_ASSERT_ARGS( from, expected ) \
+	{ \
+		int args = lua_gettop( lua ); \
+		LOG_ASSERT( args == expected, from " - Expected " #expected " argument(s) to " __FUNCTION__ ", got %d", args ); \
+	}
+
+#define LOG_EXPECT_BOOL( from, num ) LOG_ASSERT( lua_isboolean( lua, num ), from " - Expected bool argument to " __FUNCTION__ )
+#define LOG_EXPECT_NUMBER( from, num ) LOG_ASSERT( lua_isnumber( lua, num ), from " - Expected number argument to " __FUNCTION__ )
+#define LOG_EXPECT_STRING( from, num ) LOG_ASSERT( lua_isstring( lua, num ), from " - Expected string argument to " __FUNCTION__ )
+#define LOG_EXPECT_USERDATA( from, num ) LOG_ASSERT( lua_isuserdata( lua, num ), from " - Expected userdata argument to " __FUNCTION__ )
+#define LOG_EXPECT_TABLE( from, num ) LOG_ASSERT( lua_istable( lua, num ), from " - Expected table argument #" #num " to " __FUNCTION__ )
+
 enum
 {
 	VERBOSITY_INFORMATION,

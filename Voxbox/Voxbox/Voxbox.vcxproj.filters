@@ -55,9 +55,6 @@
     <ClCompile Include="Log.cpp">
       <Filter>Source Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="Console.cpp">
-      <Filter>Source Files\Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="DebugShapes.cpp">
       <Filter>Source Files\Debug</Filter>
     </ClCompile>
@@ -116,9 +113,6 @@
     </ClInclude>
     <ClInclude Include="Array.h">
       <Filter>Source Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Console.h">
-      <Filter>Source Files\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="DebugShapes.h">
       <Filter>Source Files\Debug</Filter>

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "BaseIncludes.h"
+#include "LuaAssets.h"
 #include "Camera.h"
-#include "Console.h"
 #include "Frustum.h"
 #include "Graphics.h"
 #include "Shader.h"

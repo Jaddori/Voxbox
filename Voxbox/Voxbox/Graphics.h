@@ -67,7 +67,7 @@ public:
 
 	void queueChunk( Chunk* chunk );
 	void queueText( Font* font, const char* text, const glm::vec2& position, const glm::vec4& color );
-	void queueQuad( const glm::vec2& position, const glm::vec4& uv, const glm::vec2& size, float opacity, Texture* texture );
+	void queueQuad( const glm::vec2& position, const glm::vec2& size, const glm::vec4& uv, float opacity, Texture* texture );
 	void queueBillboard( const glm::vec3& position, const glm::vec4& uv, const glm::vec2& size, bool spherical, Texture* texture );
 
 	Camera& getPerspectiveCamera();
