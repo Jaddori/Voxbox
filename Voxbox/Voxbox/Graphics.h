@@ -5,6 +5,7 @@
 #include "Texture.h"
 #include "Chunk.h"
 #include "Camera.h"
+#include "Assets.h"
 
 #define GRAPHICS_MAX_GLYPHS 128
 #define GRAPHICS_MAX_QUADS 128
@@ -58,7 +59,7 @@ public:
 	Graphics();
 	~Graphics();
 
-	bool load();
+	bool load( Assets* assets );
 	void unload();
 	void finalize();
 
@@ -80,7 +81,7 @@ private:
 
 	// rendering chunks
 	Shader chunkShader;
-	Texture blockAtlas;
+	Texture* blockAtlas;
 	GLint chunkProjectionMatrixLocation;
 	GLint chunkViewMatrixLocation;
 	GLint chunkOffsetLocation;

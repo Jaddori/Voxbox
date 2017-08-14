@@ -16,7 +16,7 @@ Graphics::~Graphics()
 	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Destructing." );
 }
 
-bool Graphics::load()
+bool Graphics::load( Assets* assets )
 {
 	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Loading." );
 
@@ -42,13 +42,19 @@ bool Graphics::load()
 	}
 
 	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Loading block atlas." );
-	if( blockAtlas.load( "./assets/textures/blocks.dds" ) )
+	/*if( blockAtlas.load( "./assets/textures/blocks.dds" ) )
 	{
 		blockAtlas.upload();
 	}
 	else
 	{
 		LOG( VERBOSITY_ERROR, "Graphics.cpp - Failed to load block atlas." );
+		result = false;
+	}*/
+	blockAtlas = assets->loadTexture( "./assets/textures/blocks.dds" );
+	if( blockAtlas == nullptr )
+	{
+		LOG_ERROR( "Graphics.cpp - Failed to load block atlas." );
 		result = false;
 	}
 
@@ -221,7 +227,7 @@ void Graphics::render()
 	chunkShader.setMat4( chunkProjectionMatrixLocation, perspectiveCamera.getProjectionMatrix() );
 	chunkShader.setMat4( chunkViewMatrixLocation, perspectiveCamera.getViewMatrix() );
 
-	blockAtlas.bind();
+	blockAtlas->bind();
 
 	const int CHUNK_COUNT = chunks[readIndex].getSize();
 	for( int i=0; i<CHUNK_COUNT; i++ )

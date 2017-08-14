@@ -9,6 +9,7 @@
 #include "DebugShapes.h"
 #include "CoreData.h"
 #include "LuaBinds.h"
+#include "Assets.h"
 
 #define THREAD_UPDATE_WAIT 1000
 #define CHUNK_WIDTH 10
@@ -142,22 +143,10 @@ int main( int argc, char* argv[] )
 			//srand( time( 0 ) );
 			srand( 1337 );
 
-			Texture texture;
-			if( !texture.load( "./assets/textures/blocks.dds" ) )
-				printf( "Failed to load texture.\n" );
-			else
-				texture.upload();
-
-			Font font;
-			if( font.load( "./assets/fonts/verdana12.bin", "./assets/fonts/verdana12.dds" ) )
-			{
-				font.upload();
-			}
-			else
-				printf( "Failed to load font.\n" );
+			Assets assets;
 
 			Graphics graphics;
-			graphics.load();
+			graphics.load( &assets );
 			graphics.getPerspectiveCamera().setPosition( glm::vec3( 0.0f, 0.0f, -10.0f ) );
 
 			Chunk* chunks = new Chunk[NUM_CHUNKS];
@@ -188,6 +177,7 @@ int main( int argc, char* argv[] )
 			coreData.chunks = chunks;
 			coreData.graphics = &graphics;
 			coreData.debugShapes = &debugShapes;
+			coreData.assets = &assets;
 
 			LuaBinds luaBinds;
 			luaBinds.bind( &coreData );
@@ -224,6 +214,7 @@ int main( int argc, char* argv[] )
 					}
 
 					// finalize objects
+					assets.upload();
 					graphics.finalize();
 					console.finalize();
 					debugShapes.finalize();

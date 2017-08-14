@@ -6,6 +6,7 @@ class Console;
 class Chunk;
 class Graphics;
 class DebugShapes;
+class Assets;
 struct CoreData
 {
 	Camera* perspectiveCamera;
@@ -14,4 +15,5 @@ struct CoreData
 	Chunk* chunks;
 	Graphics* graphics;
 	DebugShapes* debugShapes;
+	Assets* assets;
 };
