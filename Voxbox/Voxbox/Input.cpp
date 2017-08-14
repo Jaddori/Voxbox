@@ -21,6 +21,7 @@ void Input::reset()
 	memcpy( prevButtons, buttons, INPUT_MAX_BUTTONS );
 	prevMousePosition = mousePosition;
 	prevMouseWheel = mouseWheel;
+	textInput[0] = 0;
 }
 
 bool Input::update( SDL_Event* e )
@@ -58,6 +59,11 @@ bool Input::update( SDL_Event* e )
 		case SDL_MOUSEWHEEL:
 		{
 			mouseWheel = e->wheel.y;
+		} break;
+
+		case SDL_TEXTINPUT:
+		{
+			memcpy( textInput, e->text.text, sizeof(char)*INPUT_MAX_TEXT_INPUT );
 		} break;
 
 		default:
@@ -122,4 +128,9 @@ float Input::getMouseWheel() const
 float Input::getMouseWheelDelta() const
 {
 	return ( prevMouseWheel - mouseWheel );
+}
+
+const char* Input::getTextInput() const
+{
+	return textInput;
 }

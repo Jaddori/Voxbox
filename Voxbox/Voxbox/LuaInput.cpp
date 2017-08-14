@@ -142,4 +142,10 @@ namespace LuaInput
 
 		return 2;
 	}
+
+	int textInput( lua_State* lua )
+	{
+		lua_pushstring( lua, g_coreData->input->getTextInput() );
+		return 1;
+	}
 }

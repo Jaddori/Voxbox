@@ -4,6 +4,7 @@
 
 #define INPUT_MAX_KEYS 128
 #define INPUT_MAX_BUTTONS 5
+#define INPUT_MAX_TEXT_INPUT 32
 
 struct Point
 {
@@ -33,6 +34,7 @@ public:
 	Point getMouseDelta() const;
 	float getMouseWheel() const;
 	float getMouseWheelDelta() const;
+	const char* getTextInput() const;
 
 private:
 	bool keys[INPUT_MAX_KEYS];
@@ -44,4 +46,6 @@ private:
 	Point prevMousePosition;
 	float mouseWheel;
 	float prevMouseWheel;
+
+	char textInput[INPUT_MAX_TEXT_INPUT];
 };

@@ -17,4 +17,5 @@ namespace LuaInput
 	int buttonReleased( lua_State* lua );
 
 	int mousePosition( lua_State* lua );
+	int textInput( lua_State* lua );
 }
