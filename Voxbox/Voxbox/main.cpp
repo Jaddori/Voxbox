@@ -72,9 +72,6 @@ DWORD WINAPI update( LPVOID args )
 			if( glm::length( cameraMovement ) > 0 )
 				data->coreData->perspectiveCamera->updatePosition( cameraMovement );
 
-			if( data->coreData->input->keyReleased( SDL_SCANCODE_SPACE ) )
-				LOG_DEBUG( "User pressed the spacebar." );
-
 			DebugSphere sphere = { glm::vec3( 0.0f, 0.0f, 0.0f ), 2.0f, glm::vec4( 1.0f, 0.0f, 0.0f, 1.0f ) };
 			data->coreData->debugShapes->addSphere( sphere );
 

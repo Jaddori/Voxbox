@@ -18,6 +18,7 @@ Input::~Input()
 void Input::reset()
 {
 	memcpy( prevKeys, keys, INPUT_MAX_KEYS );
+	memset( repeatedKeys, 0, INPUT_MAX_KEYS );
 	memcpy( prevButtons, buttons, INPUT_MAX_BUTTONS );
 	prevMousePosition = mousePosition;
 	prevMouseWheel = mouseWheel;
@@ -32,7 +33,11 @@ bool Input::update( SDL_Event* e )
 	{
 		case SDL_KEYDOWN:
 		{
-			keys[e->key.keysym.scancode] = true;
+			if( e->key.keysym.scancode < INPUT_MAX_KEYS )
+			{
+				keys[e->key.keysym.scancode] = true;
+				repeatedKeys[e->key.keysym.scancode] = true;
+			}
 		} break;
 
 		case SDL_KEYUP:
@@ -76,31 +81,43 @@ bool Input::update( SDL_Event* e )
 
 bool Input::keyDown( int key )
 {
+	LOG_ASSERT( key >= 0 && key < INPUT_MAX_KEYS, "Bad key argument: %d", key );
 	return keys[key];
 }
 
 bool Input::keyPressed( int key )
 {
+	LOG_ASSERT( key >= 0 && key < INPUT_MAX_KEYS, "Bad key argument: %d", key );
 	return ( keys[key] && !prevKeys[key] );
 }
 
 bool Input::keyReleased( int key )
 {
+	LOG_ASSERT( key >= 0 && key < INPUT_MAX_KEYS, "Bad key argument: %d", key );
 	return ( !keys[key] && prevKeys[key] );
+}
+
+bool Input::keyRepeated( int key )
+{
+	LOG_ASSERT( key >= 0 && key < INPUT_MAX_KEYS, "Bad key argument: %d", key );
+	return repeatedKeys[key];
 }
 
 bool Input::buttonDown( int button )
 {
+	LOG_ASSERT( button >= 0 && button < INPUT_MAX_KEYS, "Bad button argument: %d", button );
 	return buttons[button];
 }
 
 bool Input::buttonPressed( int button )
 {
+	LOG_ASSERT( button >= 0 && button < INPUT_MAX_KEYS, "Bad button argument: %d", button );
 	return ( buttons[button] && !prevButtons[button] );
 }
 
 bool Input::buttonReleased( int button )
 {
+	LOG_ASSERT( button >= 0 && button < INPUT_MAX_KEYS, "Bad button argument: %d", button );
 	return ( !buttons[button] && prevButtons[button] );
 }
 
