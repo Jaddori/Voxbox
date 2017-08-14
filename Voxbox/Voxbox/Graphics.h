@@ -35,7 +35,7 @@ struct Quad
 struct QuadCollection
 {
 	Texture* texture;
-	Array<Quad> quads;
+	Array<Quad> quads[2];
 };
 
 struct Billboard
@@ -49,7 +49,7 @@ struct Billboard
 struct BillboardCollection
 {
 	Texture* texture;
-	Array<Billboard> billboards;
+	Array<Billboard> billboards[2];
 };
 
 class Graphics

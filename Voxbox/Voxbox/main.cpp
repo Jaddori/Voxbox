@@ -36,6 +36,7 @@ DWORD WINAPI generateChunks( LPVOID args )
 struct ThreadData
 {
 	CoreData* coreData;
+	LuaBinds* luaBinds;
 	bool running;
 	HANDLE updateDone;
 	HANDLE renderDone;
@@ -100,6 +101,7 @@ DWORD WINAPI update( LPVOID args )
 			}
 
 			data->coreData->console->render( data->coreData->graphics );
+			data->luaBinds->render();
 
 			ReleaseSemaphore( data->updateDone, 1, NULL );
 		}
@@ -189,13 +191,10 @@ int main( int argc, char* argv[] )
 
 			LuaBinds luaBinds;
 			luaBinds.bind( &coreData );
-			luaBinds.load();
-			luaBinds.unload();
-			luaBinds.update();
-			luaBinds.render();
 
 			ThreadData threadData;
 			threadData.coreData = &coreData;
+			threadData.luaBinds = &luaBinds;
 			threadData.running = true;
 			threadData.updateDone = CreateSemaphore( NULL, 0, 1, NULL );
 			threadData.renderDone = CreateSemaphore( NULL, 1, 1, NULL );
@@ -242,7 +241,7 @@ int main( int argc, char* argv[] )
 				}
 
 				// render
-				glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
+				glClearColor( 0.15f, 0.15f, 0.15f, 0.0f );
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 				debugShapes.render( graphics.getPerspectiveCamera().getProjectionMatrix(), graphics.getPerspectiveCamera().getViewMatrix() );

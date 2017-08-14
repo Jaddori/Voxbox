@@ -23,9 +23,7 @@ Worker.unload = function( self )
 end
 
 Worker.update = function( self )
-	print( "updating worker " .. self.ID )
 end
 
 Worker.render = function( self )
-	print( "rendering worker " .. self.ID )
 end

@@ -79,7 +79,10 @@ bool LuaBinds::bind( CoreData* coreData )
 		}
 	}
 
-	LuaCore::bind( lua, coreData );
+	LuaAssets::bind( lua, coreData );
+	LuaDebug::bind( lua, coreData );
+	LuaInput::bind( lua, coreData );
+	LuaRendering::bind( lua, coreData );
 
 	return valid;
 }

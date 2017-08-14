@@ -49,6 +49,15 @@ void Log::addMessage( int verbosity, const char* message )
 #endif
 }
 
+void Log::copyMessages( Array<LogMessage>& destination )
+{
+	WaitForSingleObject( mutex, INFINITE );
+
+	destination.fastCopy( messages );
+
+	ReleaseMutex( mutex );
+}
+
 void Log::setThreshold( int t )
 {
 	threshold = t;

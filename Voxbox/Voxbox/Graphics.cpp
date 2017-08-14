@@ -107,12 +107,17 @@ bool Graphics::load()
 		glBindBuffer( GL_ARRAY_BUFFER, quadVBO );
 		glBufferData( GL_ARRAY_BUFFER, sizeof(Quad)*GRAPHICS_MAX_QUADS, nullptr, GL_STREAM_DRAW );
 
-		glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, sizeof(Glyph), 0 );
-		glVertexAttribPointer( 1, 4, GL_FLOAT, GL_FALSE, sizeof(Glyph), (void*)(sizeof(GLfloat)*2) );
-		glVertexAttribPointer( 2, 2, GL_FLOAT, GL_FALSE, sizeof(Glyph), (void*)(sizeof(GLfloat)*6) );
-		glVertexAttribPointer( 3, 1, GL_FLOAT, GL_FALSE, sizeof(Glyph), (void*)(sizeof(GLfloat)*8) );
+		glVertexAttribPointer( 0, 2, GL_FLOAT, GL_FALSE, sizeof(Quad), 0 );
+		glVertexAttribPointer( 1, 4, GL_FLOAT, GL_FALSE, sizeof(Quad), (void*)(sizeof(GLfloat)*2) );
+		glVertexAttribPointer( 2, 2, GL_FLOAT, GL_FALSE, sizeof(Quad), (void*)(sizeof(GLfloat)*6) );
+		glVertexAttribPointer( 3, 1, GL_FLOAT, GL_FALSE, sizeof(Quad), (void*)(sizeof(GLfloat)*8) );
 
 		glBindVertexArray( 0 );
+	}
+	else
+	{
+		LOG_ERROR( "Graphics.cpp - Failed to load quad shader." );
+		result = false;
 	}
 
 	LOG( VERBOSITY_INFORMATION, "Graphics.cpp - Loading billboard shader." );
@@ -143,6 +148,11 @@ bool Graphics::load()
 		glVertexAttribPointer( 3, 1, GL_FLOAT, GL_FALSE, sizeof(Billboard), (void*)( sizeof(GLfloat)*9) );
 
 		glBindVertexArray( 0 );
+	}
+	else
+	{
+		LOG_ERROR( "Graphics.cpp - Failed to load billboard shader." );
+		result = false;
 	}
 
 	return result;
@@ -197,6 +207,11 @@ void Graphics::finalize()
 	const int GLYPH_COLLECTION_COUNT = glyphCollections.getSize();
 	for( int i=0; i<GLYPH_COLLECTION_COUNT; i++ )
 		glyphCollections[i].glyphs[writeIndex].clear();
+
+	// swap quads
+	const int QUAD_COLLECTION_COUNT = quadCollections.getSize();
+	for( int i=0; i<QUAD_COLLECTION_COUNT; i++ )
+		quadCollections[i].quads[writeIndex].clear();
 }
 
 void Graphics::render()
@@ -232,7 +247,7 @@ void Graphics::render()
 		else
 			glBindTexture( GL_TEXTURE_2D, 0 );
 
-		const int BILLBOARD_COUNT = collection.billboards.getSize();
+		const int BILLBOARD_COUNT = collection.billboards[readIndex].getSize();
 		int offset = 0;
 		while( offset < BILLBOARD_COUNT )
 		{
@@ -240,13 +255,13 @@ void Graphics::render()
 			if( count > GRAPHICS_MAX_BILLBOARDS )
 				count = GRAPHICS_MAX_BILLBOARDS;
 			
-			glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(Billboard)*count, collection.billboards.getData()+offset );
+			glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(Billboard)*count, collection.billboards[readIndex].getData()+offset );
 			glDrawArrays( GL_POINTS, 0, count );
 
 			offset += count;
 		}
 
-		collection.billboards.clear();
+		//collection.billboards.clear();
 	}
 
 	glBindVertexArray( 0 );
@@ -272,7 +287,7 @@ void Graphics::render()
 		else
 			glBindTexture( GL_TEXTURE_2D, 0 );
 
-		const int QUAD_COUNT = collection.quads.getSize();
+		const int QUAD_COUNT = collection.quads[readIndex].getSize();
 		int offset = 0;
 		while( offset < QUAD_COUNT )
 		{
@@ -280,14 +295,16 @@ void Graphics::render()
 			if( count > GRAPHICS_MAX_QUADS )
 				count = GRAPHICS_MAX_QUADS;
 
-			glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(Quad)*count, collection.quads.getData() + offset );
+			glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(Quad)*count, collection.quads[readIndex].getData() + offset );
 			glDrawArrays( GL_POINTS, 0, count );
 
 			offset += count;
 		}
 
-		collection.quads.clear();
+		//collection.quads.clear();
 	}
+
+	glBindVertexArray( 0 );
 
 	// render text
 	textShader.bind();
@@ -344,6 +361,8 @@ void Graphics::queueText( Font* font, const char* text, const glm::vec2& positio
 	{
 		GlyphCollection& collection = glyphCollections.append();
 		collection.texture = font->getTexture();
+		collection.glyphs[writeIndex].expand( GRAPHICS_MAX_GLYPHS );
+		collection.glyphs[readIndex].expand( GRAPHICS_MAX_GLYPHS );
 
 		collectionIndex = GLYPH_COLLECTION_COUNT;
 	}
@@ -388,10 +407,10 @@ void Graphics::queueText( Font* font, const char* text, const glm::vec2& positio
 
 void Graphics::queueQuad( const glm::vec2& position, const glm::vec4& uv, const glm::vec2& size, float opacity, Texture* texture  )
 {
-	const int QUAD_COUNT = quadCollections.getSize();
+	const int QUAD_COLLECTION_COUNT = quadCollections.getSize();
 
 	int index = -1;
-	for( int i=0; i<QUAD_COUNT && index < 0; i++ )
+	for( int i=0; i<QUAD_COLLECTION_COUNT && index < 0; i++ )
 		if( quadCollections[i].texture == texture )
 			index = i;
 
@@ -399,12 +418,13 @@ void Graphics::queueQuad( const glm::vec2& position, const glm::vec4& uv, const 
 	{
 		QuadCollection& collection = quadCollections.append();
 		collection.texture = texture;
-		collection.quads.expand( GRAPHICS_MAX_QUADS );
+		collection.quads[writeIndex].expand( GRAPHICS_MAX_QUADS );
+		collection.quads[readIndex].expand( GRAPHICS_MAX_QUADS );
 
-		index = QUAD_COUNT;
+		index = QUAD_COLLECTION_COUNT;
 	}
 
-	Quad& quad = quadCollections[index].quads.append();
+	Quad& quad = quadCollections[index].quads[writeIndex].append();
 	quad.position = position;
 	quad.uv = uv;
 	quad.size = size;
@@ -413,10 +433,10 @@ void Graphics::queueQuad( const glm::vec2& position, const glm::vec4& uv, const 
 
 void Graphics::queueBillboard( const glm::vec3& position, const glm::vec4& uv, const glm::vec2& size, bool spherical, Texture* texture )
 {
-	const int BILLBOARD_COUNT = billboardCollections.getSize();
+	const int BILLBOARD_COLLECTION_COUNT = billboardCollections.getSize();
 
 	int index = -1;
-	for( int i=0; i<BILLBOARD_COUNT && index < 0; i++ )
+	for( int i=0; i<BILLBOARD_COLLECTION_COUNT && index < 0; i++ )
 		if( billboardCollections[i].texture == texture )
 			index = i;
 
@@ -424,12 +444,13 @@ void Graphics::queueBillboard( const glm::vec3& position, const glm::vec4& uv, c
 	{
 		BillboardCollection& collection = billboardCollections.append();
 		collection.texture = texture;
-		collection.billboards.expand( GRAPHICS_MAX_BILLBOARDS );
+		collection.billboards[writeIndex].expand( GRAPHICS_MAX_BILLBOARDS );
+		collection.billboards[readIndex].expand( GRAPHICS_MAX_BILLBOARDS );
 
-		index = BILLBOARD_COUNT;
+		index = BILLBOARD_COLLECTION_COUNT;
 	}
 
-	Billboard& billboard = billboardCollections[index].billboards.append();
+	Billboard& billboard = billboardCollections[index].billboards[writeIndex].append();
 	billboard.position = position;
 	billboard.uv = uv;
 	billboard.size = size;

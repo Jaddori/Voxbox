@@ -67,7 +67,19 @@
     <ClCompile Include="LuaBinds.cpp">
       <Filter>Source Files\Lua</Filter>
     </ClCompile>
-    <ClCompile Include="LuaCore.cpp">
+    <ClCompile Include="LuaAssets.cpp">
+      <Filter>Source Files\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaInput.cpp">
+      <Filter>Source Files\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaRendering.cpp">
+      <Filter>Source Files\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaVoxels.cpp">
+      <Filter>Source Files\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaDebug.cpp">
       <Filter>Source Files\Lua</Filter>
     </ClCompile>
   </ItemGroup>
@@ -123,7 +135,19 @@
     <ClInclude Include="LuaBinds.h">
       <Filter>Source Files\Lua</Filter>
     </ClInclude>
-    <ClInclude Include="LuaCore.h">
+    <ClInclude Include="LuaAssets.h">
+      <Filter>Source Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaInput.h">
+      <Filter>Source Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaRendering.h">
+      <Filter>Source Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaVoxels.h">
+      <Filter>Source Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaDebug.h">
       <Filter>Source Files\Lua</Filter>
     </ClInclude>
   </ItemGroup>

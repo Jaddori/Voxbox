@@ -58,6 +58,7 @@ public:
 	void stop();
 
 	void addMessage( int verbosity, const char* message );
+	void copyMessages( Array<LogMessage>& destination );
 
 	void setThreshold( int threshold );
 

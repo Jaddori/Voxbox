@@ -1,4 +1,5 @@
 require("./assets/scripts/worker")
+require("./assets/scripts/console")
 
 w1 = Worker:create()
 w2 = Worker:create()
@@ -9,6 +10,7 @@ end
 
 function load()
 	print( "LUA LOAD" )
+	console.load()
 	
 	w1:load()
 	w2:load()
@@ -16,20 +18,21 @@ end
 
 function unload()
 	print( "LUA UNLOAD" )
+	console.unload()
 	
 	w1:unload()
 	w2:unload()
 end
 
 function update()
-	print( "LUA UPDATE" )
+	console.update()
 	
 	w1:update()
 	w2:update()
 end
 
 function render()
-	print( "LUA RENDER" )
+	console.render()
 	
 	w1:render()
 	w2:render()

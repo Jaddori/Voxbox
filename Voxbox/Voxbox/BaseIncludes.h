@@ -42,3 +42,4 @@ const float EPSILON = glm::epsilon<float>();
 #include "Array.h"
 #include "Swap.h"
 #include "SwapArray.h"
+#include "CoreData.h"
