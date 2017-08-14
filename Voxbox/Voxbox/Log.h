@@ -21,9 +21,14 @@
 		assert( (condition) ); \
 	}
 #define LOG_THRESHOLD( threshold ) Log::instance().setThreshold( threshold )
-#define LOG_INFORMATION() LOG_THRESHOLD( VERBOSITY_INFORMATION )
+#define LOG_INFORMATIONS() LOG_THRESHOLD( VERBOSITY_INFORMATION )
 #define LOG_WARNINGS() LOG_THRESHOLD( VERBOSITY_WARNING )
 #define LOG_ERRORS() LOG_THRESHOLD( VERBOSITY_ERROR )
+
+#define LOG_INFO( fmt, ... ) LOG( VERBOSITY_INFORMATION, fmt, __VA_ARGS__ )
+#define LOG_WARNING( fmt, ... ) LOG( VERBOSITY_WARNING, fmt, __VA_ARGS__ )
+#define LOG_ERROR( fmt, ... ) LOG( VERBOSITY_ERROR, fmt, __VA_ARGS__ )
+#define LOG_DEBUG( fmt, ... ) LOG( VERBOSITY_DEBUG, fmt, __VA_ARGS__ )
 
 enum
 {

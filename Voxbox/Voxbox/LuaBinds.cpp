@@ -66,61 +66,36 @@ bool LuaBinds::bind( CoreData* coreData )
 			}
 			else
 				updateFunctionReference = luaL_ref( lua, LUA_REGISTRYINDEX );
+
+			// get render function
+			lua_getglobal( lua, "render" );
+			if( !lua_isfunction( lua, -1 ) )
+			{
+				LOG( VERBOSITY_ERROR, "LuaBinds.cpp - Failed to find render function." );
+				valid = false;
+			}
+			else
+				renderFunctionReference = luaL_ref( lua, LUA_REGISTRYINDEX );
 		}
 	}
 
 	return valid;
-}
-
-void LuaBinds::load()
-{
-	if( valid )
-	{
-		lua_rawgeti( lua, LUA_REGISTRYINDEX, loadFunctionReference );
-		if( lua_pcall( lua, 0, 0, 0 ) != 0 )
-		{
-			LOG( VERBOSITY_ERROR, "LuaBinds.cpp - Failed to run load function." );
-			LOG( VERBOSITY_ERROR, "%s", lua_tostring( lua, -1 ) );
-			valid = false;
-		}
-	}
-	else
-		LOG( VERBOSITY_WARNING, "LuaBinds.cpp - Trying to call load function with invalid state." );
-}
-
-void LuaBinds::unload()
-{
-	if( valid )
-	{
-		lua_rawgeti( lua, LUA_REGISTRYINDEX, unloadFunctionReference );
-		if( lua_pcall( lua, 0, 0, 0 ) != 0 )
-		{
-			LOG( VERBOSITY_ERROR, "LuaBinds.cpp - Failed to run unload function." );
-			LOG( VERBOSITY_ERROR, "%s", lua_tostring( lua, -1 ) );
-			valid = false;
-		}
-	}
-	else
-		LOG( VERBOSITY_WARNING, "LuaBinds.cpp - Trying to call unload function with invalid state." );
-}
-
-void LuaBinds::update()
-{
-	if( valid )
-	{
-		lua_rawgeti( lua, LUA_REGISTRYINDEX, updateFunctionReference );
-		if( lua_pcall( lua, 0, 0, 0 ) != 0 )
-		{
-			LOG( VERBOSITY_ERROR, "LuaBinds.cpp - Failed to run update function." );
-			LOG( VERBOSITY_ERROR, "%s", lua_tostring( lua, -1 ) );
-			valid = false;
-		}
-	}
-	else
-		LOG( VERBOSITY_WARNING, "LuaBinds.cpp - Trying to call update function with invalid state." );
 }
 
 bool LuaBinds::getValid() const
 {
 	return valid;
+}
+
+void LuaBinds::run( int functionReference )
+{
+	LOG_ASSERT( valid, "LuaBinds.cpp - Trying to run function with invalid state." );
+
+	lua_rawgeti( lua, LUA_REGISTRYINDEX, functionReference );
+	if( lua_pcall( lua, 0, 0, 0 ) != 0 )
+	{
+		LOG_ERROR( "LuaBinds.cpp - Failed to run function reference." );
+		LOG_ERROR( "%s", lua_tostring( lua, -1 ) );
+		valid = false;
+	}
 }

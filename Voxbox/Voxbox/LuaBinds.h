@@ -13,16 +13,20 @@ public:
 
 	bool bind( CoreData* coreData );
 
-	void load();
-	void unload();
-	void update();
+	inline void load() { run( loadFunctionReference ); }
+	inline void unload() { run( unloadFunctionReference ); }
+	inline void update() { run( updateFunctionReference ); }
+	inline void render() { run( renderFunctionReference ); }
 
 	bool getValid() const;
 
 private:
+	void run( int functionReference );
+
 	lua_State* lua;
 	int loadFunctionReference;
 	int unloadFunctionReference;
 	int updateFunctionReference;
+	int renderFunctionReference;
 	bool valid;
 };

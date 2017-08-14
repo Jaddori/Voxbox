@@ -192,6 +192,7 @@ int main( int argc, char* argv[] )
 			luaBinds.load();
 			luaBinds.unload();
 			luaBinds.update();
+			luaBinds.render();
 
 			ThreadData threadData;
 			threadData.coreData = &coreData;

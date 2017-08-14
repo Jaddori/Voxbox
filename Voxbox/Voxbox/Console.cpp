@@ -1,7 +1,7 @@
 #include "Console.h"
 
 Console::Console()
-	: visible( false )
+	: visible( false ), flashTime( 0.0f )
 {
 	LOG( VERBOSITY_INFORMATION, "Console.cpp - Constructing." );
 }
@@ -35,8 +35,20 @@ void Console::unload()
 
 void Console::finalize()
 {
+	int prevMessageCount = finalMessages.getSize();
+
 	finalMessages.fastCopy( Log::instance().getMessages() );
 	finalThreshold = Log::instance().getThreshold();
+
+	int curMessageCount = finalMessages.getSize();
+	if( curMessageCount > prevMessageCount )
+	{
+		for( int i=prevMessageCount; i<curMessageCount; i++ )
+		{
+			if( finalMessages[i].verbosity > finalThreshold )
+				flashTime = CONSOLE_FLASH_TIME;
+		}
+	}
 }
 
 void Console::toggle()
@@ -46,7 +58,7 @@ void Console::toggle()
 
 void Console::render( Graphics* graphics )
 {
-	if( visible )
+	if( visible || flashTime > 0.0f )
 	{
 		// setup colors
 		const glm::vec4 TEXT_COLORS[] =
@@ -77,6 +89,9 @@ void Console::render( Graphics* graphics )
 			}
 		}
 	}
+
+	if( flashTime > 0.0f )
+		flashTime -= 0.01f;
 }
 
 void Console::setVisible( bool v )
