@@ -124,7 +124,7 @@ DWORD WINAPI update( LPVOID args )
 				perspectiveCamera.updateDirection( mouseDelta.x, mouseDelta.y );
 			}
 
-			glm::vec3 cameraMovement;
+			/*glm::vec3 cameraMovement;
 			if( input.keyDown( SDL_SCANCODE_W ) )
 				cameraMovement.z += 1.0f;
 			if( input.keyDown( SDL_SCANCODE_S ) )
@@ -134,7 +134,7 @@ DWORD WINAPI update( LPVOID args )
 			if( input.keyDown( SDL_SCANCODE_A ) )
 				cameraMovement.x -= 1.0f;
 			if( glm::length( cameraMovement ) > 0 )
-				perspectiveCamera.updatePosition( cameraMovement );
+				perspectiveCamera.updatePosition( cameraMovement );*/
 
 			const Frustum& frustum = perspectiveCamera.getFrustum();
 

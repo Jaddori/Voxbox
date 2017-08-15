@@ -22,6 +22,7 @@ namespace LuaInput
 			{ "buttonReleased",		buttonReleased },
 
 			{ "getMousePosition",	getMousePosition },
+			{ "getMouseDelta",		getMouseDelta },
 			{ "textInput",			textInput },
 			{ NULL, NULL }
 		};
@@ -153,13 +154,27 @@ namespace LuaInput
 		LUA_ASSERT_ARGS( 1 );
 		LUA_EXPECT_TABLE( 1 );
 
-		Point point = g_coreData->input->getMousePosition();
+		Point result = g_coreData->input->getMousePosition();
 
 		// set result
-		lua_setnumber( lua, 1, 1, point.x );
-		lua_setnumber( lua, 1, 2, point.y );
+		lua_setnumber( lua, 1, 1, result.x );
+		lua_setnumber( lua, 1, 2, result.y );
 
-		return 2;
+		return 0;
+	}
+
+	int getMouseDelta( lua_State* lua )
+	{
+		LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_TABLE( 1 );
+
+		Point result = g_coreData->input->getMouseDelta();
+
+		// set result
+		lua_setnumber( lua, 1, 1, result.x );
+		lua_setnumber( lua, 1, 2, result.y );
+
+		return 0;
 	}
 
 	int textInput( lua_State* lua )
@@ -178,7 +193,12 @@ namespace LuaInput
 		}
 		else if( lua_isstring( lua, index ) )
 		{
-			key = (int)( lua_tostring( lua, index )[0] );
+			const char* str = lua_tostring( lua, index );
+
+			// ASCII A starts at 65
+			// SDL_SCANCODE_A starts at 4
+			// So we transform from ASCII -> SCANCODE (65 -> 0 -> 4)
+			key = (int)str[0] - 'A' + SDL_SCANCODE_A;
 		}
 		else
 		{

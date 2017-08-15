@@ -1,8 +1,8 @@
-require("./assets/scripts/worker")
-require("./assets/scripts/console")
+require( "./assets/scripts/worker" )
+require( "./assets/scripts/console" )
+require( "./assets/scripts/camera" )
 
 local workers = {}
-local mousePosition = {}
 local rayStart = {}
 local rayEnd = {}
 local haveRay = false
@@ -21,15 +21,14 @@ function mainUnload()
 end
 
 function mainUpdate()
+	camera:update()
 	console.update()
 	
 	workers[0]:update()
 	
 	if Input.buttonReleased( Buttons.Right ) then
-		Input.getMousePosition( mousePosition )
-		
-		Camera.unproject( mousePosition, 0.0, rayStart )
-		Camera.unproject( mousePosition, 1.0, rayEnd )
+		Camera.unproject( camera.mousePosition, 0.0, rayStart )
+		Camera.unproject( camera.mousePosition, 1.0, rayEnd )
 		
 		haveRay = true
 	end
