@@ -8,21 +8,21 @@ local rayEnd = {}
 local haveRay = false
 
 function mainLoad()
-	console.load()
+	console:load()
 	
 	workerLoad()
 	workers[0] = Worker:create()
 end
 
 function mainUnload()
-	console.unload()
+	console:unload()
 	
 	workerUnload()
 end
 
 function mainUpdate()
 	camera:update()
-	console.update()
+	console:update()
 	
 	workers[0]:update()
 	
@@ -35,7 +35,7 @@ function mainUpdate()
 end
 
 function mainRender()
-	console.render()
+	console:render()
 	
 	workers[0]:render()
 	

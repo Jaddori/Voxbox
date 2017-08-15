@@ -23,6 +23,7 @@ namespace LuaDebug
 		luaL_Reg logRegs[] =
 		{
 			{ "log",			log },
+			{ "setThreshold",	setThreshold },
 			{ "getMessages",	getLogMessages },
 			{ "getThreshold",	getLogThreshold },
 			{ NULL,	NULL }
@@ -68,19 +69,39 @@ namespace LuaDebug
 		return 0;
 	}
 
+	int setThreshold( lua_State* lua )
+	{
+		LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_NUMBER( 1 );
+
+		// get threshold
+		int threshold = lua_toint( lua, 1 );
+
+		LOG_ASSERT( threshold >= VERBOSITY_INFORMATION && threshold <= VERBOSITY_DEBUG, "Bad threshold value: %d", threshold );
+
+		Log::instance().setThreshold( threshold );
+
+		return 0;
+	}
+
 	int getLogMessages( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		LUA_ASSERT_ARGS( 3 );
 		LUA_EXPECT_TABLE( 1 );
 		LUA_EXPECT_TABLE( 2 );
+		LUA_EXPECT_NUMBER( 3 );
 
 		Log::instance().copyMessages( g_logMessages );
 
+		int prevCount = lua_toint( lua, 3 ) - 1;
+		if( prevCount < 0 )
+			prevCount = 0;
+
 		const int MESSAGE_COUNT = g_logMessages.getSize();
-		for( int i=0; i<MESSAGE_COUNT; i++ )
+		for( int i=prevCount; i<MESSAGE_COUNT; i++ )
 		{
-			lua_setstring( lua, 1, i, g_logMessages[i].message );
-			lua_setnumber( lua, 2, i, g_logMessages[i].verbosity );
+			lua_setstring( lua, 1, i+1, g_logMessages[i].message );
+			lua_setnumber( lua, 2, i+1, g_logMessages[i].verbosity );
 		}
 
 		return 0;

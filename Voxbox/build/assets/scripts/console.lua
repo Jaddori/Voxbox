@@ -16,74 +16,71 @@ local CONSOLE_INPUT_HEIGHT = 24
 
 console = {}
 
-function console.load()
-	console.visible = false
-	console.font = Assets.loadFont( "./assets/fonts/verdana12.bin", "./assets/fonts/verdana12.dds" )
-	console.position = {0,0}
-	console.size = {CONSOLE_WIDTH,CONSOLE_HEIGHT}
-	console.uv = {0,0,0,0}
-	console.opacity = CONSOLE_OPACITY
-	console.flashTime = 0.0
-	console.threshold = 0
-	console.messages = {}
-	console.verbosities = {}
-	console.prevMessageCount = 0
+function console:load()
+	self.visible = false
+	self.font = Assets.loadFont( "./assets/fonts/verdana12.bin", "./assets/fonts/verdana12.dds" )
+	self.position = {0,0}
+	self.size = {CONSOLE_WIDTH,CONSOLE_HEIGHT}
+	self.uv = {0,0,0,0}
+	self.opacity = CONSOLE_OPACITY
+	self.flashTime = 0.0
+	self.threshold = 0
+	self.messages = {}
+	self.verbosities = {}
+	self.prevMessageCount = 0
 	
-	console.input = {}
-	console.input.position = {0,CONSOLE_HEIGHT+CONSOLE_INPUT_OFFSET}
-	console.input.size = {CONSOLE_WIDTH,CONSOLE_INPUT_HEIGHT}
-	console.input.text = ""
+	self.input = {}
+	self.input.position = {0,CONSOLE_HEIGHT+CONSOLE_INPUT_OFFSET}
+	self.input.size = {CONSOLE_WIDTH,CONSOLE_INPUT_HEIGHT}
+	self.input.text = ""
 end
 
-function console.unload()
+function console:unload()
 end
 
-function console.update()
+function console:update()
 	-- get messages from log
-	console.threshold = Log.getThreshold()
-	console.messages, console.verbosities = Log.getMessages()
+	self.threshold = Log.getThreshold()
+	Log.getMessages( self.messages, self.verbosities, self.prevMessageCount )
 	
 	-- check if we need to flash new messages
-	if console.visible then
-		console.prevMessageCount = #console.messages
+	if self.visible then
+		self.prevMessageCount = #self.messages
 	else
-		if #console.messages > console.prevMessageCount then
-			for i=console.prevMessageCount, #console.messages do
-				if console.verbosities[i] == VERBOSITY_WARNING then
-				end
-				
-				if console.verbosities[i] >= console.threshold then
-					console.flashTime = CONSOLE_FLASH_TIME
+		if #self.messages > self.prevMessageCount then
+			for i=self.prevMessageCount+1, #self.messages do
+				if self.verbosities[i] >= self.threshold then
+					self.flashTime = CONSOLE_FLASH_TIME
 					break
 				end
 			end
 			
-			console.prevMessageCount = #console.messages
+			self.prevMessageCount = #self.messages
 		end
 	end
 
 	-- check if user toggled the console
 	if Input.keyReleased( Keys.Console ) then
-		console.visible = not console.visible
+		self.visible = not self.visible
 	end
 	
 	-- update the console if it is visible
-	if console.visible then
+	if self.visible then
 		-- get text input
-		console.input.text = console.input.text .. Input.textInput()
+		self.input.text = self.input.text .. Input.textInput()
 		
 		-- get backspace
-		if Input.keyRepeated( Keys.Backspace ) and console.input.text:len() > 0 then
-			console.input.text = console.input.text:sub( 0, console.input.text:len()-1 )
+		if Input.keyRepeated( Keys.Backspace ) and self.input.text:len() > 0 then
+			self.input.text = self.input.text:sub( 0, self.input.text:len()-1 )
 		end
 		
 		-- get enter
 		if Input.keyReleased( Keys.Enter ) then
-			if console.input.text:len() > 0 then
-				log( VERBOSITY_DEBUG, console.input.text )
+			if self.input.text:len() > 0 then
+				log( VERBOSITY_DEBUG, self.input.text )
 		
 				-- execute entered command
-				local chunk, errorMessage = load( console.input.text )
+				local chunk, errorMessage = load( self.input.text )
 				if errorMessage then
 					log( VERBOSITY_ERROR, errorMessage )
 				else
@@ -93,39 +90,39 @@ function console.update()
 					end
 				end
 				
-				console.input.text = ""
+				self.input.text = ""
 			end
 		end
 	end
 	
-	if console.flashTime > 0.0 then
-		console.flashTime = console.flashTime - 0.01
+	if self.flashTime > 0.0 then
+		self.flashTime = self.flashTime - 0.01
 	end
 end
 
-function console.render()
-	if console.visible or console.flashTime > 0.0 then
+function console:render()
+	if self.visible or self.flashTime > 0.0 then
 		-- render message box
-		Graphics.queueQuad( console.position, console.size, console.uv, console.opacity )
+		Graphics.queueQuad( self.position, self.size, self.uv, self.opacity )
 		
 		-- render messages
-		local yoffset = 256 - console.font.height
+		local yoffset = 256 - self.font.height
 		
-		for i=#console.messages, 0, -1 do
-			if console.verbosities[i] >= console.threshold then
-				Graphics.queueText( console.font, console.messages[i], {CONSOLE_TEXT_OFFSET, yoffset}, CONSOLE_COLORS[console.verbosities[i]+1] )
-				yoffset = yoffset - console.font.height
+		for i=#self.messages, 1, -1 do
+			if self.verbosities[i] >= self.threshold then
+				Graphics.queueText( self.font, self.messages[i], {CONSOLE_TEXT_OFFSET, yoffset}, CONSOLE_COLORS[self.verbosities[i]+1] )
+				yoffset = yoffset - self.font.height
 				
 				if yoffset <= 0.0 then break end
 			end
 		end
 		
 		-- render input box
-		Graphics.queueQuad( console.input.position, console.input.size, console.uv, console.opacity )
+		Graphics.queueQuad( self.input.position, self.input.size, self.uv, self.opacity )
 		
 		-- render text input
-		if console.input.text:len() > 0 then
-			Graphics.queueText( console.font, console.input.text, {CONSOLE_TEXT_OFFSET,console.input.position[2]}, CONSOLE_COLORS[1] )
+		if self.input.text:len() > 0 then
+			Graphics.queueText( self.font, self.input.text, {CONSOLE_TEXT_OFFSET,self.input.position[2]}, CONSOLE_COLORS[1] )
 		end
 	end
 end
