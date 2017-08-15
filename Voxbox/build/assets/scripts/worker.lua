@@ -11,19 +11,26 @@ Worker.create = function( self )
 end
 
 Worker.destroy = function( self )
-	print( "destroying worker " .. self.ID )
 end
 
 Worker.load = function( self )
-	print( "loading worker " .. self.ID )
+	self.texture = Assets.loadTexture( "./assets/texture/worker.dds" )
+	self.position = {0,0,0}
+	self.size = {2,4}
+	self.uv = {0,0,1,1}
+	self.alive = true
 end
 
 Worker.unload = function( self )
-	print( "unloading worker " .. self.ID )
+	Assets.unloadTexture( self.texture )
+	self.texture = nil
 end
 
 Worker.update = function( self )
 end
 
 Worker.render = function( self )
+	if self.alive then
+		Graphics.queueBillboard( self.position, self.size, self.uv, false, self.texture )
+	end
 end

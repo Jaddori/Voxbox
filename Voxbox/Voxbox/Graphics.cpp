@@ -437,7 +437,7 @@ void Graphics::queueQuad( const glm::vec2& position, const glm::vec2& size, cons
 	quad.opacity = opacity;
 }
 
-void Graphics::queueBillboard( const glm::vec3& position, const glm::vec4& uv, const glm::vec2& size, bool spherical, Texture* texture )
+void Graphics::queueBillboard( const glm::vec3& position, const glm::vec2& size, const glm::vec4& uv, bool spherical, Texture* texture )
 {
 	const int BILLBOARD_COLLECTION_COUNT = billboardCollections.getSize();
 

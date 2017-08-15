@@ -53,7 +53,7 @@ namespace LuaInput
 
 	int keyDown( lua_State* lua )
 	{
-		LOG_ASSERT_ARGS( 1 );
+		LUA_ASSERT_ARGS( 1 );
 
 		int key = getKey( lua, 1 );
 		lua_pushboolean( lua, g_coreData->input->keyDown( key ) );
@@ -63,7 +63,7 @@ namespace LuaInput
 
 	int keyUp( lua_State* lua )
 	{
-		LOG_ASSERT_ARGS( 1 );
+		LUA_ASSERT_ARGS( 1 );
 
 		int key = getKey( lua, 1 );
 		lua_pushboolean( lua, g_coreData->input->keyUp( key ) );
@@ -73,7 +73,7 @@ namespace LuaInput
 
 	int keyPressed( lua_State* lua )
 	{
-		LOG_ASSERT_ARGS( 1 );
+		LUA_ASSERT_ARGS( 1 );
 
 		int key = getKey( lua, 1 );
 		lua_pushboolean( lua, g_coreData->input->keyPressed( key ) );
@@ -83,7 +83,7 @@ namespace LuaInput
 
 	int keyReleased( lua_State* lua )
 	{
-		LOG_ASSERT_ARGS( 1 );
+		LUA_ASSERT_ARGS( 1 );
 
 		int key = getKey( lua, 1 );
 		lua_pushboolean( lua, g_coreData->input->keyReleased( key ) );
@@ -93,7 +93,7 @@ namespace LuaInput
 
 	int keyRepeated( lua_State* lua )
 	{
-		LOG_ASSERT_ARGS( 1 );
+		LUA_ASSERT_ARGS( 1 );
 
 		int key = getKey( lua, 1 );
 		lua_pushboolean( lua, g_coreData->input->keyRepeated( key ) );
@@ -103,8 +103,8 @@ namespace LuaInput
 
 	int buttonDown( lua_State* lua )
 	{
-		LOG_ASSERT_ARGS( 1 );
-		LOG_EXPECT_NUMBER( 1 );
+		LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_NUMBER( 1 );
 
 		int button = (int)lua_tonumber( lua, 1 );
 		lua_pushboolean( lua, g_coreData->input->buttonDown( button ) );
@@ -114,8 +114,8 @@ namespace LuaInput
 
 	int buttonUp( lua_State* lua )
 	{
-		LOG_ASSERT_ARGS( 1 );
-		LOG_EXPECT_NUMBER( 1 );
+		LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_NUMBER( 1 );
 
 		int button = (int)lua_tonumber( lua, 1 );
 		lua_pushboolean( lua, g_coreData->input->buttonDown( button ) );
@@ -125,8 +125,8 @@ namespace LuaInput
 
 	int buttonPressed( lua_State* lua )
 	{
-		LOG_ASSERT_ARGS( 1 );
-		LOG_EXPECT_NUMBER( 1 );
+		LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_NUMBER( 1 );
 
 		int button = (int)lua_tonumber( lua, 1 );
 		lua_pushboolean( lua, g_coreData->input->buttonDown( button ) );
@@ -136,8 +136,8 @@ namespace LuaInput
 
 	int buttonReleased( lua_State* lua )
 	{
-		LOG_ASSERT_ARGS( 1 );
-		LOG_EXPECT_NUMBER( 1 );
+		LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_NUMBER( 1 );
 
 		int button = (int)lua_tonumber( lua, 1 );
 		lua_pushboolean( lua, g_coreData->input->buttonDown( button ) );

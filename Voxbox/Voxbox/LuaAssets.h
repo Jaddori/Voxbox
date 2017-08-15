@@ -20,8 +20,4 @@ namespace LuaAssets
 	int getHorizontalOffset( lua_State* lua );
 	int getVerticalOffset( lua_State* lua );
 	int getUV( lua_State* lua );
-
-	// helper functions
-	Texture* getTexture( lua_State* lua, int index );
-	Font* getFont( lua_State* lua, int index );
 }

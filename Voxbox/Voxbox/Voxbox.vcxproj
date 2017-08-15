@@ -182,6 +182,7 @@
     <ClInclude Include="LuaDebug.h" />
     <ClInclude Include="LuaInput.h" />
     <ClInclude Include="LuaRendering.h" />
+    <ClInclude Include="LuaUtils.h" />
     <ClInclude Include="LuaVoxels.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Swap.h" />

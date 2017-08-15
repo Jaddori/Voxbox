@@ -36,6 +36,7 @@ const float EPSILON = glm::epsilon<float>();
 
 // Lua
 #include "lua.hpp"
+#include "LuaUtils.h"
 
 // Core
 #include "Log.h"

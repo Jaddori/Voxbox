@@ -150,5 +150,8 @@
     <ClInclude Include="Assets.h">
       <Filter>Source Files\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="LuaUtils.h">
+      <Filter>Source Files\Lua</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
