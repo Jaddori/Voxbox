@@ -72,9 +72,6 @@ DWORD WINAPI update( LPVOID args )
 			if( glm::length( cameraMovement ) > 0 )
 				data->coreData->perspectiveCamera->updatePosition( cameraMovement );
 
-			DebugSphere sphere = { glm::vec3( 0.0f, 0.0f, 0.0f ), 2.0f, glm::vec4( 1.0f, 0.0f, 0.0f, 1.0f ) };
-			data->coreData->debugShapes->addSphere( sphere );
-
 			const Frustum& frustum = data->coreData->perspectiveCamera->getFrustum();
 
 			for( int x=0; x<CHUNK_WIDTH; x++ )

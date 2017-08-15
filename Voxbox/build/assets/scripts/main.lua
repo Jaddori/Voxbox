@@ -6,14 +6,14 @@ local workers = {}
 function mainLoad()
 	console.load()
 	
+	workerLoad()
 	workers[0] = Worker:create()
-	workers[0]:load()
 end
 
 function mainUnload()
 	console.unload()
 	
-	workers[0]:unload()
+	workerUnload()
 end
 
 function mainUpdate()
