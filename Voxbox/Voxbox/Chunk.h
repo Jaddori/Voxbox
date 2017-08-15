@@ -35,6 +35,7 @@ public:
 	void noise( int x, int z );
 	void render();
 
+	void setBlock( int x, int y, int z, uint8_t value );
 	void setOffset( const glm::vec3& offset );
 	void setUploaded( bool uploaded );
 
@@ -45,7 +46,7 @@ public:
 
 private:
 	inline int at( int x, int y, int z ) { return ( y*CHUNK_SIZE*CHUNK_SIZE + z*CHUNK_SIZE + x ); }
-	inline uint8_t block( int x, int y, int z ) { return blocks[at( x, y, z )]; }
+	inline uint8_t& block( int x, int y, int z ) { return blocks[at( x, y, z )]; }
 	void addHorizontalFace( const glm::vec3& position, const glm::vec3& direction, const glm::vec2& uvOffset, bool invert );
 	void addVerticalFace( const glm::vec3& position, const glm::vec2& uvOffset, bool invert );
 

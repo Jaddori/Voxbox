@@ -2,7 +2,7 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Input.h"
-#include "Chunk.h"
+#include "Region.h"
 #include "Font.h"
 #include "Graphics.h"
 #include "DebugShapes.h"
@@ -11,9 +11,9 @@
 #include "Assets.h"
 
 #define THREAD_UPDATE_WAIT 1000
-#define CHUNK_WIDTH 10
-#define CHUNK_DEPTH 10
-#define NUM_CHUNKS (CHUNK_WIDTH * CHUNK_DEPTH)
+#define REGION_WIDTH 4
+#define REGION_DEPTH 4
+#define NUM_REGIONS (REGION_WIDTH*REGION_DEPTH)
 
 bool rayCheck( const DebugLine& ray, const glm::vec3& minPosition, const glm::vec3& maxPosition )
 {
@@ -75,10 +75,17 @@ DWORD WINAPI generateChunks( LPVOID args )
 
 	LOG_INFO( "Starting chunk generation thread." );
 
-	for( int i=0; i<100; i++ )
+	/*for( int i=0; i<100; i++ )
 	{
 		data->chunks[i].calculateFaces();
 		
+		Sleep( 100 );
+	}*/
+
+	for( int i=0; i<NUM_REGIONS; i++ )
+	{
+		data->regions[i].calculateFaces();
+
 		Sleep( 100 );
 	}
 
@@ -102,13 +109,10 @@ DWORD WINAPI update( LPVOID args )
 
 	Camera& perspectiveCamera	=	*data->coreData->perspectiveCamera;
 	Input& input				=	*data->coreData->input;
-	Chunk* chunks				=	data->coreData->chunks;
+	Region* regions				=	data->coreData->regions;
 	Graphics& graphics			=	*data->coreData->graphics;
 	DebugShapes& debugShapes	=	*data->coreData->debugShapes;
 	LuaBinds& luaBinds			=	*data->luaBinds;
-
-	DebugLine projectLine;
-	projectLine.color = glm::vec4( 1.0f, 1.0f, 0.0f, 1.0f );
 
 	while( data->running )
 	{
@@ -124,21 +128,9 @@ DWORD WINAPI update( LPVOID args )
 				perspectiveCamera.updateDirection( mouseDelta.x, mouseDelta.y );
 			}
 
-			/*glm::vec3 cameraMovement;
-			if( input.keyDown( SDL_SCANCODE_W ) )
-				cameraMovement.z += 1.0f;
-			if( input.keyDown( SDL_SCANCODE_S ) )
-				cameraMovement.z -= 1.0f;
-			if( input.keyDown( SDL_SCANCODE_D ) )
-				cameraMovement.x += 1.0f;
-			if( input.keyDown( SDL_SCANCODE_A ) )
-				cameraMovement.x -= 1.0f;
-			if( glm::length( cameraMovement ) > 0 )
-				perspectiveCamera.updatePosition( cameraMovement );*/
-
 			const Frustum& frustum = perspectiveCamera.getFrustum();
 
-			for( int x=0; x<CHUNK_WIDTH; x++ )
+			/*for( int x=0; x<CHUNK_WIDTH; x++ )
 			{
 				for( int z=0; z<CHUNK_DEPTH; z++ )
 				{
@@ -156,12 +148,21 @@ DWORD WINAPI update( LPVOID args )
 						}
 					}
 				}
+			}*/
+
+			for( int x=0; x<REGION_WIDTH; x++ )
+			{
+				for( int z=0; z<REGION_DEPTH; z++ )
+				{
+					if( regions[x*REGION_DEPTH+z].getUploaded() )
+					{
+						regions[x*REGION_DEPTH+z].queueChunks( graphics, frustum );
+					}
+				}
 			}
 
 			luaBinds.update();
 			luaBinds.render();
-
-			debugShapes.addLine( projectLine );
 
 			ReleaseSemaphore( data->updateDone, 1, NULL );
 		}
@@ -208,7 +209,7 @@ int main( int argc, char* argv[] )
 			graphics.load( &assets );
 			graphics.getPerspectiveCamera().setPosition( glm::vec3( 0.0f, 0.0f, -10.0f ) );
 
-			Chunk* chunks = new Chunk[NUM_CHUNKS];
+			/*Chunk* chunks = new Chunk[NUM_CHUNKS];
 
 			for( int x=0; x<CHUNK_WIDTH; x++ )
 			{
@@ -216,6 +217,17 @@ int main( int argc, char* argv[] )
 				{
 					chunks[x*CHUNK_WIDTH+z].setOffset( glm::vec3( x, 0.0f, z ) );
 					chunks[x*CHUNK_WIDTH+z].noise( x*CHUNK_SIZE, z*CHUNK_SIZE );
+				}
+			}*/
+
+			Region* regions = new Region[NUM_REGIONS];
+
+			for( int x=0; x<REGION_WIDTH; x++ )
+			{
+				for( int z=0; z<REGION_DEPTH; z++ )
+				{
+					regions[x*REGION_WIDTH+z].setOffset( glm::vec3( x, 0.0f, z ) );
+					regions[x*REGION_WIDTH+z].noise( x, z );
 				}
 			}
 
@@ -228,7 +240,8 @@ int main( int argc, char* argv[] )
 			CoreData coreData;
 			coreData.perspectiveCamera = &graphics.getPerspectiveCamera();
 			coreData.input = &input;
-			coreData.chunks = chunks;
+			//coreData.chunks = chunks;
+			coreData.regions = regions;
 			coreData.graphics = &graphics;
 			coreData.debugShapes = &debugShapes;
 			coreData.assets = &assets;
@@ -271,11 +284,19 @@ int main( int argc, char* argv[] )
 					graphics.finalize();
 					debugShapes.finalize();
 
-					for( int i=0; i<NUM_CHUNKS; i++ )
+					/*for( int i=0; i<NUM_CHUNKS; i++ )
 					{
 						if( chunks[i].getValid() && !chunks[i].getUploaded() )
 						{
 							chunks[i].upload();
+						}
+					}*/
+
+					for( int i=0; i<NUM_REGIONS; i++ )
+					{
+						if( regions[i].getValid() && !regions[i].getUploaded() )
+						{
+							regions[i].upload();
 						}
 					}
 

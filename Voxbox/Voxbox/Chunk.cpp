@@ -244,6 +244,11 @@ void Chunk::render()
 	glBindVertexArray( 0 );
 }
 
+void Chunk::setBlock( int x, int y, int z, uint8_t value )
+{
+	block( x, y, z ) = value;
+}
+
 void Chunk::setOffset( const glm::vec3& o )
 {
 	offset = o;

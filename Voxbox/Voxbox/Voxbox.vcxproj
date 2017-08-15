@@ -162,6 +162,7 @@
     <ClCompile Include="LuaRendering.cpp" />
     <ClCompile Include="LuaVoxels.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Region.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>
@@ -186,6 +187,7 @@
     <ClInclude Include="LuaRendering.h" />
     <ClInclude Include="LuaUtils.h" />
     <ClInclude Include="LuaVoxels.h" />
+    <ClInclude Include="Region.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Swap.h" />
     <ClInclude Include="SwapArray.h" />
