@@ -15,6 +15,7 @@
 #define WINDOW_Y SDL_WINDOWPOS_UNDEFINED
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
+#define WINDOW_VIEWPORT glm::vec4( 0.0f, 0.0f, WINDOW_WIDTH, WINDOW_HEIGHT )
 
 // Rendering
 #include "GL\glew.h"
@@ -44,3 +45,8 @@ const float EPSILON = glm::epsilon<float>();
 #include "Swap.h"
 #include "SwapArray.h"
 #include "CoreData.h"
+
+struct Point
+{
+	int x, y;
+};

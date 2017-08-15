@@ -46,53 +46,71 @@ DWORD WINAPI update( LPVOID args )
 {
 	ThreadData* data = (ThreadData*)args;
 
+	Camera& perspectiveCamera	=	*data->coreData->perspectiveCamera;
+	Input& input				=	*data->coreData->input;
+	Chunk* chunks				=	data->coreData->chunks;
+	Graphics& graphics			=	*data->coreData->graphics;
+	DebugShapes& debugShapes	=	*data->coreData->debugShapes;
+	LuaBinds& luaBinds			=	*data->luaBinds;
+
+	DebugLine projectLine;
+	projectLine.color = glm::vec4( 1.0f, 1.0f, 0.0f, 1.0f );
+
 	while( data->running )
 	{
 		DWORD result = WaitForSingleObject( data->renderDone, THREAD_UPDATE_WAIT );
 		if( result == WAIT_OBJECT_0 )
 		{
-			if( data->coreData->input->keyReleased( SDL_SCANCODE_ESCAPE ) )
+			if( input.keyReleased( SDL_SCANCODE_ESCAPE ) )
 				data->running = false;
 
-			if( data->coreData->input->buttonDown( SDL_BUTTON_LEFT ) )
+			if( input.buttonDown( SDL_BUTTON_LEFT ) )
 			{
-				Point mouseDelta = data->coreData->input->getMouseDelta();
-				data->coreData->perspectiveCamera->updateDirection( mouseDelta.x, mouseDelta.y );
+				Point mouseDelta = input.getMouseDelta();
+				perspectiveCamera.updateDirection( mouseDelta.x, mouseDelta.y );
+			}
+			if( input.buttonReleased( SDL_BUTTON_RIGHT ) )
+			{
+				Point mousePosition = input.getMousePosition();
+				perspectiveCamera.unproject( mousePosition, 0.0f, projectLine.start );
+				perspectiveCamera.unproject( mousePosition, 1.0f, projectLine.end );
 			}
 
 			glm::vec3 cameraMovement;
-			if( data->coreData->input->keyDown( SDL_SCANCODE_W ) )
+			if( input.keyDown( SDL_SCANCODE_W ) )
 				cameraMovement.z += 1.0f;
-			if( data->coreData->input->keyDown( SDL_SCANCODE_S ) )
+			if( input.keyDown( SDL_SCANCODE_S ) )
 				cameraMovement.z -= 1.0f;
-			if( data->coreData->input->keyDown( SDL_SCANCODE_D ) )
+			if( input.keyDown( SDL_SCANCODE_D ) )
 				cameraMovement.x += 1.0f;
-			if( data->coreData->input->keyDown( SDL_SCANCODE_A ) )
+			if( input.keyDown( SDL_SCANCODE_A ) )
 				cameraMovement.x -= 1.0f;
 			if( glm::length( cameraMovement ) > 0 )
-				data->coreData->perspectiveCamera->updatePosition( cameraMovement );
+				perspectiveCamera.updatePosition( cameraMovement );
 
-			const Frustum& frustum = data->coreData->perspectiveCamera->getFrustum();
+			const Frustum& frustum = perspectiveCamera.getFrustum();
 
 			for( int x=0; x<CHUNK_WIDTH; x++ )
 			{
 				for( int z=0; z<CHUNK_DEPTH; z++ )
 				{
-					if( data->coreData->chunks[x*CHUNK_WIDTH+z].getUploaded() )
+					if( chunks[x*CHUNK_WIDTH+z].getUploaded() )
 					{
 						glm::vec3 minPosition = glm::vec3( x, 0.0f, z ) * (float)CHUNK_SIZE;
 						glm::vec3 maxPosition = glm::vec3( x+1, 1, z+1 ) * (float)CHUNK_SIZE;
 
 						if( frustum.aabbCollision( minPosition, maxPosition ) )
 						{
-							data->coreData->graphics->queueChunk( &data->coreData->chunks[x*CHUNK_WIDTH+z] );
+							graphics.queueChunk( &chunks[x*CHUNK_WIDTH+z] );
 						}
 					}
 				}
 			}
 
-			data->luaBinds->update();
-			data->luaBinds->render();
+			luaBinds.update();
+			luaBinds.render();
+
+			debugShapes.addLine( projectLine );
 
 			ReleaseSemaphore( data->updateDone, 1, NULL );
 		}

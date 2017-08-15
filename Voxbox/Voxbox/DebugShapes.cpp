@@ -231,6 +231,11 @@ void DebugShapes::finalize()
 	spheres.swap();
 	AABBs.swap();
 	OBBs.swap();
+
+	lines.getWrite().clear();
+	spheres.getWrite().clear();
+	AABBs.getWrite().clear();
+	OBBs.getWrite().clear();
 }
 
 void DebugShapes::addLine( const DebugLine& line )

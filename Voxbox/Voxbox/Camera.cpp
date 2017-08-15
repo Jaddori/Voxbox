@@ -38,6 +38,19 @@ void Camera::finalize()
 	frustum.swap();
 }
 
+void Camera::project( const glm::vec3& worldCoordinates, Point& result )
+{
+	glm::vec3 windowCoordinates = glm::project( worldCoordinates, viewMatrix.getWrite(), projectionMatrix.getWrite(), WINDOW_VIEWPORT );
+
+	result.x = (int)(windowCoordinates.x+0.5f);
+	result.y = (int)(windowCoordinates.y+0.5f);
+}
+
+void Camera::unproject( Point windowCoordinates, float depth, glm::vec3& result )
+{
+	result = glm::unProject( glm::vec3( windowCoordinates.x, WINDOW_HEIGHT - windowCoordinates.y, depth ), viewMatrix.getWrite(), projectionMatrix.getWrite(), WINDOW_VIEWPORT );
+}
+
 void Camera::updatePosition( const glm::vec3& localMovement )
 {
 	// move backwards and forwards

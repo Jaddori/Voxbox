@@ -6,11 +6,6 @@
 #define INPUT_MAX_BUTTONS 5
 #define INPUT_MAX_TEXT_INPUT 32
 
-struct Point
-{
-	int x, y;
-};
-
 class Input
 {
 public:

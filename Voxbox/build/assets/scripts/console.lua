@@ -54,7 +54,6 @@ function console.update()
 				
 				if console.verbosities[i] >= console.threshold then
 					console.flashTime = CONSOLE_FLASH_TIME
-					print("FLASHING")
 					break
 				end
 			end

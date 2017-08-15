@@ -1,5 +1,5 @@
 -Clean up main
--Lua support
 -Regions
--Billboards
 -Threading facilities
+-Mouse pointer projection into 3d space
+-Getting height of chunk at position
