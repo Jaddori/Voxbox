@@ -15,6 +15,60 @@
 #define CHUNK_DEPTH 10
 #define NUM_CHUNKS (CHUNK_WIDTH * CHUNK_DEPTH)
 
+bool rayCheck( const DebugLine& ray, const glm::vec3& minPosition, const glm::vec3& maxPosition )
+{
+	float epsilon = glm::epsilon<float>();
+	float tmin = 0.0f;
+	float tmax = std::numeric_limits<float>().max();
+	glm::vec3 rayDirection = glm::normalize( ray.end - ray.start );
+	glm::vec3 rayPosition = ray.start;
+	glm::vec3 aabbMin = minPosition;
+	glm::vec3 aabbMax = maxPosition;
+
+	unsigned int threeSlabs = 3;
+
+	for (unsigned int i = 0; i < threeSlabs; i++)
+	{
+		if (glm::abs(rayDirection[i]) < epsilon) // Ray is parallell to slab
+		{
+			if (rayPosition[i] < aabbMin[i] || rayPosition[i] > aabbMax[i]) // No hit if origin not inside slab
+				return false;
+		}
+		else
+		{
+			// compute intersection t value of ray with near and far plane of slab
+			float ood = 1.0f / rayDirection[i];
+			float t1 = (aabbMin[i] - rayPosition[i]) * ood;
+			float t2 = (aabbMax[i] - rayPosition[i]) * ood;
+
+			if (t1 > t2)
+			{
+				float temp = t1;
+				t1 = t2;
+				t2 = temp;
+			}
+
+			if (t1 > tmin)
+				tmin = t1;
+
+			if (t2 < tmax)
+				tmax = t2;
+
+			if (tmin > tmax)
+				return false;
+		}
+
+	}
+
+	/*float hitdistance = tmin;
+	if (tmin < 0)
+		hitdistance = tmax;
+	glm::vec3 intersectionPoint = rayPosition + (rayDirection * hitdistance);
+	ray->hit(intersectionPoint, hitdistance);*/
+
+	return true;
+}
+
 DWORD WINAPI generateChunks( LPVOID args )
 {
 	CoreData* data = (CoreData*)args;
@@ -74,6 +128,30 @@ DWORD WINAPI update( LPVOID args )
 				Point mousePosition = input.getMousePosition();
 				perspectiveCamera.unproject( mousePosition, 0.0f, projectLine.start );
 				perspectiveCamera.unproject( mousePosition, 1.0f, projectLine.end );
+
+				bool collision = false;
+				for( int x=0; x<CHUNK_WIDTH && !collision; x++ )
+				{
+					for( int z=0; z<CHUNK_DEPTH && !collision; z++ )
+					{
+						if( chunks[x*CHUNK_WIDTH+z].getUploaded() )
+						{
+							glm::vec3 minPosition = glm::vec3( x, 0.0f, z ) * (float)CHUNK_SIZE;
+							glm::vec3 maxPosition = glm::vec3( x+1, 1, z+1 ) * (float)CHUNK_SIZE;
+
+							if( rayCheck( projectLine, minPosition, maxPosition ) )
+							{
+								glm::vec3 offset = chunks[x*CHUNK_WIDTH+z].getOffset();
+								chunks[x*CHUNK_WIDTH+z].setOffset( offset + glm::vec3( 0.0f, 1.0f, 0.0f ) );
+
+								chunks[x*CHUNK_WIDTH+z].calculateFaces();
+								chunks[x*CHUNK_WIDTH+z].setUploaded( false );
+
+								collision = true;
+							}
+						}
+					}
+				}
 			}
 
 			glm::vec3 cameraMovement;
@@ -102,6 +180,9 @@ DWORD WINAPI update( LPVOID args )
 						if( frustum.aabbCollision( minPosition, maxPosition ) )
 						{
 							graphics.queueChunk( &chunks[x*CHUNK_WIDTH+z] );
+
+							DebugAABB aabb = { minPosition, maxPosition, glm::vec4( 1.0f, 0.0f, 1.0f, 1.0f ) };
+							debugShapes.addAABB( aabb );
 						}
 					}
 				}
@@ -199,8 +280,6 @@ int main( int argc, char* argv[] )
 			long fpsTimer = SDL_GetTicks();
 			int fps = 0;
 
-			int currentChunk = 0;
-
 			while( threadData.running )
 			{
 				if( WaitForSingleObject( threadData.updateDone, INFINITE ) == WAIT_OBJECT_0 )
@@ -222,12 +301,11 @@ int main( int argc, char* argv[] )
 					graphics.finalize();
 					debugShapes.finalize();
 
-					if( currentChunk < NUM_CHUNKS )
+					for( int i=0; i<NUM_CHUNKS; i++ )
 					{
-						if( chunks[currentChunk].getValid() )
+						if( chunks[i].getValid() && !chunks[i].getUploaded() )
 						{
-							chunks[currentChunk].upload();
-							currentChunk++;
+							chunks[i].upload();
 						}
 					}
 

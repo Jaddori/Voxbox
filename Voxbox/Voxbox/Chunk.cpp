@@ -55,6 +55,9 @@ void Chunk::upload()
 	delete[] vertices;
 	delete[] indices;
 
+	vertices = nullptr;
+	indices = nullptr;
+
 	uploaded = true;
 }
 
@@ -244,6 +247,11 @@ void Chunk::render()
 void Chunk::setOffset( const glm::vec3& o )
 {
 	offset = o;
+}
+
+void Chunk::setUploaded( bool u )
+{
+	uploaded = u;
 }
 
 const uint8_t* Chunk::getBlocks() const

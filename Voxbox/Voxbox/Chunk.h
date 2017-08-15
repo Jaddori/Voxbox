@@ -36,6 +36,7 @@ public:
 	void render();
 
 	void setOffset( const glm::vec3& offset );
+	void setUploaded( bool uploaded );
 
 	const uint8_t* getBlocks() const;
 	const glm::vec3& getOffset() const;
