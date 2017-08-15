@@ -20,36 +20,181 @@
 #define lua_toint( state, index) (int)lua_tonumber( state, index )
 #define lua_tobool( state, index ) (bool)lua_toboolean( state, index )
 
-inline float lua_rawfloat( lua_State* lua, int tableIndex, int fieldIndex )
+inline float lua_getfloat( lua_State* lua, int tableIndex, int fieldIndex )
 {
 	lua_rawgeti( lua, tableIndex, fieldIndex );
 	LUA_EXPECT_NUMBER( -1 );
 	return lua_tofloat( lua, -1 );
 }
 
-inline int lua_rawint( lua_State* lua, int tableIndex, int fieldIndex )
+inline int lua_getint( lua_State* lua, int tableIndex, int fieldIndex )
 {
 	lua_rawgeti( lua, tableIndex, fieldIndex );
 	LUA_EXPECT_NUMBER( -1 );
 	return lua_toint( lua, -1 );
 }
 
-#define lua_rawvec2( state, index, vec ) \
-	vec.x = lua_rawfloat( state, index, 1 ); \
-	vec.y = lua_rawfloat( state, index, 2 )
+inline const char* lua_getstring( lua_State* lua, int tableIndex, int fieldIndex )
+{
+	lua_rawgeti( lua, tableIndex, fieldIndex );
+	LUA_EXPECT_STRING( -1 );
+	return lua_tostring( lua, -1 );
+}
 
-#define lua_rawvec3( state, index, vec ) \
-	lua_rawvec2( state, index, vec ); \
-	vec.z = lua_rawfloat( state, index, 3 )
+#define lua_getvec2( state, index, vec ) \
+	vec.x = lua_getfloat( state, index, 1 ); \
+	vec.y = lua_getfloat( state, index, 2 )
 
-#define lua_rawvec4( state, index, vec ) \
-	lua_rawvec3( state, index, vec ); \
-	vec.w = lua_rawfloat( state, index, 4 )
+#define lua_getvec3( state, index, vec ) \
+	lua_getvec2( state, index, vec ); \
+	vec.z = lua_getfloat( state, index, 3 )
+
+#define lua_getvec4( state, index, vec ) \
+	lua_getvec3( state, index, vec ); \
+	vec.w = lua_getfloat( state, index, 4 )
 
 template<typename T>
-inline T* getUserdata( lua_State* lua, int index )
+inline T* lua_getuserdata( lua_State* lua, int index )
 {
 	lua_getfield( lua, index, "__self" );
 	LUA_EXPECT_USERDATA( -1 );
 	return (T*)lua_touserdata( lua, -1 );
+}
+
+inline void lua_setnumber( lua_State* lua, int tableIndex, int fieldIndex, float value )
+{
+	lua_pushnumber( lua, value );
+	lua_rawseti( lua, tableIndex, fieldIndex );
+}
+
+inline void lua_setnumber( lua_State* lua, int fieldIndex, float value )
+{
+	lua_pushnumber( lua, value );
+	lua_rawseti( lua, -2, fieldIndex );
+}
+
+inline void lua_setnumber( lua_State* lua, int tableIndex, const char* field, float value )
+{
+	lua_pushnumber( lua, value );
+	lua_setfield( lua, tableIndex, field );
+}
+
+inline void lua_setnumber( lua_State* lua, const char* field, float value )
+{
+	lua_pushnumber( lua, value );
+	lua_setfield( lua, -2, field );
+}
+
+inline void lua_setnumber( lua_State* lua, int tableIndex, int fieldIndex, int value )
+{
+	lua_pushnumber( lua, value );
+	lua_rawseti( lua, tableIndex, fieldIndex );
+}
+
+inline void lua_setnumber( lua_State* lua, int fieldIndex, int value )
+{
+	lua_pushnumber( lua, value );
+	lua_rawseti( lua, -2, fieldIndex );
+}
+
+inline void lua_setnumber( lua_State* lua, int tableIndex, const char* field, int value )
+{
+	lua_pushnumber( lua, value );
+	lua_setfield( lua, tableIndex, field );
+}
+
+inline void lua_setnumber( lua_State* lua, const char* field, int value )
+{
+	lua_pushnumber( lua, value );
+	lua_setfield( lua, -2, field );
+}
+
+inline void lua_setstring( lua_State* lua, int tableIndex, int fieldIndex, const char* str )
+{
+	lua_pushstring( lua, str );
+	lua_rawseti( lua, tableIndex, fieldIndex );
+}
+
+inline void lua_setstring( lua_State* lua, int fieldIndex, const char* str )
+{
+	lua_pushstring( lua, str );
+	lua_rawseti( lua, -2, fieldIndex );
+}
+
+inline void lua_setstring( lua_State* lua, int tableIndex, const char* field, const char* str )
+{
+	lua_pushstring( lua, str );
+	lua_setfield( lua, tableIndex, field );
+}
+
+inline void lua_setstring( lua_State* lua, const char* field, const char* str )
+{
+	lua_pushstring( lua, str );
+	lua_setfield( lua, -2, field );
+}
+
+inline void lua_setvec2( lua_State* lua, int tableIndex, const glm::vec2& vec )
+{
+	lua_setnumber( lua, tableIndex, 1, vec.x );
+	lua_setnumber( lua, tableIndex, 2, vec.y );
+}
+
+inline void lua_setvec2( lua_State* lua, const glm::vec2& vec )
+{
+	lua_setnumber( lua, -2, 1, vec.x );
+	lua_setnumber( lua, -2, 2, vec.y );
+}
+
+inline void lua_setvec3( lua_State* lua, int tableIndex, const glm::vec3& vec )
+{
+	lua_setnumber( lua, tableIndex, 1, vec.x );
+	lua_setnumber( lua, tableIndex, 2, vec.y );
+	lua_setnumber( lua, tableIndex, 3, vec.z );
+}
+
+inline void lua_setvec3( lua_State* lua, const glm::vec3& vec )
+{
+	lua_setnumber( lua, -2, 1, vec.x );
+	lua_setnumber( lua, -2, 2, vec.y );
+	lua_setnumber( lua, -2, 3, vec.z );
+}
+
+inline void lua_setvec4( lua_State* lua, int tableIndex, const glm::vec4& vec )
+{
+	lua_setnumber( lua, tableIndex, 1, vec.x );
+	lua_setnumber( lua, tableIndex, 2, vec.y );
+	lua_setnumber( lua, tableIndex, 3, vec.z );
+	lua_setnumber( lua, tableIndex, 4, vec.w );
+}
+
+inline void lua_setvec4( lua_State* lua, const glm::vec4& vec )
+{
+	lua_setnumber( lua, -2, 1, vec.x );
+	lua_setnumber( lua, -2, 2, vec.y );
+	lua_setnumber( lua, -2, 3, vec.z );
+	lua_setnumber( lua, -2, 4, vec.w );
+}
+
+inline void lua_setuserdata( lua_State* lua, int index, const char* name, void* data )
+{
+	lua_pushlightuserdata( lua, data );
+	lua_setfield( lua, index, name );
+}
+
+inline void lua_setuserdata( lua_State* lua, const char* name, void* data )
+{
+	lua_pushlightuserdata( lua, data );
+	lua_setfield( lua, -2, name );
+}
+
+inline void lua_setuserdata( lua_State* lua, int index, void* data )
+{
+	lua_pushlightuserdata( lua, data );
+	lua_setfield( lua, index, "__self" );
+}
+
+inline void lua_setuserdata( lua_State* lua, void* data )
+{
+	lua_pushlightuserdata( lua, data );
+	lua_setfield( lua, -2, "__self" );
 }

@@ -6,8 +6,9 @@ namespace LuaInput
 
 	void bind( lua_State* lua, CoreData* coreData )
 	{
+		// metatable for input
 		luaL_newmetatable( lua, "inputMeta" );
-		luaL_Reg regs[] =
+		luaL_Reg inputRegs[] =
 		{
 			{ "keyDown",		keyDown },
 			{ "keyUp",			keyUp },
@@ -25,11 +26,12 @@ namespace LuaInput
 			{ NULL, NULL }
 		};
 
-		luaL_setfuncs( lua, regs, 0 );
+		luaL_setfuncs( lua, inputRegs, 0 );
 		lua_pushvalue( lua, -1 );
 		lua_setfield( lua, -2, "__index" );
 		lua_setglobal( lua, "Input" );
 
+		// key constants
 		lua_newtable( lua );
 		lua_pushnumber( lua, SDL_SCANCODE_GRAVE );
 		lua_setfield( lua, -2, "Console" );
@@ -39,6 +41,7 @@ namespace LuaInput
 		lua_setfield( lua, -2, "Backspace" );
 		lua_setglobal( lua, "Keys" );
 
+		// button constants
 		lua_newtable( lua );
 		lua_pushnumber( lua, SDL_BUTTON_LEFT );
 		lua_setfield( lua, -2, "Left" );
