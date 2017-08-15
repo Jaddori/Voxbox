@@ -123,36 +123,6 @@ DWORD WINAPI update( LPVOID args )
 				Point mouseDelta = input.getMouseDelta();
 				perspectiveCamera.updateDirection( mouseDelta.x, mouseDelta.y );
 			}
-			if( input.buttonReleased( SDL_BUTTON_RIGHT ) )
-			{
-				Point mousePosition = input.getMousePosition();
-				perspectiveCamera.unproject( mousePosition, 0.0f, projectLine.start );
-				perspectiveCamera.unproject( mousePosition, 1.0f, projectLine.end );
-
-				bool collision = false;
-				for( int x=0; x<CHUNK_WIDTH && !collision; x++ )
-				{
-					for( int z=0; z<CHUNK_DEPTH && !collision; z++ )
-					{
-						if( chunks[x*CHUNK_WIDTH+z].getUploaded() )
-						{
-							glm::vec3 minPosition = glm::vec3( x, 0.0f, z ) * (float)CHUNK_SIZE;
-							glm::vec3 maxPosition = glm::vec3( x+1, 1, z+1 ) * (float)CHUNK_SIZE;
-
-							if( rayCheck( projectLine, minPosition, maxPosition ) )
-							{
-								glm::vec3 offset = chunks[x*CHUNK_WIDTH+z].getOffset();
-								chunks[x*CHUNK_WIDTH+z].setOffset( offset + glm::vec3( 0.0f, 1.0f, 0.0f ) );
-
-								chunks[x*CHUNK_WIDTH+z].calculateFaces();
-								chunks[x*CHUNK_WIDTH+z].setUploaded( false );
-
-								collision = true;
-							}
-						}
-					}
-				}
-			}
 
 			glm::vec3 cameraMovement;
 			if( input.keyDown( SDL_SCANCODE_W ) )

@@ -10,19 +10,19 @@ namespace LuaInput
 		luaL_newmetatable( lua, "inputMeta" );
 		luaL_Reg inputRegs[] =
 		{
-			{ "keyDown",		keyDown },
-			{ "keyUp",			keyUp },
-			{ "keyPressed",		keyPressed },
-			{ "keyReleased",	keyReleased },
-			{ "keyRepeated",	keyRepeated },
+			{ "keyDown",			keyDown },
+			{ "keyUp",				keyUp },
+			{ "keyPressed",			keyPressed },
+			{ "keyReleased",		keyReleased },
+			{ "keyRepeated",		keyRepeated },
 			
-			{ "buttonDown",		buttonDown },
-			{ "buttonUp",		buttonUp },
-			{ "buttonPressed",	buttonPressed },
-			{ "buttonReleased", buttonReleased },
+			{ "buttonDown",			buttonDown },
+			{ "buttonUp",			buttonUp },
+			{ "buttonPressed",		buttonPressed },
+			{ "buttonReleased",		buttonReleased },
 
-			{ "mousePosition",	mousePosition },
-			{ "textInput",		textInput },
+			{ "getMousePosition",	getMousePosition },
+			{ "textInput",			textInput },
 			{ NULL, NULL }
 		};
 
@@ -148,12 +148,16 @@ namespace LuaInput
 		return 1;
 	}
 
-	int mousePosition( lua_State* lua )
+	int getMousePosition( lua_State* lua )
 	{
+		LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_TABLE( 1 );
+
 		Point point = g_coreData->input->getMousePosition();
 
-		lua_pushnumber( lua, point.x );
-		lua_pushnumber( lua, point.y );
+		// set result
+		lua_setnumber( lua, 1, 1, point.x );
+		lua_setnumber( lua, 1, 2, point.y );
 
 		return 2;
 	}

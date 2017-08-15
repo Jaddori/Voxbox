@@ -46,7 +46,7 @@ void Camera::project( const glm::vec3& worldCoordinates, Point& result )
 	result.y = (int)(windowCoordinates.y+0.5f);
 }
 
-void Camera::unproject( Point windowCoordinates, float depth, glm::vec3& result )
+void Camera::unproject( const Point& windowCoordinates, float depth, glm::vec3& result )
 {
 	result = glm::unProject( glm::vec3( windowCoordinates.x, WINDOW_HEIGHT - windowCoordinates.y, depth ), viewMatrix.getWrite(), projectionMatrix.getWrite(), WINDOW_VIEWPORT );
 }

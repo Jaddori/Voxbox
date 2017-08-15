@@ -13,7 +13,7 @@ public:
 	void finalize();
 
 	void project( const glm::vec3& worldCoordinates, Point& result );
-	void unproject( Point windowCoordinates, float depth, glm::vec3& result );
+	void unproject( const Point& windowCoordinates, float depth, glm::vec3& result );
 
 	void updatePosition( const glm::vec3& localMovement );
 	void updateDirection( int deltaX, int deltaY );

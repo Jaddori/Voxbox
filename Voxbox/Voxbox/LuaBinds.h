@@ -6,6 +6,7 @@
 #include "LuaDebug.h"
 #include "LuaInput.h"
 #include "LuaRendering.h"
+#include "LuaCamera.h"
 
 #define LUA_MAIN_SCRIPT "./assets/scripts/main.lua"
 
