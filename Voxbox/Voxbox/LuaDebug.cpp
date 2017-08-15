@@ -70,19 +70,20 @@ namespace LuaDebug
 
 	int getLogMessages( lua_State* lua )
 	{
-		Log::instance().copyMessages( g_logMessages );
+		LUA_ASSERT_ARGS( 2 );
+		LUA_EXPECT_TABLE( 1 );
+		LUA_EXPECT_TABLE( 2 );
 
-		lua_newtable( lua ); // message table
-		lua_newtable( lua ); // verbosity table
+		Log::instance().copyMessages( g_logMessages );
 
 		const int MESSAGE_COUNT = g_logMessages.getSize();
 		for( int i=0; i<MESSAGE_COUNT; i++ )
 		{
-			lua_setstring( lua, -3, i, g_logMessages[i].message );
-			lua_setnumber( lua, -2, i, g_logMessages[i].verbosity );
+			lua_setstring( lua, 1, i, g_logMessages[i].message );
+			lua_setnumber( lua, 2, i, g_logMessages[i].verbosity );
 		}
 
-		return 2;
+		return 0;
 	}
 
 	int getLogThreshold( lua_State* lua )

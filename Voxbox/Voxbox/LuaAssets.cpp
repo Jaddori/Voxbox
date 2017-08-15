@@ -150,17 +150,21 @@ namespace LuaAssets
 
 	int getUV( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		LUA_ASSERT_ARGS( 3 );
 		LUA_EXPECT_TABLE( 1 );
 		LUA_EXPECT_STRING( 2 );
+		LUA_EXPECT_TABLE( 3 );
 
 		Font* font = lua_getuserdata<Font>( lua, 1 );
 		const char* c = lua_tostring( lua, 2 );
 
 		glm::vec4 uv = font->getUV( c[0] );
-		lua_newtable( lua );
-		lua_setvec4( lua, uv );
+		//lua_newtable( lua );
+		//lua_setvec4( lua, uv );
 
-		return 1;
+		// set result
+		lua_setvec4( lua, 3, uv );
+
+		return 0;
 	}
 }

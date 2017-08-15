@@ -71,9 +71,7 @@ namespace LuaCamera
 		g_coreData->perspectiveCamera->unproject( windowCoordinates, depth, result );
 
 		// set result
-		lua_setnumber( lua, 3, 1, result.x );
-		lua_setnumber( lua, 3, 2, result.y );
-		lua_setnumber( lua, 3, 3, result.z );
+		lua_setvec3( lua, 3, result );
 
 		return 0;
 	}
@@ -142,9 +140,7 @@ namespace LuaCamera
 		glm::vec3 position = g_coreData->perspectiveCamera->getPosition();
 
 		// set result
-		lua_setnumber( lua, 1, 1, position.x );
-		lua_setnumber( lua, 1, 2, position.y );
-		lua_setnumber( lua, 1, 3, position.z );
+		lua_setvec3( lua, 1, position );
 
 		return 0;
 	}
@@ -157,9 +153,7 @@ namespace LuaCamera
 		glm::vec3 direction = g_coreData->perspectiveCamera->getDirection();
 
 		// set result
-		lua_setnumber( lua, 1, 1, direction.x );
-		lua_setnumber( lua, 1, 2, direction.y );
-		lua_setnumber( lua, 1, 3, direction.z );
+		lua_setvec3( lua, 1, direction );
 
 		return 0;
 	}
