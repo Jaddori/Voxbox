@@ -14,10 +14,10 @@ Worker.destroy = function( self )
 end
 
 Worker.load = function( self )
-	self.texture = Assets.loadTexture( "./assets/texture/worker.dds" )
+	self.texture = Assets.loadTexture( "./assets/textures/worker.dds" )
 	self.position = {0,0,0}
 	self.size = {2,4}
-	self.uv = {0,0,1,1}
+	self.uv = {0,0,0.25,0.5}
 	self.alive = true
 end
 
