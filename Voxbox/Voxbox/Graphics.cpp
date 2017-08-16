@@ -218,6 +218,11 @@ void Graphics::finalize()
 	const int QUAD_COLLECTION_COUNT = quadCollections.getSize();
 	for( int i=0; i<QUAD_COLLECTION_COUNT; i++ )
 		quadCollections[i].quads[writeIndex].clear();
+
+	// swap billboards
+	const int BILLBOARD_COLLECTION_COUNT = billboardCollections.getSize();
+	for( int i=0; i<BILLBOARD_COLLECTION_COUNT; i++ )
+		billboardCollections[i].billboards[writeIndex].clear();
 }
 
 void Graphics::render()

@@ -88,6 +88,12 @@
     <ClCompile Include="Region.cpp">
       <Filter>Source Files\Voxels</Filter>
     </ClCompile>
+    <ClCompile Include="World.cpp">
+      <Filter>Source Files\Voxels</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -164,6 +170,12 @@
     </ClInclude>
     <ClInclude Include="Region.h">
       <Filter>Source Files\Voxels</Filter>
+    </ClInclude>
+    <ClInclude Include="World.h">
+      <Filter>Source Files\Voxels</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Source Files\Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

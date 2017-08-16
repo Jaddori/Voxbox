@@ -2,7 +2,7 @@
 
 class Camera;
 class Input;
-class Region;
+class World;
 class Graphics;
 class DebugShapes;
 class Assets;
@@ -10,7 +10,7 @@ struct CoreData
 {
 	Camera* perspectiveCamera;
 	Input* input;
-	Region* regions;
+	World* world;
 	Graphics* graphics;
 	DebugShapes* debugShapes;
 	Assets* assets;

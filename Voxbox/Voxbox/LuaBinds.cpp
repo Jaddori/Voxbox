@@ -29,6 +29,7 @@ bool LuaBinds::bind( CoreData* coreData )
 	LuaInput::bind( lua, coreData );
 	LuaRendering::bind( lua, coreData );
 	LuaCamera::bind( lua, coreData );
+	LuaVoxels::bind( lua, coreData );
 
 	// load main script
 	LOG_INFO( "Loading main script." );

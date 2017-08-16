@@ -2,7 +2,7 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Input.h"
-#include "Region.h"
+#include "World.h"
 #include "Font.h"
 #include "Graphics.h"
 #include "DebugShapes.h"
@@ -11,63 +11,6 @@
 #include "Assets.h"
 
 #define THREAD_UPDATE_WAIT 1000
-#define REGION_WIDTH 4
-#define REGION_DEPTH 4
-#define NUM_REGIONS (REGION_WIDTH*REGION_DEPTH)
-
-bool rayCheck( const DebugLine& ray, const glm::vec3& minPosition, const glm::vec3& maxPosition )
-{
-	float epsilon = glm::epsilon<float>();
-	float tmin = 0.0f;
-	float tmax = std::numeric_limits<float>().max();
-	glm::vec3 rayDirection = glm::normalize( ray.end - ray.start );
-	glm::vec3 rayPosition = ray.start;
-	glm::vec3 aabbMin = minPosition;
-	glm::vec3 aabbMax = maxPosition;
-
-	unsigned int threeSlabs = 3;
-
-	for (unsigned int i = 0; i < threeSlabs; i++)
-	{
-		if (glm::abs(rayDirection[i]) < epsilon) // Ray is parallell to slab
-		{
-			if (rayPosition[i] < aabbMin[i] || rayPosition[i] > aabbMax[i]) // No hit if origin not inside slab
-				return false;
-		}
-		else
-		{
-			// compute intersection t value of ray with near and far plane of slab
-			float ood = 1.0f / rayDirection[i];
-			float t1 = (aabbMin[i] - rayPosition[i]) * ood;
-			float t2 = (aabbMax[i] - rayPosition[i]) * ood;
-
-			if (t1 > t2)
-			{
-				float temp = t1;
-				t1 = t2;
-				t2 = temp;
-			}
-
-			if (t1 > tmin)
-				tmin = t1;
-
-			if (t2 < tmax)
-				tmax = t2;
-
-			if (tmin > tmax)
-				return false;
-		}
-
-	}
-
-	/*float hitdistance = tmin;
-	if (tmin < 0)
-		hitdistance = tmax;
-	glm::vec3 intersectionPoint = rayPosition + (rayDirection * hitdistance);
-	ray->hit(intersectionPoint, hitdistance);*/
-
-	return true;
-}
 
 DWORD WINAPI generateChunks( LPVOID args )
 {
@@ -75,19 +18,7 @@ DWORD WINAPI generateChunks( LPVOID args )
 
 	LOG_INFO( "Starting chunk generation thread." );
 
-	/*for( int i=0; i<100; i++ )
-	{
-		data->chunks[i].calculateFaces();
-		
-		Sleep( 100 );
-	}*/
-
-	for( int i=0; i<NUM_REGIONS; i++ )
-	{
-		data->regions[i].calculateFaces();
-
-		Sleep( 100 );
-	}
+	data->world->calculateFaces();
 
 	LOG_INFO( "Chunk generation thread finished." );
 
@@ -109,7 +40,7 @@ DWORD WINAPI update( LPVOID args )
 
 	Camera& perspectiveCamera	=	*data->coreData->perspectiveCamera;
 	Input& input				=	*data->coreData->input;
-	Region* regions				=	data->coreData->regions;
+	World& world				=	*data->coreData->world;
 	Graphics& graphics			=	*data->coreData->graphics;
 	DebugShapes& debugShapes	=	*data->coreData->debugShapes;
 	LuaBinds& luaBinds			=	*data->luaBinds;
@@ -128,38 +59,34 @@ DWORD WINAPI update( LPVOID args )
 				perspectiveCamera.updateDirection( mouseDelta.x, mouseDelta.y );
 			}
 
-			const Frustum& frustum = perspectiveCamera.getFrustum();
-
-			/*for( int x=0; x<CHUNK_WIDTH; x++ )
+			/*if( input.buttonDown( SDL_BUTTON_MIDDLE ) )
 			{
-				for( int z=0; z<CHUNK_DEPTH; z++ )
+				Point mousePosition = input.getMousePosition();
+				glm::vec3 rayStart, rayEnd;
+				perspectiveCamera.unproject( mousePosition, 0.0f, rayStart );
+				perspectiveCamera.unproject( mousePosition, 1.0f, rayEnd );
+
+				glm::vec3 blockLocation;
+				if( world.hitBlock( rayStart, rayEnd, blockLocation ) )
 				{
-					if( chunks[x*CHUNK_WIDTH+z].getUploaded() )
-					{
-						glm::vec3 minPosition = glm::vec3( x, 0.0f, z ) * (float)CHUNK_SIZE;
-						glm::vec3 maxPosition = glm::vec3( x+1, 1, z+1 ) * (float)CHUNK_SIZE;
-
-						if( frustum.aabbCollision( minPosition, maxPosition ) )
-						{
-							graphics.queueChunk( &chunks[x*CHUNK_WIDTH+z] );
-
-							DebugAABB aabb = { minPosition, maxPosition, glm::vec4( 1.0f, 0.0f, 1.0f, 1.0f ) };
-							debugShapes.addAABB( aabb );
-						}
-					}
+					LOG_DEBUG( "Hit block (%f,%f,%f).", blockLocation.x, blockLocation.y, blockLocation.z );
 				}
 			}*/
 
-			for( int x=0; x<REGION_WIDTH; x++ )
+			const Frustum& frustum = perspectiveCamera.getFrustum();
+
+			/*for( int x=0; x<REGION_WIDTH; x++ )
 			{
 				for( int z=0; z<REGION_DEPTH; z++ )
 				{
 					if( regions[x*REGION_DEPTH+z].getUploaded() )
 					{
-						regions[x*REGION_DEPTH+z].queueChunks( graphics, frustum );
+						regions[x*REGION_DEPTH+z].queueChunks( graphics, frustum, debugShapes );
 					}
 				}
-			}
+			}*/
+
+			world.queueChunks( data->coreData, frustum );
 
 			luaBinds.update();
 			luaBinds.render();
@@ -175,7 +102,7 @@ int main( int argc, char* argv[] )
 {
 	LOG_START( "./log.txt" );
 	LOG_WARNINGS();
-
+	
 	SDL_Window* window = SDL_CreateWindow( "Voxbox", WINDOW_X, WINDOW_Y, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL );
 	if( window )
 	{
@@ -209,18 +136,7 @@ int main( int argc, char* argv[] )
 			graphics.load( &assets );
 			graphics.getPerspectiveCamera().setPosition( glm::vec3( 0.0f, 0.0f, -10.0f ) );
 
-			/*Chunk* chunks = new Chunk[NUM_CHUNKS];
-
-			for( int x=0; x<CHUNK_WIDTH; x++ )
-			{
-				for( int z=0; z<CHUNK_DEPTH; z++ )
-				{
-					chunks[x*CHUNK_WIDTH+z].setOffset( glm::vec3( x, 0.0f, z ) );
-					chunks[x*CHUNK_WIDTH+z].noise( x*CHUNK_SIZE, z*CHUNK_SIZE );
-				}
-			}*/
-
-			Region* regions = new Region[NUM_REGIONS];
+			/*Region* regions = new Region[NUM_REGIONS];
 
 			for( int x=0; x<REGION_WIDTH; x++ )
 			{
@@ -229,7 +145,12 @@ int main( int argc, char* argv[] )
 					regions[x*REGION_WIDTH+z].setOffset( glm::vec3( x, 0.0f, z ) );
 					regions[x*REGION_WIDTH+z].noise( x, z );
 				}
-			}
+			}*/
+
+			World world;
+			world.load();
+			world.calculateFaces();
+			world.upload();
 
 			DebugShapes debugShapes;
 			debugShapes.load();
@@ -241,7 +162,8 @@ int main( int argc, char* argv[] )
 			coreData.perspectiveCamera = &graphics.getPerspectiveCamera();
 			coreData.input = &input;
 			//coreData.chunks = chunks;
-			coreData.regions = regions;
+			//coreData.regions = regions;
+			coreData.world = &world;
 			coreData.graphics = &graphics;
 			coreData.debugShapes = &debugShapes;
 			coreData.assets = &assets;
@@ -258,7 +180,7 @@ int main( int argc, char* argv[] )
 			threadData.renderDone = CreateSemaphore( NULL, 1, 1, NULL );
 			HANDLE updateThread = CreateThread( NULL, 0, update, &threadData, 0, NULL );
 
-			HANDLE generationThread = CreateThread( NULL, 0, generateChunks, &coreData, 0, NULL );
+			//HANDLE generationThread = CreateThread( NULL, 0, generateChunks, &coreData, 0, NULL );
 
 			long fpsTimer = SDL_GetTicks();
 			int fps = 0;
@@ -284,21 +206,15 @@ int main( int argc, char* argv[] )
 					graphics.finalize();
 					debugShapes.finalize();
 
-					/*for( int i=0; i<NUM_CHUNKS; i++ )
-					{
-						if( chunks[i].getValid() && !chunks[i].getUploaded() )
-						{
-							chunks[i].upload();
-						}
-					}*/
-
-					for( int i=0; i<NUM_REGIONS; i++ )
+					/*for( int i=0; i<NUM_REGIONS; i++ )
 					{
 						if( regions[i].getValid() && !regions[i].getUploaded() )
 						{
 							regions[i].upload();
 						}
-					}
+					}*/
+
+					world.upload();
 
 					ReleaseSemaphore( threadData.renderDone, 1, NULL );
 				}

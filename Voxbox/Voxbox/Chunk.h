@@ -35,6 +35,8 @@ public:
 	void noise( int x, int z );
 	void render();
 
+	bool hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::vec3& location );
+
 	void setBlock( int x, int y, int z, uint8_t value );
 	void setOffset( const glm::vec3& offset );
 	void setUploaded( bool uploaded );

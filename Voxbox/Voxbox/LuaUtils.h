@@ -18,7 +18,7 @@
 
 #define lua_tofloat( state, index ) (float)lua_tonumber( state, index )
 #define lua_toint( state, index) (int)lua_tonumber( state, index )
-#define lua_tobool( state, index ) (bool)lua_toboolean( state, index )
+#define lua_tobool( state, index ) (lua_toboolean( state, index ) > 0)
 
 inline float lua_getfloat( lua_State* lua, int tableIndex, int fieldIndex )
 {

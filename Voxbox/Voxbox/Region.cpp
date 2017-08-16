@@ -1,7 +1,6 @@
 #include "Region.h"
 
 Region::Region()
-	: valid( false ), uploaded( false )
 {
 	chunks = new Chunk[REGION_HEIGHT];
 }
@@ -15,20 +14,22 @@ void Region::upload()
 {
 	for( int i=0; i<REGION_HEIGHT; i++ )
 	{
-		chunks[i].upload();
+		if( chunks[i].getValid() && !chunks[i].getUploaded() )
+		{
+			chunks[i].upload();
+		}
 	}
-
-	uploaded = true;
 }
 
 void Region::calculateFaces()
 {
 	for( int i=0; i<REGION_HEIGHT; i++ )
 	{
-		chunks[i].calculateFaces();
+		if( !chunks[i].getValid() )
+		{
+			chunks[i].calculateFaces();
+		}
 	}
-
-	valid = true;
 }
 
 void Region::noise( int noiseX, int noiseZ )
@@ -73,10 +74,12 @@ void Region::noise( int noiseX, int noiseZ )
 	}
 }
 
-void Region::queueChunks( Graphics& graphics, const Frustum& frustum )
+void Region::queueChunks( CoreData* coreData, const Frustum& frustum )
 {
-	glm::vec3 minPosition = offset;
+	glm::vec3 minPosition = offset * (float)CHUNK_SIZE;
 	glm::vec3 maxPosition = minPosition + glm::vec3( CHUNK_SIZE, CHUNK_SIZE*REGION_HEIGHT, CHUNK_SIZE );
+
+	coreData->debugShapes->addAABB( { minPosition, maxPosition, glm::vec4( 1.0f, 0.0f, 1.0f, 1.0f ) } );
 
 	if( frustum.aabbCollision( minPosition, maxPosition ) )
 	{
@@ -84,15 +87,47 @@ void Region::queueChunks( Graphics& graphics, const Frustum& frustum )
 
 		for( int i=0; i<REGION_HEIGHT; i++ )
 		{
+			coreData->debugShapes->addAABB( { minPosition, maxPosition, glm::vec4( 1.0f, 0.0f, 0.0f, 1.0f ) } );
+
 			if( frustum.aabbCollision( minPosition, maxPosition ) )
 			{
-				graphics.queueChunk( &chunks[i] );
+				coreData->graphics->queueChunk( &chunks[i] );
 			}
 
 			minPosition.y += CHUNK_SIZE;
 			maxPosition.y += CHUNK_SIZE;
 		}
 	}
+}
+
+bool Region::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::vec3& location )
+{
+	bool result = false;
+
+	glm::vec3 minPosition = offset * (float)CHUNK_SIZE;
+	glm::vec3 maxPosition = minPosition + glm::vec3( CHUNK_SIZE, CHUNK_SIZE*REGION_HEIGHT, CHUNK_SIZE );
+
+	if( rayCheck( rayStart, rayEnd, minPosition, maxPosition ) )
+	{
+		maxPosition = minPosition + glm::vec3( CHUNK_SIZE );
+
+		for( int i=0; i<REGION_HEIGHT && !result; i++ )
+		{
+			if( rayCheck( rayStart, rayEnd, minPosition, maxPosition ) )
+			{
+				LOG_DEBUG( "Considering chunk %d.", i );
+				result = chunks[i].hitBlock( rayStart, rayEnd, location );
+			}
+
+			minPosition.y += CHUNK_SIZE;
+			maxPosition.y += CHUNK_SIZE;
+
+			if( result )
+				LOG_DEBUG( "Hit chunk %d.", i );
+		}
+	}
+
+	return result;
 }
 
 void Region::setOffset( const glm::vec3& o )
@@ -106,14 +141,4 @@ void Region::setOffset( const glm::vec3& o )
 const glm::vec3& Region::getOffset() const
 {
 	return offset;
-}
-
-bool Region::getValid() const
-{
-	return valid;
-}
-
-bool Region::getUploaded() const
-{
-	return uploaded;
 }

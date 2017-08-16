@@ -122,7 +122,7 @@ namespace LuaInput
 		LUA_EXPECT_NUMBER( 1 );
 
 		int button = (int)lua_tonumber( lua, 1 );
-		lua_pushboolean( lua, g_coreData->input->buttonDown( button ) );
+		lua_pushboolean( lua, g_coreData->input->buttonUp( button ) );
 
 		return 1;
 	}
@@ -133,7 +133,7 @@ namespace LuaInput
 		LUA_EXPECT_NUMBER( 1 );
 
 		int button = (int)lua_tonumber( lua, 1 );
-		lua_pushboolean( lua, g_coreData->input->buttonDown( button ) );
+		lua_pushboolean( lua, g_coreData->input->buttonPressed( button ) );
 
 		return 1;
 	}
@@ -144,7 +144,7 @@ namespace LuaInput
 		LUA_EXPECT_NUMBER( 1 );
 
 		int button = (int)lua_tonumber( lua, 1 );
-		lua_pushboolean( lua, g_coreData->input->buttonDown( button ) );
+		lua_pushboolean( lua, g_coreData->input->buttonReleased( button ) );
 
 		return 1;
 	}

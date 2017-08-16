@@ -45,6 +45,7 @@ const float EPSILON = glm::epsilon<float>();
 #include "Swap.h"
 #include "SwapArray.h"
 #include "CoreData.h"
+#include "Utils.h"
 
 struct Point
 {
