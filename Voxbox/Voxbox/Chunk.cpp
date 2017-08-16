@@ -248,42 +248,7 @@ void Chunk::render()
 	glBindVertexArray( 0 );
 }
 
-bool Chunk::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::vec3& location )
-{
-	bool result = false;
-
-	float minDistance = CAMERA_FAR+10.0f;
-
-	for( int y=0; y<CHUNK_SIZE; y++ )
-	{
-		for( int x=0; x<CHUNK_SIZE; x++ )
-		{
-			for( int z=0; z<CHUNK_SIZE; z++ )
-			{
-				if( block( x, y, z ) > 0 )
-				{
-					glm::vec3 minPosition = offset * (float)CHUNK_SIZE + glm::vec3( x, y, z );
-					glm::vec3 maxPosition = minPosition + glm::vec3( 1.0f );
-
-					if( rayCheck( rayStart, rayEnd, minPosition, maxPosition ) )
-					{
-						float distance = glm::distance( rayStart, minPosition );
-						if( distance < minDistance )
-						{
-							minDistance = distance;
-							location = minPosition;
-						}
-						result = true;
-					}
-				}
-			}
-		}
-	}
-
-	return result;
-}
-
-bool Chunk::marchBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::vec3& location )
+bool Chunk::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, BlockIndex& blockIndex )
 {
 	bool result = false;
 
@@ -316,7 +281,11 @@ bool Chunk::marchBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm:
 		{
 			if( block( x, y, z ) > 0 )
 			{
-				location = glm::vec3( x, y, z ) + offset * (float)CHUNK_SIZE;
+				//location = glm::vec3( x, y, z ) + offset * (float)CHUNK_SIZE;
+				blockIndex.x = x;
+				blockIndex.y = y;
+				blockIndex.z = z;
+
 				result = true;
 			}
 			else

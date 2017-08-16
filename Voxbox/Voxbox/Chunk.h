@@ -23,6 +23,11 @@ struct Vertex
 	glm::vec2 uv;
 };
 
+struct BlockIndex
+{
+	int x, y, z;
+};
+
 class Chunk
 {
 public:
@@ -36,8 +41,7 @@ public:
 	void noise( int x, int z );
 	void render();
 
-	bool hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::vec3& location );
-	bool marchBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::vec3& location );
+	bool hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, BlockIndex& blockIndex );
 
 	void setBlock( int x, int y, int z, uint8_t value );
 	void setOffset( const glm::vec3& offset );

@@ -101,47 +101,7 @@ void Region::queueChunks( CoreData* coreData, const Frustum& frustum )
 	}
 }
 
-bool Region::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::vec3& location )
-{
-	bool result = false;
-
-	glm::vec3 minPosition = offset * (float)CHUNK_SIZE;
-	glm::vec3 maxPosition = minPosition + glm::vec3( CHUNK_SIZE, CHUNK_SIZE*REGION_HEIGHT, CHUNK_SIZE );
-
-	float minDistance = CAMERA_FAR + 10.0f;
-
-	if( inside( rayStart, minPosition, maxPosition ) ||
-		rayCheck( rayStart, rayEnd, minPosition, maxPosition ) )
-	{
-		maxPosition = minPosition + glm::vec3( CHUNK_SIZE );
-
-		for( int i=0; i<REGION_HEIGHT; i++ )
-		{
-			if( inside( rayStart, minPosition, maxPosition ) ||
-				rayCheck( rayStart, rayEnd, minPosition, maxPosition ) )
-			{
-				glm::vec3 tempLocation;
-				if( chunks[i].hitBlock( rayStart, rayEnd, tempLocation ) )
-				{
-					float distance = glm::distance( rayStart, tempLocation );
-					if( distance < minDistance )
-					{
-						minDistance = distance;
-						location = tempLocation;
-					}
-					result = true;
-				}
-			}
-
-			minPosition.y += CHUNK_SIZE;
-			maxPosition.y += CHUNK_SIZE;
-		}
-	}
-
-	return result;
-}
-
-bool Region::marchBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::vec3& location )
+bool Region::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, ChunkIndex& chunkIndex )
 {
 	bool result = false;
 
@@ -157,14 +117,23 @@ bool Region::marchBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm
 
 		for( int i=0; i<REGION_HEIGHT; i++ )
 		{
-			glm::vec3 tempLocation;
-			if( chunks[i].marchBlock( rayStart, rayEnd, tempLocation ) )
+			BlockIndex tempIndex = {};
+			if( chunks[i].hitBlock( rayStart, rayEnd, tempIndex ) )
 			{
-				float distance = glm::distance( rayStart, tempLocation );
+				/*float distance = glm::distance( rayStart, tempLocation );
 				if( distance < minDistance )
 				{
 					distance = minDistance;
 					location = tempLocation;
+				}*/
+
+				glm::vec3 blockPosition = glm::vec3( tempIndex.x, tempIndex.y, tempIndex.z ) + chunks[i].getOffset() * (float)CHUNK_SIZE;
+				float distance = glm::distance( rayStart, blockPosition );
+				if( distance < minDistance )
+				{
+					distance = minDistance;
+					chunkIndex.block = tempIndex;
+					chunkIndex.chunk = i;
 				}
 
 				result = true;

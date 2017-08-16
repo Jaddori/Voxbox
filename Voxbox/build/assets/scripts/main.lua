@@ -31,10 +31,10 @@ function mainUpdate()
 		Camera.unproject( camera.mousePosition, 0.0, rayStart )
 		Camera.unproject( camera.mousePosition, 1.0, rayEnd )
 		
-		if World.marchBlock( rayStart, rayEnd, blockLocation ) then
-			workers[1].position = blockLocation
+		if World.hitBlock( rayStart, rayEnd, blockLocation ) then
+			--workers[1].position = blockLocation
 			
-			local str = "Hit block: " .. tostring(blockLocation[1]) .. "," .. tostring(blockLocation[2]) .. "," .. tostring(blockLocation[3])
+			local str = "Hit block: " .. tostring(blockLocation[1]) .. "," .. tostring(blockLocation[2]) .. "," .. tostring(blockLocation[3]) .. ", (" .. tostring(blockLocation.chunk) .. "," .. tostring(blockLocation.region) .. ")"
 			Log.log( VERBOSITY_DEBUG, str )
 		end
 		

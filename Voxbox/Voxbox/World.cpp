@@ -57,25 +57,15 @@ void World::queueChunks( CoreData* coreData, const Frustum& frustum )
 	}
 }
 
-bool World::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::vec3& location )
+bool World::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, RegionIndex& regionIndex )
 {
 	bool result = false;
 
 	for( int i=0; i<WORLD_REGIONS && !result; i++ )
 	{
-		result = regions[i].hitBlock( rayStart, rayEnd, location );
-	}
-
-	return result;
-}
-
-bool World::marchBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::vec3& location )
-{
-	bool result = false;
-
-	for( int i=0; i<WORLD_REGIONS && !result; i++ )
-	{
-		result = regions[i].marchBlock( rayStart, rayEnd, location );
+		result = regions[i].hitBlock( rayStart, rayEnd, regionIndex.chunkIndex );
+		if( result )
+			regionIndex.region = i;
 	}
 
 	return result;

@@ -7,6 +7,12 @@
 
 #define REGION_HEIGHT 16
 
+struct ChunkIndex
+{
+	BlockIndex block;
+	int chunk;
+};
+
 class Region
 {
 public:
@@ -18,8 +24,7 @@ public:
 	void noise( int x, int z );
 
 	void queueChunks( CoreData* coreData, const Frustum& frustum );
-	bool hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::vec3& location );
-	bool marchBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::vec3& location );
+	bool hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, ChunkIndex& chunkIndex );
 
 	void setOffset( const glm::vec3& offset );
 
