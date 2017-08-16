@@ -2,6 +2,7 @@
 
 #include "BaseIncludes.h"
 #include "Shader.h"
+#include "DebugShapes.h"
 
 #define CHUNK_SIZE 16
 #define CHUNK_VOLUME (CHUNK_SIZE*CHUNK_SIZE*CHUNK_SIZE)
@@ -36,6 +37,7 @@ public:
 	void render();
 
 	bool hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::vec3& location );
+	bool marchBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::vec3& location );
 
 	void setBlock( int x, int y, int z, uint8_t value );
 	void setOffset( const glm::vec3& offset );
@@ -45,6 +47,8 @@ public:
 	const glm::vec3& getOffset() const;
 	bool getValid() const;
 	bool getUploaded() const;
+
+	DebugSphere dbg;
 
 private:
 	inline int at( int x, int y, int z ) { return ( y*CHUNK_SIZE*CHUNK_SIZE + z*CHUNK_SIZE + x ); }

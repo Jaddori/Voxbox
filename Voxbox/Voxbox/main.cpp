@@ -59,6 +59,11 @@ DWORD WINAPI update( LPVOID args )
 				perspectiveCamera.updateDirection( mouseDelta.x, mouseDelta.y );
 			}
 
+			if( input.buttonReleased( SDL_BUTTON_MIDDLE ) )
+			{
+				world.calculateFaces();
+			}
+
 			/*if( input.buttonDown( SDL_BUTTON_MIDDLE ) )
 			{
 				Point mousePosition = input.getMousePosition();

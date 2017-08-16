@@ -1,6 +1,6 @@
 #include "Utils.h"
 
-bool rayCheck( const glm::vec3& rayStart, const glm::vec3& rayEnd, const glm::vec3& minPosition, const glm::vec3& maxPosition )
+bool rayCheck( const glm::vec3& rayStart, const glm::vec3& rayEnd, const glm::vec3& minPosition, const glm::vec3& maxPosition, glm::vec3* hitPoint )
 {
 	float epsilon = glm::epsilon<float>();
 	float tmin = 0.0f;
@@ -45,11 +45,21 @@ bool rayCheck( const glm::vec3& rayStart, const glm::vec3& rayEnd, const glm::ve
 
 	}
 
-	/*float hitdistance = tmin;
-	if (tmin < 0)
-	hitdistance = tmax;
-	glm::vec3 intersectionPoint = rayPosition + (rayDirection * hitdistance);
-	ray->hit(intersectionPoint, hitdistance);*/
+	if( hitPoint )
+	{
+		float hitdistance = tmin;
+		if (tmin < 0)
+			hitdistance = tmax;
+		*hitPoint = rayPosition + (rayDirection * hitdistance);
+	}
 
 	return true;
+}
+
+float distanceToLine( const glm::vec3& lineStart, const glm::vec3& lineEnd, const glm::vec3& point )
+{
+	float dividend = glm::length( glm::cross( (point-lineStart), (point-lineEnd) ) );
+	float divisor = glm::length( lineEnd - lineStart );
+
+	return ( dividend / divisor );
 }

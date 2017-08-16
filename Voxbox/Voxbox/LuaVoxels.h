@@ -15,4 +15,5 @@ namespace LuaVoxels
 
 	// World
 	int hitBlock( lua_State* lua );
+	int marchBlock( lua_State* lua );
 }

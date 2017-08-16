@@ -14,6 +14,9 @@ Chunk::Chunk()
 		blocks[at( 5, y, 5 )] = y % 3;
 	}
 #endif
+
+	dbg.radius = 2.0f;
+	dbg.color = glm::vec4( 0.0f, 0.0f, 1.0f, 1.0f );
 }
 
 Chunk::~Chunk()
@@ -133,6 +136,7 @@ void Chunk::calculateFaces()
 	}
 
 	valid = true;
+	uploaded = false;
 }
 
 void Chunk::addHorizontalFace( const glm::vec3& position, const glm::vec3& direction, const glm::vec2& uvOffset, bool invert )
@@ -272,6 +276,73 @@ bool Chunk::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::v
 						result = true;
 					}
 				}
+			}
+		}
+	}
+
+	return result;
+}
+
+bool Chunk::marchBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::vec3& location )
+{
+	bool result = false;
+
+	glm::vec3 minPosition = offset * (float)CHUNK_SIZE;
+	glm::vec3 maxPosition = minPosition + glm::vec3( CHUNK_SIZE );
+
+	glm::vec3 rayDirection = glm::normalize( rayEnd - rayStart );
+	float rayLength = glm::length( rayEnd - rayStart );
+
+	glm::vec3 start = rayStart;
+	if( rayCheck( rayStart, rayEnd, minPosition, maxPosition, &start ) )
+	{
+		dbg.position = start;
+
+		start -= offset * (float)CHUNK_SIZE;
+		glm::vec3 end = start + ( rayDirection * rayLength );
+
+		int x = (int)start.x;
+		int y = (int)start.y;
+		int z = (int)start.z;
+
+		clampInt( x, 0, CHUNK_SIZE-1 );
+		clampInt( y, 0, CHUNK_SIZE-1 );
+		clampInt( z, 0, CHUNK_SIZE-1 );
+
+		while( !result &&
+				x >= 0 && x < CHUNK_SIZE &&
+				y >= 0 && y < CHUNK_SIZE &&
+				z >= 0 && z < CHUNK_SIZE )
+		{
+			if( block( x, y, z ) > 0 )
+			{
+				location = glm::vec3( x, y, z ) + offset * (float)CHUNK_SIZE;
+				result = true;
+			}
+			else
+			{
+				glm::vec3 xcandidate( x-1, y, z );
+				if( rayDirection.x > 0.0f )
+					xcandidate.x = x + 1.0f;
+
+				glm::vec3 ycandidate( x, y-1, z );
+				if( rayDirection.y > 0.0f )
+					ycandidate.y = y + 1.0f;
+
+				glm::vec3 zcandidate( x, y, z-1 );
+				if( rayDirection.z > 0.0f )
+					zcandidate.z = z + 1.0f;
+
+				float xdistance = distanceToLine( start, end, xcandidate );
+				float ydistance = distanceToLine( start, end, ycandidate );
+				float zdistance = distanceToLine( start, end, zcandidate );
+
+				if( xdistance < ydistance && xdistance < zdistance )
+					x += ( rayDirection.x > 0.0f ? 1 : -1 );
+				else if( ydistance < xdistance && ydistance < zdistance )
+					y += ( rayDirection.y > 0.0f ? 1 : -1 );
+				else
+					z += ( rayDirection.z > 0.0f ? 1 : -1 );
 			}
 		}
 	}

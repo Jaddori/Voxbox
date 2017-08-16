@@ -69,6 +69,18 @@ bool World::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::v
 	return result;
 }
 
+bool World::marchBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::vec3& location )
+{
+	bool result = false;
+
+	for( int i=0; i<WORLD_REGIONS && !result; i++ )
+	{
+		result = regions[i].marchBlock( rayStart, rayEnd, location );
+	}
+
+	return result;
+}
+
 Region& World::getRegion( int x, int z )
 {
 	LOG_ASSERT( x >= 0 && x < WORLD_WIDTH, "x index out of range." );

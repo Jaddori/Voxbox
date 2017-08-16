@@ -20,6 +20,7 @@ public:
 	void queueChunks( CoreData* coreData, const Frustum& frustum );
 
 	bool hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::vec3& location );
+	bool marchBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::vec3& location );
 
 	Region& getRegion( int x, int z );
 	Region* getRegions();

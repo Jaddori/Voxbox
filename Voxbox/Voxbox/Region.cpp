@@ -25,7 +25,7 @@ void Region::calculateFaces()
 {
 	for( int i=0; i<REGION_HEIGHT; i++ )
 	{
-		if( !chunks[i].getValid() )
+		//if( !chunks[i].getValid() )
 		{
 			chunks[i].calculateFaces();
 		}
@@ -92,6 +92,7 @@ void Region::queueChunks( CoreData* coreData, const Frustum& frustum )
 			if( frustum.aabbCollision( minPosition, maxPosition ) )
 			{
 				coreData->graphics->queueChunk( &chunks[i] );
+				coreData->debugShapes->addSphere( chunks[i].dbg );
 			}
 
 			minPosition.y += CHUNK_SIZE;
@@ -107,23 +108,70 @@ bool Region::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::
 	glm::vec3 minPosition = offset * (float)CHUNK_SIZE;
 	glm::vec3 maxPosition = minPosition + glm::vec3( CHUNK_SIZE, CHUNK_SIZE*REGION_HEIGHT, CHUNK_SIZE );
 
-	if( rayCheck( rayStart, rayEnd, minPosition, maxPosition ) )
+	float minDistance = CAMERA_FAR + 10.0f;
+
+	if( inside( rayStart, minPosition, maxPosition ) ||
+		rayCheck( rayStart, rayEnd, minPosition, maxPosition ) )
 	{
 		maxPosition = minPosition + glm::vec3( CHUNK_SIZE );
 
-		for( int i=0; i<REGION_HEIGHT && !result; i++ )
+		for( int i=0; i<REGION_HEIGHT; i++ )
 		{
-			if( rayCheck( rayStart, rayEnd, minPosition, maxPosition ) )
+			if( inside( rayStart, minPosition, maxPosition ) ||
+				rayCheck( rayStart, rayEnd, minPosition, maxPosition ) )
 			{
-				LOG_DEBUG( "Considering chunk %d.", i );
-				result = chunks[i].hitBlock( rayStart, rayEnd, location );
+				glm::vec3 tempLocation;
+				if( chunks[i].hitBlock( rayStart, rayEnd, tempLocation ) )
+				{
+					float distance = glm::distance( rayStart, tempLocation );
+					if( distance < minDistance )
+					{
+						minDistance = distance;
+						location = tempLocation;
+					}
+					result = true;
+				}
 			}
 
 			minPosition.y += CHUNK_SIZE;
 			maxPosition.y += CHUNK_SIZE;
+		}
+	}
 
-			if( result )
-				LOG_DEBUG( "Hit chunk %d.", i );
+	return result;
+}
+
+bool Region::marchBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, glm::vec3& location )
+{
+	bool result = false;
+
+	glm::vec3 minPosition = offset * (float)CHUNK_SIZE;
+	glm::vec3 maxPosition = minPosition + glm::vec3( CHUNK_SIZE, CHUNK_SIZE*REGION_HEIGHT, CHUNK_SIZE );
+
+	float minDistance = CAMERA_FAR + 10.0f;
+
+	if( inside( rayStart, minPosition, maxPosition ) || 
+		rayCheck( rayStart, rayEnd, minPosition, maxPosition ) )
+	{
+		maxPosition = minPosition + glm::vec3( CHUNK_SIZE );
+
+		for( int i=0; i<REGION_HEIGHT; i++ )
+		{
+			glm::vec3 tempLocation;
+			if( chunks[i].marchBlock( rayStart, rayEnd, tempLocation ) )
+			{
+				float distance = glm::distance( rayStart, tempLocation );
+				if( distance < minDistance )
+				{
+					distance = minDistance;
+					location = tempLocation;
+				}
+
+				result = true;
+			}
+
+			minPosition.y += CHUNK_SIZE;
+			maxPosition.y += CHUNK_SIZE;
 		}
 	}
 
