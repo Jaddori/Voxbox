@@ -47,11 +47,6 @@ DWORD WINAPI update( LPVOID args )
 				perspectiveCamera.updateDirection( mouseDelta.x, mouseDelta.y );
 			}
 
-			if( input.buttonReleased( SDL_BUTTON_MIDDLE ) )
-			{
-				world.calculateFaces();
-			}
-
 			const Frustum& frustum = perspectiveCamera.getFrustum();
 			world.queueChunks( data->coreData, frustum );
 
@@ -63,15 +58,6 @@ DWORD WINAPI update( LPVOID args )
 	}
 
 	return 0;
-}
-
-void wasteTime()
-{
-	LOG_DEBUG( "Starting to waste time." );
-
-	Sleep( 2000 );
-
-	LOG_DEBUG( "Done wasting time" );
 }
 
 int main( int argc, char* argv[] )
@@ -106,6 +92,9 @@ int main( int argc, char* argv[] )
 			//srand( time( 0 ) );
 			srand( 1337 );
 
+			ThreadPool threadPool;
+			threadPool.load();
+
 			Assets assets;
 
 			Graphics graphics;
@@ -113,9 +102,7 @@ int main( int argc, char* argv[] )
 			graphics.getPerspectiveCamera().setPosition( glm::vec3( 0.0f, 0.0f, -10.0f ) );
 
 			World world;
-			world.load();
-			world.calculateFaces();
-			world.upload();
+			world.load( &threadPool );
 
 			DebugShapes debugShapes;
 			debugShapes.load();
@@ -143,8 +130,6 @@ int main( int argc, char* argv[] )
 			threadData.renderDone = CreateSemaphore( NULL, 1, 1, NULL );
 			HANDLE updateThread = CreateThread( NULL, 0, update, &threadData, 0, NULL );
 
-			ThreadPool threadPool;
-
 			long fpsTimer = SDL_GetTicks();
 			int fps = 0;
 
@@ -162,11 +147,6 @@ int main( int argc, char* argv[] )
 							threadData.running = false;
 
 						input.update( &e );
-					}
-
-					if( input.keyReleased( 'F'-'A'+4 ) )
-					{
-						threadPool.queueTask( wasteTime );
 					}
 
 					// finalize objects
@@ -202,6 +182,8 @@ int main( int argc, char* argv[] )
 				else
 					fps++;
 			}
+
+			threadPool.unload();
 
 			LOG_INFO( "Waiting for update thread to finish." );
 			WaitForSingleObject( updateThread, INFINITE );

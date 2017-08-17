@@ -28,9 +28,6 @@ public:
 		/*if( size >= capacity )
 			expand( capacity * 2 );*/
 
-		if( first < 0 )
-			first = 0;
-
 		last++;
 
 		if( last >= capacity )
@@ -40,6 +37,9 @@ public:
 			expand( capacity * 2 );
 
 		data[last] = item;
+
+		if( first < 0 )
+			first = 0;
 	}
 
 	T dequeue()
@@ -81,14 +81,15 @@ private:
 	{
 		T* temp = new T[newCapacity];
 
-		for( int i=0; i<last-first; i++ )
-			temp[first+i] = data[i];
+		for( int i=0; i<capacity; i++ )
+			temp[i] = data[i];
 
 		delete[] data;
 		data = temp;
 
-		last -= first;
 		first = 0;
+		last = capacity;
+		capacity = newCapacity;
 	}
 
 	T* data;

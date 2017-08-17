@@ -5,7 +5,12 @@
 #define THREAD_POOL_MAX_THREADS 2
 #define THREAD_POOL_TIMEOUT 1000
 
-typedef void (Task)();
+typedef void (Task)( void* args );
+struct Job
+{
+	Task* task;
+	void* args;
+};
 
 class ThreadPool
 {
@@ -13,7 +18,10 @@ public:
 	ThreadPool();
 	~ThreadPool();
 
-	void queueTask( Task* task );
+	void load();
+	void unload();
+
+	void queueWork( const Job& job );
 	void schedule();
 
 private:
@@ -22,7 +30,7 @@ private:
 		int id;
 		bool alive, done;
 		HANDLE signal;
-		Task* task;
+		Job job;
 	};
 
 	static DWORD WINAPI threadWork( LPVOID args );
@@ -30,6 +38,6 @@ private:
 	HANDLE threads[THREAD_POOL_MAX_THREADS];
 	ThreadData data[THREAD_POOL_MAX_THREADS];
 
-	Queue<Task*> tasks;
+	Queue<Job> jobs;
 	int curTask;
 };

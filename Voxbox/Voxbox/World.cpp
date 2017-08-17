@@ -9,16 +9,20 @@ World::~World()
 	unload();
 }
 
-void World::load()
+void World::load( ThreadPool* pool )
 {
+	threadPool = pool;
+
 	regions = new Region[WORLD_REGIONS];
 
 	for( int x=0; x<WORLD_WIDTH; x++ )
 	{
 		for( int z=0; z<WORLD_DEPTH; z++ )
 		{
-			regions[x*WORLD_DEPTH+z].setOffset( glm::vec3( x, 0.0f, z ) );
-			regions[x*WORLD_DEPTH+z].noise( x, z );
+			int index = x * WORLD_DEPTH + z;
+			regions[index].setOffset( glm::vec3( x, 0.0f, z ) );
+			regions[index].noise( x, z );
+			regions[index].queueWork( threadPool );
 		}
 	}
 }
@@ -71,16 +75,6 @@ void World::saveWorld( const char* path )
 	}
 
 	fclose( file );
-}
-
-void World::calculateFaces()
-{
-	LOG_ASSERT( regions != nullptr, "Regions have not been allocated." );
-
-	for( int i=0; i<WORLD_REGIONS; i++ )
-	{
-		regions[i].calculateFaces();
-	}
 }
 
 void World::queueChunks( CoreData* coreData, const Frustum& frustum )

@@ -4,8 +4,10 @@
 #include "Chunk.h"
 #include "Frustum.h"
 #include "Graphics.h"
+#include "ThreadPool.h"
 
 #define REGION_HEIGHT 16
+#define REGION_SLEEP_BETWEEN_CHUNKS Sleep( 500 )
 
 struct ChunkIndex
 {
@@ -20,8 +22,9 @@ public:
 	~Region();
 
 	void upload();
-	void calculateFaces();
+	//void calculateFaces();
 	void noise( int x, int z );
+	void queueWork( ThreadPool* threadPool );
 
 	void loadRegion( FILE* file );
 	void saveRegion( FILE* file );
@@ -34,6 +37,8 @@ public:
 	const glm::vec3& getOffset() const;
 
 private:
+	static void calculateChunk( void* args );
+
 	Chunk* chunks;
 	glm::vec3 offset;
 };

@@ -4,6 +4,15 @@ ThreadPool::ThreadPool()
 	: curTask( 0 )
 {
 	LOG_INFO( "Constructing." );
+}
+
+ThreadPool::~ThreadPool()
+{
+	LOG_INFO( "Destructing." );
+}
+
+void ThreadPool::load()
+{
 	LOG_INFO( "Creating threads." );
 
 	for( int i=0; i<THREAD_POOL_MAX_THREADS; i++ )
@@ -12,42 +21,40 @@ ThreadPool::ThreadPool()
 		data[i].alive = true;
 		data[i].done = true;
 		data[i].signal = CreateSemaphore( NULL, 0, 1, NULL );
-		data[i].task = nullptr;
 		threads[i] = CreateThread( NULL, 0, threadWork, &data[i], 0, NULL );
 	}
 }
 
-ThreadPool::~ThreadPool()
+void ThreadPool::unload()
 {
 	LOG_INFO( "Waiting for threads to finish." );
 
 	for( int i=0; i<THREAD_POOL_MAX_THREADS; i++ )
-	{
 		data[i].alive = false;
-		WaitForSingleObject( threads[i], INFINITE );
-		CloseHandle( threads[i] );
-	}
 
-	LOG_INFO( "Destructing." );
+	WaitForMultipleObjects( THREAD_POOL_MAX_THREADS, threads, TRUE, INFINITE );
+
+	for( int i=0; i<THREAD_POOL_MAX_THREADS; i++ )
+		CloseHandle( threads[i] );
 }
 
-void ThreadPool::queueTask( Task* task )
+void ThreadPool::queueWork( const Job& job)
 {
-	LOG_ASSERT( task != nullptr, "Task's function is nullptr." );
+	LOG_ASSERT( job.task != nullptr, "Job task is nullptr." );
 
-	tasks.enqueue( task );
+	jobs.enqueue( job );
 }
 
 void ThreadPool::schedule()
 {
-	for( int i=0; i<THREAD_POOL_MAX_THREADS && tasks.getSize() > 0; i++ )
+	for( int i=0; i<THREAD_POOL_MAX_THREADS && jobs.getSize() > 0; i++ )
 	{
 		if( data[i].done )
 		{
-			data[i].task = tasks.dequeue();
+			data[i].done = false;
+			data[i].job = jobs.dequeue();
 				
 			ReleaseSemaphore( data[i].signal, 1, NULL );
-			break;
 		}
 	}
 }
@@ -65,9 +72,8 @@ DWORD WINAPI ThreadPool::threadWork( LPVOID args )
 		if( waitResult == WAIT_OBJECT_0 )
 		{
 			LOG_DEBUG( "Thread #%d executing task.", data->id );
-			data->done = false;
 
-			data->task();
+			data->job.task( data->job.args );
 
 			data->done = true;
 		}

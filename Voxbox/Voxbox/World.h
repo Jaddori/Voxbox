@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Region.h"
+#include "ThreadPool.h"
 
 #define WORLD_WIDTH 2
 #define WORLD_DEPTH 2
@@ -18,14 +19,14 @@ public:
 	World();
 	~World();
 
-	void load();
+	void load( ThreadPool* threadPool );
 	void unload();
 	void upload();
 
 	void loadWorld( const char* path );
 	void saveWorld( const char* path );
 
-	void calculateFaces();
+	//void calculateFaces();
 	void queueChunks( CoreData* coreData, const Frustum& frustum );
 
 	float hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, RegionIndex& regionIndex );
@@ -42,4 +43,5 @@ public:
 
 private:
 	Region* regions;
+	ThreadPool* threadPool;
 };

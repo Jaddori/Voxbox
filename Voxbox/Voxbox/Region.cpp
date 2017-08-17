@@ -21,7 +21,7 @@ void Region::upload()
 	}
 }
 
-void Region::calculateFaces()
+/*void Region::calculateFaces()
 {
 	for( int i=0; i<REGION_HEIGHT; i++ )
 	{
@@ -30,7 +30,7 @@ void Region::calculateFaces()
 			chunks[i].calculateFaces();
 		}
 	}
-}
+}*/
 
 void Region::noise( int noiseX, int noiseZ )
 {
@@ -74,6 +74,15 @@ void Region::noise( int noiseX, int noiseZ )
 	}
 }
 
+void Region::queueWork( ThreadPool* threadPool )
+{
+	for( int i=0; i<REGION_HEIGHT; i++ )
+	{
+		Job job = { calculateChunk, &chunks[i] };
+		threadPool->queueWork( job );
+	}
+}
+
 void Region::loadRegion( FILE* file )
 {
 	for( int i=0; i<REGION_HEIGHT; i++ )
@@ -101,7 +110,7 @@ void Region::queueChunks( CoreData* coreData, const Frustum& frustum )
 		{
 			coreData->debugShapes->addAABB( { minPosition, maxPosition, glm::vec4( 1.0f, 0.0f, 0.0f, 1.0f ) } );
 
-			if( frustum.aabbCollision( minPosition, maxPosition ) )
+			if( chunks[i].getUploaded() && frustum.aabbCollision( minPosition, maxPosition ) )
 			{
 				coreData->graphics->queueChunk( &chunks[i] );
 				coreData->debugShapes->addSphere( chunks[i].dbg );
@@ -154,4 +163,13 @@ void Region::setOffset( const glm::vec3& o )
 const glm::vec3& Region::getOffset() const
 {
 	return offset;
+}
+
+void Region::calculateChunk( void* args )
+{
+	Chunk* chunk = (Chunk*)args;
+
+	REGION_SLEEP_BETWEEN_CHUNKS;
+
+	chunk->calculateFaces();
 }
