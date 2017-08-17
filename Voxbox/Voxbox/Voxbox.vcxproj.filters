@@ -26,6 +26,9 @@
     <Filter Include="Source Files\Lua">
       <UniqueIdentifier>{6a94925c-6b8e-44dd-93f4-66ae8b7b5632}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Threading">
+      <UniqueIdentifier>{a43cd33b-3780-4194-8332-9f7b80d5b17e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -96,6 +99,9 @@
     </ClCompile>
     <ClCompile Include="LuaCore.cpp">
       <Filter>Source Files\Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadPool.cpp">
+      <Filter>Source Files\Threading</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -182,6 +188,12 @@
     </ClInclude>
     <ClInclude Include="LuaCore.h">
       <Filter>Source Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadPool.h">
+      <Filter>Source Files\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Queue.h">
+      <Filter>Source Files\Threading</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -9,6 +9,7 @@
 #include "CoreData.h"
 #include "LuaBinds.h"
 #include "Assets.h"
+#include "ThreadPool.h"
 
 #define THREAD_UPDATE_WAIT 1000
 
@@ -62,6 +63,15 @@ DWORD WINAPI update( LPVOID args )
 	}
 
 	return 0;
+}
+
+void wasteTime()
+{
+	LOG_DEBUG( "Starting to waste time." );
+
+	Sleep( 2000 );
+
+	LOG_DEBUG( "Done wasting time" );
 }
 
 int main( int argc, char* argv[] )
@@ -133,6 +143,8 @@ int main( int argc, char* argv[] )
 			threadData.renderDone = CreateSemaphore( NULL, 1, 1, NULL );
 			HANDLE updateThread = CreateThread( NULL, 0, update, &threadData, 0, NULL );
 
+			ThreadPool threadPool;
+
 			long fpsTimer = SDL_GetTicks();
 			int fps = 0;
 
@@ -152,12 +164,19 @@ int main( int argc, char* argv[] )
 						input.update( &e );
 					}
 
+					if( input.keyReleased( 'F'-'A'+4 ) )
+					{
+						threadPool.queueTask( wasteTime );
+					}
+
 					// finalize objects
 					assets.upload();
 					graphics.finalize();
 					debugShapes.finalize();
 
 					world.upload();
+
+					threadPool.schedule();
 
 					ReleaseSemaphore( threadData.renderDone, 1, NULL );
 				}
