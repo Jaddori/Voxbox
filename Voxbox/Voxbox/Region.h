@@ -24,7 +24,7 @@ public:
 	void noise( int x, int z );
 
 	void queueChunks( CoreData* coreData, const Frustum& frustum );
-	bool hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, ChunkIndex& chunkIndex );
+	float hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, ChunkIndex& chunkIndex );
 
 	void setOffset( const glm::vec3& offset );
 

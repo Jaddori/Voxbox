@@ -101,9 +101,9 @@ void Region::queueChunks( CoreData* coreData, const Frustum& frustum )
 	}
 }
 
-bool Region::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, ChunkIndex& chunkIndex )
+float Region::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, ChunkIndex& chunkIndex )
 {
-	bool result = false;
+	float result = -1.0f;
 
 	glm::vec3 minPosition = offset * (float)CHUNK_SIZE;
 	glm::vec3 maxPosition = minPosition + glm::vec3( CHUNK_SIZE, CHUNK_SIZE*REGION_HEIGHT, CHUNK_SIZE );
@@ -120,23 +120,15 @@ bool Region::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, Chunk
 			BlockIndex tempIndex = {};
 			if( chunks[i].hitBlock( rayStart, rayEnd, tempIndex ) )
 			{
-				/*float distance = glm::distance( rayStart, tempLocation );
-				if( distance < minDistance )
-				{
-					distance = minDistance;
-					location = tempLocation;
-				}*/
-
 				glm::vec3 blockPosition = glm::vec3( tempIndex.x, tempIndex.y, tempIndex.z ) + chunks[i].getOffset() * (float)CHUNK_SIZE;
 				float distance = glm::distance( rayStart, blockPosition );
-				if( distance < minDistance )
+				if( distance > 0.0f && distance < minDistance )
 				{
-					distance = minDistance;
+					minDistance = distance;
+					result = distance;
 					chunkIndex.block = tempIndex;
 					chunkIndex.chunk = i;
 				}
-
-				result = true;
 			}
 
 			minPosition.y += CHUNK_SIZE;

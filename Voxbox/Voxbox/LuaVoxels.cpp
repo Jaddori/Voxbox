@@ -43,9 +43,9 @@ namespace LuaVoxels
 
 		// set result
 		RegionIndex regionIndex;
-		bool didHit = g_coreData->world->hitBlock( rayStart, rayEnd, regionIndex );
+		float hitLength = g_coreData->world->hitBlock( rayStart, rayEnd, regionIndex );
 
-		if( didHit )
+		if( hitLength > 0.0f )
 		{
 			lua_setnumber( lua, 3, 1, regionIndex.chunkIndex.block.x );
 			lua_setnumber( lua, 3, 2, regionIndex.chunkIndex.block.y );
@@ -53,9 +53,10 @@ namespace LuaVoxels
 
 			lua_setnumber( lua, 3, "chunk", regionIndex.chunkIndex.chunk );
 			lua_setnumber( lua, 3, "region", regionIndex.region );
+			lua_setnumber( lua, 3, "length", hitLength );
 		}
 
-		lua_pushboolean( lua, didHit );
+		lua_pushboolean( lua, ( hitLength > 0.0f ) );
 		return 1;
 	}
 }

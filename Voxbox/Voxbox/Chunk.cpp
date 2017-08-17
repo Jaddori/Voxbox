@@ -248,9 +248,9 @@ void Chunk::render()
 	glBindVertexArray( 0 );
 }
 
-bool Chunk::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, BlockIndex& blockIndex )
+float Chunk::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, BlockIndex& blockIndex )
 {
-	bool result = false;
+	float result = -1.0f;
 
 	glm::vec3 minPosition = offset * (float)CHUNK_SIZE;
 	glm::vec3 maxPosition = minPosition + glm::vec3( CHUNK_SIZE );
@@ -274,7 +274,7 @@ bool Chunk::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, BlockI
 		clampInt( y, 0, CHUNK_SIZE-1 );
 		clampInt( z, 0, CHUNK_SIZE-1 );
 
-		while( !result &&
+		while( result < 0.0f &&
 				x >= 0 && x < CHUNK_SIZE &&
 				y >= 0 && y < CHUNK_SIZE &&
 				z >= 0 && z < CHUNK_SIZE )
@@ -286,7 +286,11 @@ bool Chunk::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, BlockI
 				blockIndex.y = y;
 				blockIndex.z = z;
 
-				result = true;
+				glm::vec3 blockCenter = glm::vec3( x, y, z ) + offset * (float)CHUNK_SIZE;
+				glm::vec3 closestPoint;
+				projectVector( rayEnd-rayStart, blockCenter-rayStart, closestPoint );
+
+				result = glm::length( closestPoint );
 			}
 			else
 			{

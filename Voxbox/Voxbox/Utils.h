@@ -24,3 +24,9 @@ inline void clampInt( int& value, int minValue, int maxValue )
 	else if( value > maxValue )
 		value = maxValue;
 }
+
+inline void projectVector( const glm::vec3& onto, const glm::vec3& v, glm::vec3& result )
+{
+	float ontoLength = glm::length( onto );
+	result = ( glm::dot( v, onto ) / ( ontoLength * ontoLength ) ) * onto;
+}

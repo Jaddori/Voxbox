@@ -41,7 +41,7 @@ public:
 	void noise( int x, int z );
 	void render();
 
-	bool hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, BlockIndex& blockIndex );
+	float hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, BlockIndex& blockIndex );
 
 	void setBlock( int x, int y, int z, uint8_t value );
 	void setOffset( const glm::vec3& offset );

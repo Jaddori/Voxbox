@@ -57,15 +57,21 @@ void World::queueChunks( CoreData* coreData, const Frustum& frustum )
 	}
 }
 
-bool World::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, RegionIndex& regionIndex )
+float World::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, RegionIndex& regionIndex )
 {
-	bool result = false;
+	float result = -1.0f;
 
-	for( int i=0; i<WORLD_REGIONS && !result; i++ )
+	float minDistance = CAMERA_FAR + 10.0f;
+	for( int i=0; i<WORLD_REGIONS; i++ )
 	{
-		result = regions[i].hitBlock( rayStart, rayEnd, regionIndex.chunkIndex );
-		if( result )
+		float distance = regions[i].hitBlock( rayStart, rayEnd, regionIndex.chunkIndex );
+		if( distance > 0.0f && distance < minDistance )
+		{
+			result = distance;
+			minDistance = distance;
+
 			regionIndex.region = i;
+		}
 	}
 
 	return result;

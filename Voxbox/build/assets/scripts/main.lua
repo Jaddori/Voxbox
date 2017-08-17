@@ -1,3 +1,4 @@
+require( "./assets/scripts/utils" )
 require( "./assets/scripts/worker" )
 require( "./assets/scripts/console" )
 require( "./assets/scripts/camera" )
@@ -34,8 +35,7 @@ function mainUpdate()
 		if World.hitBlock( rayStart, rayEnd, blockLocation ) then
 			--workers[1].position = blockLocation
 			
-			local str = "Hit block: " .. tostring(blockLocation[1]) .. "," .. tostring(blockLocation[2]) .. "," .. tostring(blockLocation[3]) .. ", (" .. tostring(blockLocation.chunk) .. "," .. tostring(blockLocation.region) .. ")"
-			Log.log( VERBOSITY_DEBUG, str )
+			printBlockLocation( blockLocation )
 		end
 		
 		haveRay = true

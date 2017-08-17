@@ -25,7 +25,7 @@ public:
 	void calculateFaces();
 	void queueChunks( CoreData* coreData, const Frustum& frustum );
 
-	bool hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, RegionIndex& regionIndex );
+	float hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, RegionIndex& regionIndex );
 
 	Region& getRegion( int x, int z );
 	Region* getRegions();
