@@ -20,4 +20,5 @@ namespace LuaDebug
 	int addSphere( lua_State* lua );
 	int addAABB( lua_State* lua );
 	int addOBB( lua_State* lua );
+	int ignoreDepth( lua_State* lua );
 };

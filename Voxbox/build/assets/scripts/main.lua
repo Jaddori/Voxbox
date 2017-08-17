@@ -24,8 +24,11 @@ function mainUnload()
 end
 
 function mainUpdate()
-	camera:update()
 	console:update()
+	
+	if not console.visible then
+		camera:update()
+	end
 	
 	workers[1]:update()
 	

@@ -1,6 +1,7 @@
 #include "DebugShapes.h"
 
 DebugShapes::DebugShapes()
+	: ignoreDepth( false )
 {
 	LOG_INFO( "Constructing." );
 }
@@ -164,6 +165,9 @@ void DebugShapes::unload()
 
 void DebugShapes::render( const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix )
 {
+	if( ignoreDepth )
+		glDisable( GL_DEPTH_TEST );
+
 	const int LINE_COUNT = lines.getRead().getSize();
 	const int SPHERE_COUNT = spheres.getRead().getSize();
 	const int AABB_COUNT = AABBs.getRead().getSize();
@@ -192,19 +196,6 @@ void DebugShapes::render( const glm::mat4& projectionMatrix, const glm::mat4& vi
 		}
 	}
 
-	/*if( NUM_SPHERES > 0 )
-	{
-		glBindVertexArray( sphereVAO );
-		glBindBuffer( GL_ARRAY_BUFFER, sphereVBO );
-		glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(DebugSphere)*NUM_SPHERES, spheres.getRead().getData() );
-
-		sphereShader.bind();
-		sphereShader.setMat4( sphereProjectionMatrixLocation, projectionMatrix );
-		sphereShader.setMat4( sphereViewMatrixLocation, viewMatrix );
-
-		glDrawArrays( GL_POINTS, 0, NUM_SPHERES );
-	}*/
-
 	if( SPHERE_COUNT > 0 )
 	{
 		sphereShader.bind();
@@ -228,19 +219,6 @@ void DebugShapes::render( const glm::mat4& projectionMatrix, const glm::mat4& vi
 		}
 	}
 
-	/*if( NUM_AABB > 0 )
-	{
-		glBindVertexArray( aabbVAO );
-		glBindBuffer( GL_ARRAY_BUFFER, aabbVBO );
-		glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(DebugAABB)*NUM_AABB, AABBs.getRead().getData() );
-
-		aabbShader.bind();
-		aabbShader.setMat4( aabbProjectionMatrixLocation, projectionMatrix );
-		aabbShader.setMat4( aabbViewMatrixLocation, viewMatrix );
-
-		glDrawArrays( GL_POINTS, 0, NUM_AABB );
-	}*/
-
 	if( AABB_COUNT > 0 )
 	{
 		aabbShader.bind();
@@ -263,19 +241,6 @@ void DebugShapes::render( const glm::mat4& projectionMatrix, const glm::mat4& vi
 			offset += count;
 		}
 	}
-
-	/*if( NUM_OBB > 0 )
-	{
-		glBindVertexArray( obbVAO );
-		glBindBuffer( GL_ARRAY_BUFFER, obbVBO );
-		glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(DebugOBB)*NUM_OBB, OBBs.getRead().getData() );
-
-		obbShader.bind();
-		obbShader.setMat4( obbProjectionMatrixLocation, projectionMatrix );
-		obbShader.setMat4( obbViewMatrixLocation, viewMatrix );
-
-		glDrawArrays( GL_POINTS, 0, NUM_OBB );
-	}*/
 
 	if( OBB_COUNT > 0 )
 	{
@@ -302,6 +267,9 @@ void DebugShapes::render( const glm::mat4& projectionMatrix, const glm::mat4& vi
 
 	// reset
 	glBindVertexArray( 0 );
+
+	if( ignoreDepth )
+		glEnable( GL_DEPTH_TEST );
 }
 
 void DebugShapes::finalize()
@@ -335,4 +303,14 @@ void DebugShapes::addAABB( const DebugAABB& aabb )
 void DebugShapes::addOBB( const DebugOBB& obb )
 {
 	OBBs.getWrite().add( obb );
+}
+
+void DebugShapes::setIgnoreDepth( bool ignore )
+{
+	ignoreDepth = ignore;
+}
+
+bool DebugShapes::getIgnoreDepth() const
+{
+	return ignoreDepth;
 }

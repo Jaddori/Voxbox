@@ -39,10 +39,11 @@ namespace LuaDebug
 		luaL_newmetatable( lua, "debugShapesMeta" );
 		luaL_Reg debugShapesRegs[] =
 		{
-			{ "addLine",	addLine },
-			{ "addSphere",	addSphere },
-			{ "addAABB",	addAABB },
-			{ "addOBB",		addOBB },
+			{ "addLine",		addLine },
+			{ "addSphere",		addSphere },
+			{ "addAABB",		addAABB },
+			{ "addOBB",			addOBB },
+			{ "ignoreDepth",	ignoreDepth },
 			{ NULL, NULL }
 		};
 
@@ -219,6 +220,25 @@ namespace LuaDebug
 		lua_getvec4( lua, 6, color );
 
 		g_coreData->debugShapes->addOBB( { position, xAxis, yAxis, zAxis, extents, color } );
+
+		return 0;
+	}
+
+	int ignoreDepth( lua_State* lua )
+	{
+		int args = lua_gettop( lua );
+
+		LOG_ASSERT( args <= 1, "Expected less than 2 arguments. Got %d.", args );
+
+		bool ignore = true;
+		if( args == 1 )
+		{
+			LUA_EXPECT_BOOL( 1 );
+
+			ignore = lua_tobool( lua, 1 );
+		}
+
+		g_coreData->debugShapes->setIgnoreDepth( ignore );
 
 		return 0;
 	}

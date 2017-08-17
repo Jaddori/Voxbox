@@ -57,11 +57,16 @@ public:
 	void addAABB( const DebugAABB& aabb );
 	void addOBB( const DebugOBB& obb );
 
+	void setIgnoreDepth( bool ignore );
+
+	bool getIgnoreDepth() const;
+
 private:
 	SwapArray<DebugLine> lines;
 	SwapArray<DebugSphere> spheres;
 	SwapArray<DebugAABB> AABBs;
 	SwapArray<DebugOBB> OBBs;
+	bool ignoreDepth;
 
 	// line
 	Shader lineShader;

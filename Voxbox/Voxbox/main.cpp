@@ -12,19 +12,6 @@
 
 #define THREAD_UPDATE_WAIT 1000
 
-DWORD WINAPI generateChunks( LPVOID args )
-{
-	CoreData* data = (CoreData*)args;
-
-	LOG_INFO( "Starting chunk generation thread." );
-
-	data->world->calculateFaces();
-
-	LOG_INFO( "Chunk generation thread finished." );
-
-	return 0;
-}
-
 struct ThreadData
 {
 	CoreData* coreData;
@@ -64,33 +51,7 @@ DWORD WINAPI update( LPVOID args )
 				world.calculateFaces();
 			}
 
-			/*if( input.buttonDown( SDL_BUTTON_MIDDLE ) )
-			{
-				Point mousePosition = input.getMousePosition();
-				glm::vec3 rayStart, rayEnd;
-				perspectiveCamera.unproject( mousePosition, 0.0f, rayStart );
-				perspectiveCamera.unproject( mousePosition, 1.0f, rayEnd );
-
-				glm::vec3 blockLocation;
-				if( world.hitBlock( rayStart, rayEnd, blockLocation ) )
-				{
-					LOG_DEBUG( "Hit block (%f,%f,%f).", blockLocation.x, blockLocation.y, blockLocation.z );
-				}
-			}*/
-
 			const Frustum& frustum = perspectiveCamera.getFrustum();
-
-			/*for( int x=0; x<REGION_WIDTH; x++ )
-			{
-				for( int z=0; z<REGION_DEPTH; z++ )
-				{
-					if( regions[x*REGION_DEPTH+z].getUploaded() )
-					{
-						regions[x*REGION_DEPTH+z].queueChunks( graphics, frustum, debugShapes );
-					}
-				}
-			}*/
-
 			world.queueChunks( data->coreData, frustum );
 
 			luaBinds.update();
@@ -141,17 +102,6 @@ int main( int argc, char* argv[] )
 			graphics.load( &assets );
 			graphics.getPerspectiveCamera().setPosition( glm::vec3( 0.0f, 0.0f, -10.0f ) );
 
-			/*Region* regions = new Region[NUM_REGIONS];
-
-			for( int x=0; x<REGION_WIDTH; x++ )
-			{
-				for( int z=0; z<REGION_DEPTH; z++ )
-				{
-					regions[x*REGION_WIDTH+z].setOffset( glm::vec3( x, 0.0f, z ) );
-					regions[x*REGION_WIDTH+z].noise( x, z );
-				}
-			}*/
-
 			World world;
 			world.load();
 			world.calculateFaces();
@@ -166,8 +116,6 @@ int main( int argc, char* argv[] )
 			CoreData coreData;
 			coreData.perspectiveCamera = &graphics.getPerspectiveCamera();
 			coreData.input = &input;
-			//coreData.chunks = chunks;
-			//coreData.regions = regions;
 			coreData.world = &world;
 			coreData.graphics = &graphics;
 			coreData.debugShapes = &debugShapes;
@@ -184,8 +132,6 @@ int main( int argc, char* argv[] )
 			threadData.updateDone = CreateSemaphore( NULL, 0, 1, NULL );
 			threadData.renderDone = CreateSemaphore( NULL, 1, 1, NULL );
 			HANDLE updateThread = CreateThread( NULL, 0, update, &threadData, 0, NULL );
-
-			//HANDLE generationThread = CreateThread( NULL, 0, generateChunks, &coreData, 0, NULL );
 
 			long fpsTimer = SDL_GetTicks();
 			int fps = 0;
@@ -211,14 +157,6 @@ int main( int argc, char* argv[] )
 					graphics.finalize();
 					debugShapes.finalize();
 
-					/*for( int i=0; i<NUM_REGIONS; i++ )
-					{
-						if( regions[i].getValid() && !regions[i].getUploaded() )
-						{
-							regions[i].upload();
-						}
-					}*/
-
 					world.upload();
 
 					ReleaseSemaphore( threadData.renderDone, 1, NULL );
@@ -228,10 +166,9 @@ int main( int argc, char* argv[] )
 				glClearColor( 0.15f, 0.15f, 0.15f, 0.0f );
 				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-				debugShapes.render( graphics.getPerspectiveCamera().getProjectionMatrix(), graphics.getPerspectiveCamera().getViewMatrix() );
-
-				//console.render( &graphics );
 				graphics.render();
+
+				debugShapes.render( graphics.getPerspectiveCamera().getProjectionMatrix(), graphics.getPerspectiveCamera().getViewMatrix() );
 
 				SDL_GL_SwapWindow( window );
 
