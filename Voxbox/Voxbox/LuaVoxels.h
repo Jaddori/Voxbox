@@ -17,4 +17,6 @@ namespace LuaVoxels
 	int hitBlock( lua_State* lua );
 	int localToWorld( lua_State* lua );
 	int worldToLocal( lua_State* lua );
+	int loadWorld( lua_State* lua );
+	int saveWorld( lua_State* lua );
 }

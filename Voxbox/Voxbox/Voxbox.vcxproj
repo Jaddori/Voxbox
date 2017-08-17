@@ -157,6 +157,7 @@
     <ClCompile Include="LuaAssets.cpp" />
     <ClCompile Include="LuaBinds.cpp" />
     <ClCompile Include="LuaCamera.cpp" />
+    <ClCompile Include="LuaCore.cpp" />
     <ClCompile Include="LuaDebug.cpp" />
     <ClCompile Include="LuaInput.cpp" />
     <ClCompile Include="LuaRendering.cpp" />
@@ -184,6 +185,7 @@
     <ClInclude Include="LuaAssets.h" />
     <ClInclude Include="LuaBinds.h" />
     <ClInclude Include="LuaCamera.h" />
+    <ClInclude Include="LuaCore.h" />
     <ClInclude Include="LuaDebug.h" />
     <ClInclude Include="LuaInput.h" />
     <ClInclude Include="LuaRendering.h" />

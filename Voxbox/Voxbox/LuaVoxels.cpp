@@ -17,6 +17,8 @@ namespace LuaVoxels
 			{ "hitBlock",		hitBlock },
 			{ "localToWorld",	localToWorld },
 			{ "worldToLocal",	worldToLocal },
+			{ "loadWorld",		loadWorld },
+			{ "saveWorld",		saveWorld },
 			{ NULL, NULL }
 		};
 
@@ -120,6 +122,30 @@ namespace LuaVoxels
 		lua_setnumber( lua, 2, "chunk", regionIndex.chunkIndex.chunk );
 		lua_setnumber( lua, 2, "region", regionIndex.region );
 		lua_setnumber( lua, 2, "length", 0.0f );
+
+		return 0;
+	}
+
+	int loadWorld( lua_State* lua )
+	{
+		LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_STRING( 1 );
+
+		// get path
+		const char* path = lua_tostring( lua, 1 );
+		g_coreData->world->loadWorld( path );
+
+		return 0;
+	}
+
+	int saveWorld( lua_State* lua )
+	{
+		LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_STRING( 1 );
+
+		// get path
+		const char* path = lua_tostring( lua, 1 );
+		g_coreData->world->saveWorld( path );
 
 		return 0;
 	}

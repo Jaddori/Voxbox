@@ -8,6 +8,7 @@
 #include "LuaRendering.h"
 #include "LuaCamera.h"
 #include "LuaVoxels.h"
+#include "LuaCore.h"
 
 #define LUA_MAIN_SCRIPT "./assets/scripts/main.lua"
 

@@ -74,6 +74,18 @@ void Region::noise( int noiseX, int noiseZ )
 	}
 }
 
+void Region::loadRegion( FILE* file )
+{
+	for( int i=0; i<REGION_HEIGHT; i++ )
+		chunks[i].loadChunk( file );
+}
+
+void Region::saveRegion( FILE* file )
+{
+	for( int i=0; i<REGION_HEIGHT; i++ )
+		chunks[i].saveChunk( file );
+}
+
 void Region::queueChunks( CoreData* coreData, const Frustum& frustum )
 {
 	glm::vec3 minPosition = offset * (float)CHUNK_SIZE;

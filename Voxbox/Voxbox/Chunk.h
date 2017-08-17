@@ -41,6 +41,9 @@ public:
 	void noise( int x, int z );
 	void render();
 
+	void loadChunk( FILE* file );
+	void saveChunk( FILE* file );
+
 	float hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, BlockIndex& blockIndex );
 
 	void setBlock( int x, int y, int z, uint8_t value );

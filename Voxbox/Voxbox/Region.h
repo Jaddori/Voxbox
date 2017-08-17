@@ -23,6 +23,9 @@ public:
 	void calculateFaces();
 	void noise( int x, int z );
 
+	void loadRegion( FILE* file );
+	void saveRegion( FILE* file );
+
 	void queueChunks( CoreData* coreData, const Frustum& frustum );
 	float hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, ChunkIndex& chunkIndex );
 

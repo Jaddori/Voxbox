@@ -22,6 +22,9 @@ public:
 	void unload();
 	void upload();
 
+	void loadWorld( const char* path );
+	void saveWorld( const char* path );
+
 	void calculateFaces();
 	void queueChunks( CoreData* coreData, const Frustum& frustum );
 

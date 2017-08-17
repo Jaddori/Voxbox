@@ -248,6 +248,16 @@ void Chunk::render()
 	glBindVertexArray( 0 );
 }
 
+void Chunk::loadChunk( FILE* file )
+{
+	fread( blocks, sizeof(blocks[0]), CHUNK_VOLUME, file );
+}
+
+void Chunk::saveChunk( FILE* file )
+{
+	fwrite( blocks, sizeof(blocks[0]), CHUNK_VOLUME, file );
+}
+
 float Chunk::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, BlockIndex& blockIndex )
 {
 	float result = -1.0f;

@@ -39,6 +39,40 @@ void World::upload()
 	}
 }
 
+void World::loadWorld( const char* path )
+{
+	LOG_ASSERT( regions != nullptr, "Regions have not been allocated." );
+
+	FILE* file = fopen( path, "rb" );
+	LOG_ASSERT( file != NULL, "Failed to open \"%s\".", path );
+
+	LOG_INFO( "Saving world to %s.", path );
+
+	for( int i=0; i<WORLD_REGIONS; i++ )
+	{
+		regions[i].loadRegion( file );
+	}
+
+	fclose( file );
+}
+
+void World::saveWorld( const char* path )
+{
+	LOG_ASSERT( regions != nullptr, "Regions have not been allocated." );
+
+	FILE* file = fopen( path, "wb" );
+	LOG_ASSERT( file != NULL, "Failed to open \"%s\".", path );
+
+	LOG_INFO( "Loading world from %s.", path );
+
+	for( int i=0; i<WORLD_REGIONS; i++ )
+	{
+		regions[i].saveRegion( file );
+	}
+
+	fclose( file );
+}
+
 void World::calculateFaces()
 {
 	LOG_ASSERT( regions != nullptr, "Regions have not been allocated." );
