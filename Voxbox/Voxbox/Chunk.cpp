@@ -281,7 +281,6 @@ float Chunk::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, Block
 		{
 			if( block( x, y, z ) > 0 )
 			{
-				//location = glm::vec3( x, y, z ) + offset * (float)CHUNK_SIZE;
 				blockIndex.x = x;
 				blockIndex.y = y;
 				blockIndex.z = z;

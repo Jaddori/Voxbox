@@ -113,26 +113,18 @@ float Region::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, Chun
 	if( inside( rayStart, minPosition, maxPosition ) || 
 		rayCheck( rayStart, rayEnd, minPosition, maxPosition ) )
 	{
-		maxPosition = minPosition + glm::vec3( CHUNK_SIZE );
-
 		for( int i=0; i<REGION_HEIGHT; i++ )
 		{
-			BlockIndex tempIndex = {};
-			if( chunks[i].hitBlock( rayStart, rayEnd, tempIndex ) )
+			BlockIndex tempIndex = { -1, -1, -1 };
+			float distance = chunks[i].hitBlock( rayStart, rayEnd, tempIndex );
+			if( distance > 0.0f && distance < minDistance )
 			{
-				glm::vec3 blockPosition = glm::vec3( tempIndex.x, tempIndex.y, tempIndex.z ) + chunks[i].getOffset() * (float)CHUNK_SIZE;
-				float distance = glm::distance( rayStart, blockPosition );
-				if( distance > 0.0f && distance < minDistance )
-				{
-					minDistance = distance;
-					result = distance;
-					chunkIndex.block = tempIndex;
-					chunkIndex.chunk = i;
-				}
-			}
+				minDistance = distance;
+				result = distance;
 
-			minPosition.y += CHUNK_SIZE;
-			maxPosition.y += CHUNK_SIZE;
+				chunkIndex.block = tempIndex;
+				chunkIndex.chunk = i;
+			}
 		}
 	}
 

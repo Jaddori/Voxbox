@@ -64,12 +64,14 @@ float World::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, Regio
 	float minDistance = CAMERA_FAR + 10.0f;
 	for( int i=0; i<WORLD_REGIONS; i++ )
 	{
-		float distance = regions[i].hitBlock( rayStart, rayEnd, regionIndex.chunkIndex );
+		ChunkIndex tempIndex = { -1, -1, -1, -1 };
+		float distance = regions[i].hitBlock( rayStart, rayEnd, tempIndex );
 		if( distance > 0.0f && distance < minDistance )
 		{
 			result = distance;
 			minDistance = distance;
 
+			regionIndex.chunkIndex = tempIndex;
 			regionIndex.region = i;
 		}
 	}
