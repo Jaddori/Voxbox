@@ -27,6 +27,13 @@ public:
 
 	float hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, RegionIndex& regionIndex );
 
+	void localToWorld( const RegionIndex& region, BlockIndex& block );
+	void worldToLocal( int x, int y, int z, RegionIndex& index );
+	inline void worldToLocal( const BlockIndex& block, RegionIndex& index )
+	{
+		worldToLocal( block.x, block.y, block.z, index );
+	}
+
 	Region& getRegion( int x, int z );
 	Region* getRegions();
 

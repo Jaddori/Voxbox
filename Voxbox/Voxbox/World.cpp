@@ -77,6 +77,37 @@ float World::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, Regio
 	return result;
 }
 
+void World::localToWorld( const RegionIndex& region, BlockIndex& block )
+{
+	int regionX = region.region / WORLD_WIDTH;
+	int regionZ = region.region % WORLD_DEPTH;
+
+	block.x = region.chunkIndex.block.x + regionX * CHUNK_SIZE;
+	block.z = region.chunkIndex.block.z + regionZ * CHUNK_SIZE;
+
+	block.y = region.chunkIndex.block.y + region.chunkIndex.chunk * CHUNK_SIZE;
+}
+
+void World::worldToLocal( int x, int y, int z, RegionIndex& index )
+{
+	LOG_ASSERT( x >= 0 && x < CHUNK_SIZE * WORLD_WIDTH, "X index out of world range." );
+	LOG_ASSERT( y >= 0 && y < CHUNK_SIZE * REGION_HEIGHT, "Y index out of world range." );
+	LOG_ASSERT( z >= 0 && z < CHUNK_SIZE * WORLD_DEPTH, "Z index out of world range." );
+
+	// transform to chunk index
+	int chunkX = x / CHUNK_SIZE;
+	int chunkY = y / CHUNK_SIZE;
+	int chunkZ = z / CHUNK_SIZE;
+
+	index.region = chunkX*WORLD_DEPTH+chunkZ;
+	index.chunkIndex.chunk = chunkY;
+
+	// transform to block index
+	index.chunkIndex.block.x = x % CHUNK_SIZE;
+	index.chunkIndex.block.y = y % CHUNK_SIZE;
+	index.chunkIndex.block.z = z % CHUNK_SIZE;
+}
+
 Region& World::getRegion( int x, int z )
 {
 	LOG_ASSERT( x >= 0 && x < WORLD_WIDTH, "x index out of range." );
