@@ -6,8 +6,7 @@
 #include "Graphics.h"
 #include "ThreadPool.h"
 
-#define REGION_HEIGHT 16
-#define REGION_SLEEP_BETWEEN_CHUNKS Sleep( 500 )
+#define REGION_HEIGHT 6
 
 struct ChunkIndex
 {
@@ -21,6 +20,7 @@ public:
 	Region();
 	~Region();
 
+	void load( ThreadPool* threadPool );
 	void upload();
 	//void calculateFaces();
 	void noise( int x, int z );
@@ -32,6 +32,7 @@ public:
 	void queueChunks( CoreData* coreData, const Frustum& frustum );
 	float hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, ChunkIndex& chunkIndex );
 
+	void setBlock( const ChunkIndex& index, uint8_t value );
 	void setOffset( const glm::vec3& offset );
 
 	const glm::vec3& getOffset() const;
@@ -41,4 +42,6 @@ private:
 
 	Chunk* chunks;
 	glm::vec3 offset;
+
+	ThreadPool* threadPool;
 };

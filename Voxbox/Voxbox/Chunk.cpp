@@ -3,7 +3,7 @@
 Chunk::Chunk()
 	: vao( 0 ), vbo( 0 ), ibo( 0 ),
 	vertices( nullptr ), indices( nullptr ),
-	valid( false ), uploaded( false )
+	valid( false ), uploaded( false ), dirty( false )
 {
 	memset( blocks, 0, CHUNK_VOLUME );
 #if 0
@@ -14,9 +14,6 @@ Chunk::Chunk()
 		blocks[at( 5, y, 5 )] = y % 3;
 	}
 #endif
-
-	dbg.radius = 2.0f;
-	dbg.color = glm::vec4( 0.0f, 0.0f, 1.0f, 1.0f );
 }
 
 Chunk::~Chunk()
@@ -76,67 +73,71 @@ void Chunk::unload()
 
 void Chunk::calculateFaces()
 {
-	if( vertices == nullptr )
+	if( dirty )
 	{
-		vertices = new Vertex[CHUNK_VOLUME*24];
-		indices = new GLuint[CHUNK_VOLUME*36];
-	}
-
-	numVertices = 0;
-	numIndices = 0;
-	for( int y=0; y<CHUNK_SIZE; y++ )
-	{
-		for( int z=0; z<CHUNK_SIZE; z++ )
+		if( vertices == nullptr )
 		{
-			for( int x=0; x<CHUNK_SIZE; x++ )
+			vertices = new Vertex[CHUNK_VOLUME*24];
+			indices = new GLuint[CHUNK_VOLUME*36];
+		}
+
+		numVertices = 0;
+		numIndices = 0;
+		for( int y=0; y<CHUNK_SIZE; y++ )
+		{
+			for( int z=0; z<CHUNK_SIZE; z++ )
 			{
-				uint8_t type = block( x, y, z );
-				if( type > 0 )
+				for( int x=0; x<CHUNK_SIZE; x++ )
 				{
-					glm::vec2 uvOrigin( (float)(type % 10)*0.1f, (float)(type / 10)*0.1f );
-
-					// front
-					if( z == 0 || block( x, y, z-1 ) == 0 )
+					uint8_t type = block( x, y, z );
+					if( type > 0 )
 					{
-						addHorizontalFace( glm::vec3( x, y, z ), glm::vec3( 1.0f, 0.0f, 0.0f ), uvOrigin+CHUNK_FRONT_UV, false );
-					}
+						glm::vec2 uvOrigin( (float)(type % 10)*0.1f, (float)(type / 10)*0.1f );
 
-					// back
-					if( z == CHUNK_SIZE-1 || block( x, y, z+1 ) == 0 )
-					{
-						addHorizontalFace( glm::vec3( x, y, z+1.0f ), glm::vec3( 1.0f, 0.0f, 0.0f ), uvOrigin+CHUNK_BACK_UV, true );
-					}
+						// front
+						if( z == 0 || block( x, y, z-1 ) == 0 )
+						{
+							addHorizontalFace( glm::vec3( x, y, z ), glm::vec3( 1.0f, 0.0f, 0.0f ), uvOrigin+CHUNK_FRONT_UV, false );
+						}
 
-					// left
-					if( x == 0 || block( x-1, y, z ) == 0 )
-					{
-						addHorizontalFace( glm::vec3( x, y, z ), glm::vec3( 0.0f, 0.0f, 1.0f ), uvOrigin+CHUNK_LEFT_UV, true );
-					}
+						// back
+						if( z == CHUNK_SIZE-1 || block( x, y, z+1 ) == 0 )
+						{
+							addHorizontalFace( glm::vec3( x, y, z+1.0f ), glm::vec3( 1.0f, 0.0f, 0.0f ), uvOrigin+CHUNK_BACK_UV, true );
+						}
 
-					// right
-					if( x == CHUNK_SIZE-1 || block( x+1, y, z ) == 0 )
-					{
-						addHorizontalFace( glm::vec3( x+1.0f, y, z ), glm::vec3( 0.0f, 0.0f, 1.0f ), uvOrigin+CHUNK_RIGHT_UV, false );
-					}
+						// left
+						if( x == 0 || block( x-1, y, z ) == 0 )
+						{
+							addHorizontalFace( glm::vec3( x, y, z ), glm::vec3( 0.0f, 0.0f, 1.0f ), uvOrigin+CHUNK_LEFT_UV, true );
+						}
 
-					// top
-					if( y == CHUNK_SIZE-1 || block( x, y+1, z ) == 0 )
-					{
-						addVerticalFace( glm::vec3( x, y+1.0f, z ), uvOrigin+CHUNK_TOP_UV, false );
-					}
+						// right
+						if( x == CHUNK_SIZE-1 || block( x+1, y, z ) == 0 )
+						{
+							addHorizontalFace( glm::vec3( x+1.0f, y, z ), glm::vec3( 0.0f, 0.0f, 1.0f ), uvOrigin+CHUNK_RIGHT_UV, false );
+						}
 
-					// bottom
-					if( y == 0 || block( x, y-1, z ) == 0 )
-					{
-						addVerticalFace( glm::vec3( x, y, z ), uvOrigin+CHUNK_BOTTOM_UV, true );
+						// top
+						if( y == CHUNK_SIZE-1 || block( x, y+1, z ) == 0 )
+						{
+							addVerticalFace( glm::vec3( x, y+1.0f, z ), uvOrigin+CHUNK_TOP_UV, false );
+						}
+
+						// bottom
+						if( y == 0 || block( x, y-1, z ) == 0 )
+						{
+							addVerticalFace( glm::vec3( x, y, z ), uvOrigin+CHUNK_BOTTOM_UV, true );
+						}
 					}
 				}
 			}
 		}
-	}
 
-	valid = true;
-	uploaded = false;
+		valid = true;
+		uploaded = false;
+		dirty = false;
+	}
 }
 
 void Chunk::addHorizontalFace( const glm::vec3& position, const glm::vec3& direction, const glm::vec2& uvOffset, bool invert )
@@ -271,8 +272,6 @@ float Chunk::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, Block
 	glm::vec3 start = rayStart;
 	if( rayCheck( rayStart, rayEnd, minPosition, maxPosition, &start ) )
 	{
-		dbg.position = start;
-
 		start -= offset * (float)CHUNK_SIZE;
 		glm::vec3 end = start + ( rayDirection * rayLength );
 
@@ -334,7 +333,11 @@ float Chunk::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, Block
 
 void Chunk::setBlock( int x, int y, int z, uint8_t value )
 {
-	block( x, y, z ) = value;
+	if( block( x, y, z ) != value )
+	{
+		dirty = true;
+		block( x, y, z ) = value;
+	}
 }
 
 void Chunk::setOffset( const glm::vec3& o )
@@ -365,4 +368,9 @@ bool Chunk::getValid() const
 bool Chunk::getUploaded() const
 {
 	return uploaded;
+}
+
+bool Chunk::getDirty() const
+{
+	return dirty;
 }

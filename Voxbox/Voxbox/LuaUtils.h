@@ -27,6 +27,13 @@ inline float lua_getfloat( lua_State* lua, int tableIndex, int fieldIndex )
 	return lua_tofloat( lua, -1 );
 }
 
+inline float lua_getfloat( lua_State* lua, int tableIndex, const char* field )
+{
+	lua_getfield( lua, tableIndex, field );
+	LUA_EXPECT_NUMBER( -1 );
+	return lua_tofloat( lua, -1 );
+}
+
 inline int lua_getint( lua_State* lua, int tableIndex, int fieldIndex )
 {
 	lua_rawgeti( lua, tableIndex, fieldIndex );
@@ -34,9 +41,23 @@ inline int lua_getint( lua_State* lua, int tableIndex, int fieldIndex )
 	return lua_toint( lua, -1 );
 }
 
+inline int lua_getint( lua_State* lua, int tableIndex, const char* field )
+{
+	lua_getfield( lua, tableIndex, field );
+	LUA_EXPECT_NUMBER( -1 );
+	return lua_toint( lua, -1 );
+}
+
 inline const char* lua_getstring( lua_State* lua, int tableIndex, int fieldIndex )
 {
 	lua_rawgeti( lua, tableIndex, fieldIndex );
+	LUA_EXPECT_STRING( -1 );
+	return lua_tostring( lua, -1 );
+}
+
+inline const char* lua_getstring( lua_State* lua, int tableIndex, const char* field )
+{
+	lua_getfield( lua, tableIndex, field );
 	LUA_EXPECT_STRING( -1 );
 	return lua_tostring( lua, -1 );
 }

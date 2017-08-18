@@ -10,6 +10,11 @@ Region::~Region()
 	delete[] chunks;
 }
 
+void Region::load( ThreadPool* pool )
+{
+	threadPool = pool;
+}
+
 void Region::upload()
 {
 	for( int i=0; i<REGION_HEIGHT; i++ )
@@ -100,20 +105,17 @@ void Region::queueChunks( CoreData* coreData, const Frustum& frustum )
 	glm::vec3 minPosition = offset * (float)CHUNK_SIZE;
 	glm::vec3 maxPosition = minPosition + glm::vec3( CHUNK_SIZE, CHUNK_SIZE*REGION_HEIGHT, CHUNK_SIZE );
 
-	coreData->debugShapes->addAABB( { minPosition, maxPosition, glm::vec4( 1.0f, 0.0f, 1.0f, 1.0f ) } );
-
 	if( frustum.aabbCollision( minPosition, maxPosition ) )
 	{
 		maxPosition = minPosition + glm::vec3( CHUNK_SIZE );
 
 		for( int i=0; i<REGION_HEIGHT; i++ )
 		{
-			coreData->debugShapes->addAABB( { minPosition, maxPosition, glm::vec4( 1.0f, 0.0f, 0.0f, 1.0f ) } );
+			coreData->debugShapes->addAABB( { minPosition, maxPosition, glm::vec4( 1.0f, 1.0f, 1.0f, 1.0f ) } );
 
 			if( chunks[i].getUploaded() && frustum.aabbCollision( minPosition, maxPosition ) )
 			{
 				coreData->graphics->queueChunk( &chunks[i] );
-				coreData->debugShapes->addSphere( chunks[i].dbg );
 			}
 
 			minPosition.y += CHUNK_SIZE;
@@ -152,6 +154,18 @@ float Region::hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, Chun
 	return result;
 }
 
+void Region::setBlock( const ChunkIndex& index, uint8_t value )
+{
+	LOG_ASSERT( index.chunk >= 0 && index.chunk < REGION_HEIGHT, "Chunk index out of range." );
+
+	chunks[index.chunk].setBlock( index.block, value );
+	if( chunks[index.chunk].getDirty() )
+	{
+		Job job = { calculateChunk, &chunks[index.chunk] };
+		threadPool->queueWork( job );
+	}
+}
+
 void Region::setOffset( const glm::vec3& o )
 {
 	offset = o;
@@ -168,8 +182,6 @@ const glm::vec3& Region::getOffset() const
 void Region::calculateChunk( void* args )
 {
 	Chunk* chunk = (Chunk*)args;
-
-	REGION_SLEEP_BETWEEN_CHUNKS;
 
 	chunk->calculateFaces();
 }

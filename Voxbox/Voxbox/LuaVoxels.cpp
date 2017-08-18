@@ -19,6 +19,7 @@ namespace LuaVoxels
 			{ "worldToLocal",	worldToLocal },
 			{ "loadWorld",		loadWorld },
 			{ "saveWorld",		saveWorld },
+			{ "setBlock",		setBlock },
 			{ NULL, NULL }
 		};
 
@@ -146,6 +147,32 @@ namespace LuaVoxels
 		// get path
 		const char* path = lua_tostring( lua, 1 );
 		g_coreData->world->saveWorld( path );
+
+		return 0;
+	}
+
+	int setBlock( lua_State* lua )
+	{
+		LUA_ASSERT_ARGS( 2 );
+		LUA_EXPECT_TABLE( 1 );
+		LUA_EXPECT_NUMBER( 2 );
+
+		// get region index
+		RegionIndex index;
+
+		index.chunkIndex.block.x = lua_getint( lua, 1, 1 );
+		index.chunkIndex.block.y = lua_getint( lua, 1, 2 );
+		index.chunkIndex.block.z = lua_getint( lua, 1, 3 );
+
+		index.chunkIndex.chunk = lua_getint( lua, 1, "chunk" );
+		index.region = lua_getint( lua, 1, "region" );
+
+		// get block type
+		int type = lua_toint( lua, 2 );
+
+		LOG_ASSERT( type >= 0 && type < 255, "Block type out of range." );
+
+		g_coreData->world->setBlock( index, (uint8_t)type );
 
 		return 0;
 	}

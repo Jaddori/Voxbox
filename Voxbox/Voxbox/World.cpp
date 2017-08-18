@@ -20,6 +20,7 @@ void World::load( ThreadPool* pool )
 		for( int z=0; z<WORLD_DEPTH; z++ )
 		{
 			int index = x * WORLD_DEPTH + z;
+			regions[index].load( threadPool );
 			regions[index].setOffset( glm::vec3( x, 0.0f, z ) );
 			regions[index].noise( x, z );
 			regions[index].queueWork( threadPool );
@@ -136,6 +137,13 @@ void World::worldToLocal( int x, int y, int z, RegionIndex& index )
 	index.chunkIndex.block.x = x % CHUNK_SIZE;
 	index.chunkIndex.block.y = y % CHUNK_SIZE;
 	index.chunkIndex.block.z = z % CHUNK_SIZE;
+}
+
+void World::setBlock( const RegionIndex& index, uint8_t value )
+{
+	LOG_ASSERT( index.region >= 0 && index.region < WORLD_REGIONS, "Region index out of range." );
+
+	regions[index.region].setBlock( index.chunkIndex, value );
 }
 
 Region& World::getRegion( int x, int z )

@@ -47,6 +47,10 @@ public:
 	float hitBlock( const glm::vec3& rayStart, const glm::vec3& rayEnd, BlockIndex& blockIndex );
 
 	void setBlock( int x, int y, int z, uint8_t value );
+	void setBlock( const BlockIndex& index, uint8_t value )
+	{
+		setBlock( index.x, index.y, index.z, value );
+	}
 	void setOffset( const glm::vec3& offset );
 	void setUploaded( bool uploaded );
 
@@ -54,8 +58,7 @@ public:
 	const glm::vec3& getOffset() const;
 	bool getValid() const;
 	bool getUploaded() const;
-
-	DebugSphere dbg;
+	bool getDirty() const;
 
 private:
 	inline int at( int x, int y, int z ) { return ( y*CHUNK_SIZE*CHUNK_SIZE + z*CHUNK_SIZE + x ); }
@@ -77,4 +80,5 @@ private:
 
 	bool valid;
 	bool uploaded;
+	bool dirty;
 };

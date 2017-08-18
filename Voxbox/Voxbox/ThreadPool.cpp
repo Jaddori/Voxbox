@@ -71,7 +71,7 @@ DWORD WINAPI ThreadPool::threadWork( LPVOID args )
 		DWORD waitResult = WaitForSingleObject( data->signal, THREAD_POOL_TIMEOUT );
 		if( waitResult == WAIT_OBJECT_0 )
 		{
-			LOG_DEBUG( "Thread #%d executing task.", data->id );
+			LOG_INFO( "Thread #%d executing task.", data->id );
 
 			data->job.task( data->job.args );
 

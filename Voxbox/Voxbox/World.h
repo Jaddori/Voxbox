@@ -38,6 +38,8 @@ public:
 		worldToLocal( block.x, block.y, block.z, index );
 	}
 
+	void setBlock( const RegionIndex& index, uint8_t value );
+
 	Region& getRegion( int x, int z );
 	Region* getRegions();
 

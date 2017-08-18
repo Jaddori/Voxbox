@@ -26,14 +26,6 @@ function workerLoad()
 		if self.alive then
 			Graphics.queueBillboard( self.position, self.size, self.uv, false, self.texture )
 			DebugShapes.addSphere( self.position, 2.0, {0.0, 0.0, 1.0, 1.0} )
-			
-			local xend = {self.position[1]+100.0, self.position[2], self.position[3]}
-			local yend = {self.position[1], self.position[2]+100.0, self.position[3]}
-			local zend = {self.position[1], self.position[2], self.position[3]+100.0}
-			
-			DebugShapes.addLine( self.position, xend, {1.0, 0.0, 0.0, 1.0} )
-			DebugShapes.addLine( self.position, yend, {0.0, 1.0, 0.0, 1.0} )
-			DebugShapes.addLine( self.position, zend, {0.0, 0.0, 1.0, 1.0} )
 		end
 	end
 end

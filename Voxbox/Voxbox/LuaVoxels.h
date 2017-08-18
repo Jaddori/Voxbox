@@ -19,4 +19,5 @@ namespace LuaVoxels
 	int worldToLocal( lua_State* lua );
 	int loadWorld( lua_State* lua );
 	int saveWorld( lua_State* lua );
+	int setBlock( lua_State* lua );
 }
