@@ -41,3 +41,14 @@ function printTable( t )
 		Log.log( VERBOSITY_DEBUG, k .. ": " .. v )
 	end
 end
+
+function distance( a, b )
+	local c = { b[1]-a[1], b[2]-a[2], b[3]-a[3] }
+	return math.sqrt( c[1]*c[1] + c[2]*c[2] + c[3]*c[3] )
+end
+
+function direction( a, b )
+	local c = { b[1]-a[1], b[2]-a[2], b[3]-a[3] }
+	local clen = math.sqrt( c[1]*c[1] + c[2]*c[2] + c[3]*c[3] )
+	return { c[1] / clen, c[2] / clen, c[3] / clen }
+end

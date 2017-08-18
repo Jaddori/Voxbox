@@ -350,6 +350,11 @@ void Chunk::setUploaded( bool u )
 	uploaded = u;
 }
 
+uint8_t Chunk::getBlock( int x, int y, int z ) const
+{
+	return blocks[at( x, y, z )];
+}
+
 const uint8_t* Chunk::getBlocks() const
 {
 	return blocks;

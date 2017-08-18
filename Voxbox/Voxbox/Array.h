@@ -6,6 +6,8 @@ template<typename T>
 class Array
 {
 public:
+	typedef bool (CompareFunc)( const T& a, const T& b );
+
 	Array()
 		: size( 0 ), capacity( ARRAY_DEFAULT_CAPACITY )
 	{
@@ -64,17 +66,24 @@ public:
 
 		if( index != size-1 )
 		{
-			data[index] = data[--size];
+			data[index] = data[size-1];
 		}
+
+		size--;
 	}
 
-	int find( const T& element )
+	int find( const T& element, CompareFunc* comp )
 	{
 		int index = -1;
 		for( int i=0; i<size && index < 0; i++ )
-			if( data[i] == element )
+			if( comp( data[i], element ) )
 				index = i;
 		return index;
+	}
+
+	inline bool contains( const T& element, CompareFunc* comp )
+	{
+		return ( find( element, comp ) >= 0 );
 	}
 
 	void clear()
@@ -109,6 +118,27 @@ public:
 
 		size = ref.size;
 		memcpy( data, ref.data, sizeof(T)*ref.size );
+	}
+
+	void sort( CompareFunc* comp )
+	{
+		bool swapped = true;
+		for( int i=0; i<size-1 && swapped; i++ )
+		{
+			swapped = false;
+
+			for( int j=i+1; j<size; j++ )
+			{
+				if( comp( data[i], data[j] ) )
+				{
+					T temp = data[i];
+					data[i] = data[j];
+					data[j] = temp;
+
+					swapped = true;
+				}
+			}
+		}
 	}
 
 	T& at( int index )

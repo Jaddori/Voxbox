@@ -54,6 +54,7 @@ public:
 	void setOffset( const glm::vec3& offset );
 	void setUploaded( bool uploaded );
 
+	uint8_t getBlock( int x, int y, int z ) const;
 	const uint8_t* getBlocks() const;
 	const glm::vec3& getOffset() const;
 	bool getValid() const;
@@ -61,7 +62,7 @@ public:
 	bool getDirty() const;
 
 private:
-	inline int at( int x, int y, int z ) { return ( y*CHUNK_SIZE*CHUNK_SIZE + z*CHUNK_SIZE + x ); }
+	inline int at( int x, int y, int z ) const { return ( y*CHUNK_SIZE*CHUNK_SIZE + z*CHUNK_SIZE + x ); }
 	inline uint8_t& block( int x, int y, int z ) { return blocks[at( x, y, z )]; }
 	void addHorizontalFace( const glm::vec3& position, const glm::vec3& direction, const glm::vec2& uvOffset, bool invert );
 	void addVerticalFace( const glm::vec3& position, const glm::vec2& uvOffset, bool invert );

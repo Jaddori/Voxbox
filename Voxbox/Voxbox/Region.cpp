@@ -174,6 +174,22 @@ void Region::setOffset( const glm::vec3& o )
 		chunks[i].setOffset( glm::vec3( offset.x, offset.y + i, offset.z ) );
 }
 
+int Region::getHeight( int x, int z ) const
+{
+	int result = -1;
+
+	for( int chunkIndex=REGION_HEIGHT-1; chunkIndex>=0 && result < 0; chunkIndex-- )
+	{
+		for( int y = CHUNK_SIZE-1; y >= 0 && result < 0; y-- )
+		{
+			if( chunks[chunkIndex].getBlock( x, y, z ) > 0 )
+				result = chunkIndex * CHUNK_SIZE + y;
+		}
+	}
+
+	return result;
+}
+
 const glm::vec3& Region::getOffset() const
 {
 	return offset;

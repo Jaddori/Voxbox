@@ -35,6 +35,7 @@ public:
 	void setBlock( const ChunkIndex& index, uint8_t value );
 	void setOffset( const glm::vec3& offset );
 
+	int getHeight( int x, int z ) const;
 	const glm::vec3& getOffset() const;
 
 private:

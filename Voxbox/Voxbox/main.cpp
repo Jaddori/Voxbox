@@ -60,6 +60,11 @@ DWORD WINAPI update( LPVOID args )
 	return 0;
 }
 
+int compareNumbers( const int& a, const int& b )
+{
+	return ( b < a );
+}
+
 int main( int argc, char* argv[] )
 {
 	LOG_START( "./log.txt" );

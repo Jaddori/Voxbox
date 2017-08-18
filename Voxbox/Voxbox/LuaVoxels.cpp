@@ -20,6 +20,7 @@ namespace LuaVoxels
 			{ "loadWorld",		loadWorld },
 			{ "saveWorld",		saveWorld },
 			{ "setBlock",		setBlock },
+			{ "findPath",		findPath },
 			{ NULL, NULL }
 		};
 
@@ -175,5 +176,42 @@ namespace LuaVoxels
 		g_coreData->world->setBlock( index, (uint8_t)type );
 
 		return 0;
+	}
+
+	int findPath( lua_State* lua )
+	{
+		LUA_ASSERT_ARGS( 3 );
+		LUA_EXPECT_TABLE( 1 );
+		LUA_EXPECT_TABLE( 2 );
+		LUA_EXPECT_TABLE( 3 );
+
+		// get start
+		BlockIndex start;
+		start.x = lua_getint( lua, 1, 1 );
+		start.y = lua_getint( lua, 1, 2 );
+		start.z = lua_getint( lua, 1, 3 );
+
+		// get end
+		BlockIndex end;
+		end.x = lua_getint( lua, 2, 1 );
+		end.y = lua_getint( lua, 2, 2 );
+		end.z = lua_getint( lua, 2, 3 );
+
+		// set result
+		Array<BlockIndex> path;
+		g_coreData->world->findPath( start, end, path );
+
+		for( int i=0; i<path.getSize(); i++ )
+		{
+			BlockIndex& index = path[i];
+			lua_newtable( lua );
+			lua_setnumber( lua, 1, index.x );
+			lua_setnumber( lua, 2, index.y+1.5f );
+			lua_setnumber( lua, 3, index.z );
+			lua_rawseti( lua, 3, i+1 );
+		}
+
+		lua_pushnumber( lua, path.getSize() );
+		return 1;
 	}
 }
