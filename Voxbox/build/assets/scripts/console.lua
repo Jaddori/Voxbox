@@ -144,34 +144,44 @@ function console:update()
 	end
 end
 
+function console:renderMessages()
+	-- render message box
+	Graphics.queueQuad( self.position, self.size, self.uv, self.opacity )
+	
+	-- render messages
+	local yoffset = 256 - self.font.height
+	
+	for i=#self.messages, 1, -1 do
+		if self.verbosities[i] >= self.threshold then
+			Graphics.queueText( self.font, self.messages[i], {CONSOLE_TEXT_OFFSET, yoffset}, CONSOLE_COLORS[self.verbosities[i]+1] )
+			yoffset = yoffset - self.font.height
+			
+			if yoffset <= 0.0 then break end
+		end
+	end
+end
+
+function console:renderInput()
+	-- render input box
+	Graphics.queueQuad( self.input.position, self.input.size, self.uv, self.opacity )
+	
+	-- render text input
+	local inputText = ">" .. self.input.text
+	if self.input.caretVisible then
+		inputText = inputText .. "_"
+	end
+	
+	if inputText:len() > 0 then
+		Graphics.queueText( self.font, inputText, {CONSOLE_TEXT_OFFSET,self.input.position[2]}, CONSOLE_COLORS[1] )
+	end
+end
+
 function console:render()
 	if self.visible or self.flashTime > 0.0 then
-		-- render message box
-		Graphics.queueQuad( self.position, self.size, self.uv, self.opacity )
-		
-		-- render messages
-		local yoffset = 256 - self.font.height
-		
-		for i=#self.messages, 1, -1 do
-			if self.verbosities[i] >= self.threshold then
-				Graphics.queueText( self.font, self.messages[i], {CONSOLE_TEXT_OFFSET, yoffset}, CONSOLE_COLORS[self.verbosities[i]+1] )
-				yoffset = yoffset - self.font.height
-				
-				if yoffset <= 0.0 then break end
-			end
-		end
-		
-		-- render input box
-		Graphics.queueQuad( self.input.position, self.input.size, self.uv, self.opacity )
-		
-		-- render text input
-		local inputText = self.input.text
-		if self.input.caretVisible then
-			inputText = inputText .. "_"
-		end
-		
-		if inputText:len() > 0 then
-			Graphics.queueText( self.font, inputText, {CONSOLE_TEXT_OFFSET,self.input.position[2]}, CONSOLE_COLORS[1] )
-		end
+		console:renderMessages()
+	end
+	
+	if self.visible then
+		console:renderInput()
 	end
 end

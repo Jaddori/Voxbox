@@ -15,6 +15,7 @@ function mainLoad()
 	
 	workerLoad()
 	workers[1] = Worker:create()
+	workers[1].position = { 5, 31+1, 25 }
 end
 
 function mainUnload()
@@ -37,9 +38,12 @@ function mainUpdate()
 		Camera.unproject( camera.mousePosition, 1.0, rayEnd )
 		
 		if World.hitBlock( rayStart, rayEnd, localBlock ) then
-			--printLocalBlock( localBlock )
+			World.localToWorld( localBlock, worldBlock )
 			
-			World.setBlock( localBlock, 10 )
+			--copyWorldBlock( workers[1].position, worldBlock )
+			--printWorldBlock( worldBlock )
+			worldBlock[2] = worldBlock[2] + 1
+			workers[1]:setTarget( worldBlock )
 		end
 		
 		haveRay = true
