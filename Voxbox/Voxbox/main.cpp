@@ -41,12 +41,6 @@ DWORD WINAPI update( LPVOID args )
 			if( input.keyReleased( SDL_SCANCODE_ESCAPE ) )
 				data->running = false;
 
-			if( input.buttonDown( SDL_BUTTON_LEFT ) )
-			{
-				Point mouseDelta = input.getMouseDelta();
-				perspectiveCamera.updateDirection( mouseDelta.x, mouseDelta.y );
-			}
-
 			const Frustum& frustum = perspectiveCamera.getFrustum();
 			world.queueChunks( data->coreData, frustum );
 
@@ -58,11 +52,6 @@ DWORD WINAPI update( LPVOID args )
 	}
 
 	return 0;
-}
-
-int compareNumbers( const int& a, const int& b )
-{
-	return ( b < a );
 }
 
 int main( int argc, char* argv[] )
