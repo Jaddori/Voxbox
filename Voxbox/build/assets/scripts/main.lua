@@ -40,15 +40,8 @@ function mainUpdate()
 		if World.hitBlock( rayStart, rayEnd, localBlock ) then
 			World.localToWorld( localBlock, worldBlock )
 			
-			--copyWorldBlock( workers[1].position, worldBlock )
-			--printWorldBlock( worldBlock )
-			
-			--worldBlock[2] = worldBlock[2] + 1
 			workers[1]:setTarget( worldBlock )
 			World.setBlock( localBlock, 10 )
-			
-			printWorldBlock( worldBlock )
-			printWorldBlock( workers[1].path[1] )
 		end
 		
 		haveRay = true
