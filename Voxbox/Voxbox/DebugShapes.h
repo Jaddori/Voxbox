@@ -58,8 +58,10 @@ public:
 	void addOBB( const DebugOBB& obb );
 
 	void setIgnoreDepth( bool ignore );
+	void setVisible( bool visible );
 
 	bool getIgnoreDepth() const;
+	bool getVisible() const;
 
 private:
 	SwapArray<DebugLine> lines;
@@ -67,6 +69,7 @@ private:
 	SwapArray<DebugAABB> AABBs;
 	SwapArray<DebugOBB> OBBs;
 	bool ignoreDepth;
+	bool visible;
 
 	// line
 	Shader lineShader;

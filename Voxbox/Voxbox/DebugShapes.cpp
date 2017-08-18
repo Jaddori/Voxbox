@@ -1,7 +1,7 @@
 #include "DebugShapes.h"
 
 DebugShapes::DebugShapes()
-	: ignoreDepth( false )
+	: ignoreDepth( false ), visible( true )
 {
 	LOG_INFO( "Constructing." );
 }
@@ -165,111 +165,114 @@ void DebugShapes::unload()
 
 void DebugShapes::render( const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix )
 {
-	if( ignoreDepth )
-		glDisable( GL_DEPTH_TEST );
-
-	const int LINE_COUNT = lines.getRead().getSize();
-	const int SPHERE_COUNT = spheres.getRead().getSize();
-	const int AABB_COUNT = AABBs.getRead().getSize();
-	const int OBB_COUNT = OBBs.getRead().getSize();
-
-	if( LINE_COUNT > 0 )
+	if( visible )
 	{
-		lineShader.bind();
-		lineShader.setMat4( lineProjectionMatrixLocation, projectionMatrix );
-		lineShader.setMat4( lineViewMatrixLocation, viewMatrix );
+		if( ignoreDepth )
+			glDisable( GL_DEPTH_TEST );
 
-		glBindVertexArray( lineVAO );
-		glBindBuffer( GL_ARRAY_BUFFER, lineVBO );
+		const int LINE_COUNT = lines.getRead().getSize();
+		const int SPHERE_COUNT = spheres.getRead().getSize();
+		const int AABB_COUNT = AABBs.getRead().getSize();
+		const int OBB_COUNT = OBBs.getRead().getSize();
 
-		int offset = 0;
-		while( offset < LINE_COUNT )
+		if( LINE_COUNT > 0 )
 		{
-			int count = LINE_COUNT - offset;
-			if( count > DEBUG_SHAPES_MAX_LINES )
-				count = DEBUG_SHAPES_MAX_LINES;
+			lineShader.bind();
+			lineShader.setMat4( lineProjectionMatrixLocation, projectionMatrix );
+			lineShader.setMat4( lineViewMatrixLocation, viewMatrix );
 
-			glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(DebugLine)*count, lines.getRead().getData() + offset );
-			glDrawArrays( GL_POINTS, 0, count );
+			glBindVertexArray( lineVAO );
+			glBindBuffer( GL_ARRAY_BUFFER, lineVBO );
 
-			offset += count;
+			int offset = 0;
+			while( offset < LINE_COUNT )
+			{
+				int count = LINE_COUNT - offset;
+				if( count > DEBUG_SHAPES_MAX_LINES )
+					count = DEBUG_SHAPES_MAX_LINES;
+
+				glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(DebugLine)*count, lines.getRead().getData() + offset );
+				glDrawArrays( GL_POINTS, 0, count );
+
+				offset += count;
+			}
 		}
-	}
 
-	if( SPHERE_COUNT > 0 )
-	{
-		sphereShader.bind();
-		sphereShader.setMat4( sphereProjectionMatrixLocation, projectionMatrix );
-		sphereShader.setMat4( sphereViewMatrixLocation, viewMatrix );
-
-		glBindVertexArray( sphereVAO );
-		glBindBuffer( GL_ARRAY_BUFFER, sphereVBO );
-
-		int offset = 0;
-		while( offset < SPHERE_COUNT )
+		if( SPHERE_COUNT > 0 )
 		{
-			int count = SPHERE_COUNT - offset;
-			if( count > DEBUG_SHAPES_MAX_SPHERES )
-				count = DEBUG_SHAPES_MAX_SPHERES;
+			sphereShader.bind();
+			sphereShader.setMat4( sphereProjectionMatrixLocation, projectionMatrix );
+			sphereShader.setMat4( sphereViewMatrixLocation, viewMatrix );
 
-			glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(DebugSphere)*count, spheres.getRead().getData() + offset );
-			glDrawArrays( GL_POINTS, 0, count );
+			glBindVertexArray( sphereVAO );
+			glBindBuffer( GL_ARRAY_BUFFER, sphereVBO );
 
-			offset += count;
+			int offset = 0;
+			while( offset < SPHERE_COUNT )
+			{
+				int count = SPHERE_COUNT - offset;
+				if( count > DEBUG_SHAPES_MAX_SPHERES )
+					count = DEBUG_SHAPES_MAX_SPHERES;
+
+				glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(DebugSphere)*count, spheres.getRead().getData() + offset );
+				glDrawArrays( GL_POINTS, 0, count );
+
+				offset += count;
+			}
 		}
-	}
 
-	if( AABB_COUNT > 0 )
-	{
-		aabbShader.bind();
-		aabbShader.setMat4( aabbProjectionMatrixLocation, projectionMatrix );
-		aabbShader.setMat4( aabbViewMatrixLocation, viewMatrix );
-
-		glBindVertexArray( aabbVAO );
-		glBindBuffer( GL_ARRAY_BUFFER, aabbVBO );
-
-		int offset = 0;
-		while( offset < AABB_COUNT )
+		if( AABB_COUNT > 0 )
 		{
-			int count = AABB_COUNT - offset;
-			if( count > DEBUG_SHAPES_MAX_AABB )
-				count = DEBUG_SHAPES_MAX_AABB;
+			aabbShader.bind();
+			aabbShader.setMat4( aabbProjectionMatrixLocation, projectionMatrix );
+			aabbShader.setMat4( aabbViewMatrixLocation, viewMatrix );
 
-			glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(DebugAABB)*count, AABBs.getRead().getData() + offset );
-			glDrawArrays( GL_POINTS, 0, count );
+			glBindVertexArray( aabbVAO );
+			glBindBuffer( GL_ARRAY_BUFFER, aabbVBO );
 
-			offset += count;
+			int offset = 0;
+			while( offset < AABB_COUNT )
+			{
+				int count = AABB_COUNT - offset;
+				if( count > DEBUG_SHAPES_MAX_AABB )
+					count = DEBUG_SHAPES_MAX_AABB;
+
+				glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(DebugAABB)*count, AABBs.getRead().getData() + offset );
+				glDrawArrays( GL_POINTS, 0, count );
+
+				offset += count;
+			}
 		}
-	}
 
-	if( OBB_COUNT > 0 )
-	{
-		obbShader.bind();
-		obbShader.setMat4( obbProjectionMatrixLocation, projectionMatrix );
-		obbShader.setMat4( obbViewMatrixLocation, viewMatrix );
-
-		glBindVertexArray( obbVAO );
-		glBindBuffer( GL_ARRAY_BUFFER, obbVBO );
-
-		int offset = 0;
-		while( offset < OBB_COUNT )
+		if( OBB_COUNT > 0 )
 		{
-			int count = OBB_COUNT - offset;
-			if( count > DEBUG_SHAPES_MAX_OBB )
-				count = DEBUG_SHAPES_MAX_OBB;
+			obbShader.bind();
+			obbShader.setMat4( obbProjectionMatrixLocation, projectionMatrix );
+			obbShader.setMat4( obbViewMatrixLocation, viewMatrix );
 
-			glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(DebugOBB)*count, OBBs.getRead().getData() + offset );
-			glDrawArrays( GL_POINTS, 0, count );
+			glBindVertexArray( obbVAO );
+			glBindBuffer( GL_ARRAY_BUFFER, obbVBO );
 
-			offset += count;
+			int offset = 0;
+			while( offset < OBB_COUNT )
+			{
+				int count = OBB_COUNT - offset;
+				if( count > DEBUG_SHAPES_MAX_OBB )
+					count = DEBUG_SHAPES_MAX_OBB;
+
+				glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(DebugOBB)*count, OBBs.getRead().getData() + offset );
+				glDrawArrays( GL_POINTS, 0, count );
+
+				offset += count;
+			}
 		}
+
+		// reset
+		glBindVertexArray( 0 );
+
+		if( ignoreDepth )
+			glEnable( GL_DEPTH_TEST );
 	}
-
-	// reset
-	glBindVertexArray( 0 );
-
-	if( ignoreDepth )
-		glEnable( GL_DEPTH_TEST );
 }
 
 void DebugShapes::finalize()
@@ -310,7 +313,17 @@ void DebugShapes::setIgnoreDepth( bool ignore )
 	ignoreDepth = ignore;
 }
 
+void DebugShapes::setVisible( bool v )
+{
+	visible = v;
+}
+
 bool DebugShapes::getIgnoreDepth() const
 {
 	return ignoreDepth;
+}
+
+bool DebugShapes::getVisible() const
+{
+	return visible;
 }

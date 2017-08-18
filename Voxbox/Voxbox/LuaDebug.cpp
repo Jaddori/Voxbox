@@ -44,6 +44,7 @@ namespace LuaDebug
 			{ "addAABB",		addAABB },
 			{ "addOBB",			addOBB },
 			{ "ignoreDepth",	ignoreDepth },
+			{ "setVisible",		setVisible },
 			{ NULL, NULL }
 		};
 
@@ -239,6 +240,19 @@ namespace LuaDebug
 		}
 
 		g_coreData->debugShapes->setIgnoreDepth( ignore );
+
+		return 0;
+	}
+
+	int setVisible( lua_State* lua )
+	{
+		LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_BOOL( 1 );
+
+		// get visible
+		bool visible = lua_tobool( lua, 1 );
+
+		g_coreData->debugShapes->setVisible( visible );
 
 		return 0;
 	}
