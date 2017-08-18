@@ -13,6 +13,7 @@ local CONSOLE_TEXT_OFFSET = 8
 local CONSOLE_FLASH_TIME = 5
 local CONSOLE_INPUT_OFFSET = 2
 local CONSOLE_INPUT_HEIGHT = 24
+local CONSOLE_INPUT_CARET_FLASH_TIME = 0.5
 
 console = {}
 
@@ -33,6 +34,8 @@ function console:load()
 	self.input.position = {0,CONSOLE_HEIGHT+CONSOLE_INPUT_OFFSET}
 	self.input.size = {CONSOLE_WIDTH,CONSOLE_INPUT_HEIGHT}
 	self.input.text = ""
+	self.input.caretVisible = true
+	self.input.caretElapsed = CONSOLE_INPUT_CARET_FLASH_TIME
 end
 
 function console:unload()
@@ -42,22 +45,6 @@ function console:update()
 	-- get messages from log
 	self.threshold = Log.getThreshold()
 	Log.getMessages( self.messages, self.verbosities, self.prevMessageCount )
-	
-	-- check if we need to flash new messages
-	if self.visible then
-		self.prevMessageCount = #self.messages
-	else
-		if #self.messages > self.prevMessageCount then
-			for i=self.prevMessageCount+1, #self.messages do
-				if self.verbosities[i] >= self.threshold then
-					self.flashTime = CONSOLE_FLASH_TIME
-					break
-				end
-			end
-			
-			self.prevMessageCount = #self.messages
-		end
-	end
 
 	-- check if user toggled the console
 	if Input.keyReleased( Keys.Console ) then
@@ -66,6 +53,8 @@ function console:update()
 	
 	-- update the console if it is visible
 	if self.visible then
+		self.prevMessageCount = #self.messages
+	
 		-- get text input
 		self.input.text = self.input.text .. Input.textInput()
 		
@@ -92,6 +81,25 @@ function console:update()
 				
 				self.input.text = ""
 			end
+		end
+		
+		-- flash caret
+		self.input.caretElapsed = self.input.caretElapsed - 0.01
+		if self.input.caretElapsed < 0.0 then
+			self.input.caretElapsed = CONSOLE_INPUT_CARET_FLASH_TIME
+			self.input.caretVisible = not self.input.caretVisible
+		end
+	else
+		-- check if we need to flash new messages
+		if #self.messages > self.prevMessageCount then
+			for i=self.prevMessageCount+1, #self.messages do
+				if self.verbosities[i] >= self.threshold then
+					self.flashTime = CONSOLE_FLASH_TIME
+					break
+				end
+			end
+			
+			self.prevMessageCount = #self.messages
 		end
 	end
 	
@@ -121,8 +129,13 @@ function console:render()
 		Graphics.queueQuad( self.input.position, self.input.size, self.uv, self.opacity )
 		
 		-- render text input
-		if self.input.text:len() > 0 then
-			Graphics.queueText( self.font, self.input.text, {CONSOLE_TEXT_OFFSET,self.input.position[2]}, CONSOLE_COLORS[1] )
+		local inputText = self.input.text
+		if self.input.caretVisible then
+			inputText = inputText .. "_"
+		end
+		
+		if inputText:len() > 0 then
+			Graphics.queueText( self.font, inputText, {CONSOLE_TEXT_OFFSET,self.input.position[2]}, CONSOLE_COLORS[1] )
 		end
 	end
 end
