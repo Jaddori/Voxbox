@@ -34,22 +34,18 @@ namespace LuaInput
 
 		// key constants
 		lua_newtable( lua );
-		lua_pushnumber( lua, SDL_SCANCODE_GRAVE );
-		lua_setfield( lua, -2, "Console" );
-		lua_pushnumber( lua, SDL_SCANCODE_RETURN );
-		lua_setfield( lua, -2, "Enter" );
-		lua_pushnumber( lua, SDL_SCANCODE_BACKSPACE );
-		lua_setfield( lua, -2, "Backspace" );
+		lua_setnumber( lua, "Console", SDL_SCANCODE_GRAVE );
+		lua_setnumber( lua, "Enter", SDL_SCANCODE_RETURN );
+		lua_setnumber( lua, "Backspace", SDL_SCANCODE_BACKSPACE );
+		lua_setnumber( lua, "Up", SDL_SCANCODE_UP );
+		lua_setnumber( lua, "Down", SDL_SCANCODE_DOWN );
 		lua_setglobal( lua, "Keys" );
 
 		// button constants
 		lua_newtable( lua );
-		lua_pushnumber( lua, SDL_BUTTON_LEFT );
-		lua_setfield( lua, -2, "Left" );
-		lua_pushnumber( lua, SDL_BUTTON_RIGHT );
-		lua_setfield( lua, -2, "Right" );
-		lua_pushnumber( lua, SDL_BUTTON_MIDDLE );
-		lua_setfield( lua, -2, "Middle" );
+		lua_setnumber( lua, "Left", SDL_BUTTON_LEFT );
+		lua_setnumber( lua, "Right", SDL_BUTTON_RIGHT );
+		lua_setnumber( lua, "Middle", SDL_BUTTON_MIDDLE );
 		lua_setglobal( lua, "Buttons" );
 
 		g_coreData = coreData;

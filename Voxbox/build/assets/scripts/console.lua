@@ -14,6 +14,7 @@ local CONSOLE_FLASH_TIME = 5
 local CONSOLE_INPUT_OFFSET = 2
 local CONSOLE_INPUT_HEIGHT = 24
 local CONSOLE_INPUT_CARET_FLASH_TIME = 0.5
+local CONSOLE_INPUT_MAX_COMMANDS = 3
 
 console = {}
 
@@ -36,6 +37,8 @@ function console:load()
 	self.input.text = ""
 	self.input.caretVisible = true
 	self.input.caretElapsed = CONSOLE_INPUT_CARET_FLASH_TIME
+	self.input.commands = { "a", "b", "c" }
+	self.input.currentCommand = 0
 end
 
 function console:unload()
@@ -79,8 +82,53 @@ function console:update()
 					end
 				end
 				
+				-- check if entered command is already in list of remembered commands
+				local newCommand = true
+				for i=1, #self.input.commands do
+					if self.input.commands[i] == self.input.text then
+						newCommand = false
+						break
+					end
+				end
+				
+				if newCommand then
+					-- add enter command to list of remembered commands
+					if #self.input.commands >= CONSOLE_INPUT_MAX_COMMANDS then
+						for i=1, CONSOLE_INPUT_MAX_COMMANDS-1 do
+							self.input.commands[i] = self.input.commands[i+1]
+						end
+						
+						self.input.commands[CONSOLE_INPUT_MAX_COMMANDS] = self.input.text
+					else
+						self.input.commands[#self.input.commands+1] = self.input.text
+					end
+				end
+				
+				self.input.currentCommand = 0
+				
+				-- reset input text
 				self.input.text = ""
 			end
+		end
+		
+		-- get up arrow
+		if Input.keyRepeated( Keys.Up ) then
+			self.input.currentCommand = self.input.currentCommand - 1
+			if self.input.currentCommand <= 0 then
+				self.input.currentCommand = #self.input.commands
+			end
+			
+			self.input.text = self.input.commands[self.input.currentCommand]
+		end
+		
+		-- get down arrow
+		if Input.keyRepeated( Keys.Down ) then
+			self.input.currentCommand = self.input.currentCommand + 1
+			if self.input.currentCommand > #self.input.commands then
+				self.input.currentCommand = 1
+			end
+			
+			self.input.text = self.input.commands[self.input.currentCommand]
 		end
 		
 		-- flash caret
