@@ -10,6 +10,7 @@ function workerLoad()
 		alive = false,
 		path = {},
 		curPathNode = 0,
+		direction = {0,0,0}
 	}
 	
 	Worker.setTarget = function( self, worldBlock )
@@ -33,12 +34,14 @@ function workerLoad()
 		if self.curPathNode > 0 then
 			local target = self.path[self.curPathNode]
 			
-			local dir = direction( self.position, target )
-			self.position[1] = self.position[1] + dir[1] * 0.05
-			self.position[2] = self.position[2] + dir[2] * 0.05
-			self.position[3] = self.position[3] + dir[3] * 0.05
+			--local dir = Vec3.direction( self.position, target )
+			Vec3.direction( self.position, target, self.direction )
 			
-			if distance( self.position, target ) < 0.1 then
+			local movement = {0,0,0}
+			Vec3.mul( self.direction, 0.05, movement )
+			Vec3.addeq( self.position, movement )
+			
+			if Vec3.distance( self.position, target ) < 0.1 then
 				self.curPathNode = self.curPathNode - 1
 			end
 		end

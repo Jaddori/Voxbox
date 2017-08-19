@@ -12,9 +12,7 @@ function printWorldBlock( b )
 end
 
 function copyLocalBlock( to, from )
-	to[1] = from[1]
-	to[2] = from[2]
-	to[3] = from[3]
+	Vec3.copy( from, to )
 	
 	to.chunk = from.chunk
 	to.region = from.region
@@ -22,33 +20,11 @@ function copyLocalBlock( to, from )
 end
 
 function copyWorldBlock( to, from )
-	to[1] = from[1]
-	to[2] = from[2]
-	to[3] = from[3]
-end
-
-function vectorToString( v )
-	local str = v[1]
-	for i=2, #v do
-		str = str .. "," .. tostring(v[i])
-	end
-	
-	return str
+	Vec3.copy( from, to )
 end
 
 function printTable( t )
 	for k,v in pairs(t) do
 		Log.log( VERBOSITY_DEBUG, k .. ": " .. v )
 	end
-end
-
-function distance( a, b )
-	local c = { b[1]-a[1], b[2]-a[2], b[3]-a[3] }
-	return math.sqrt( c[1]*c[1] + c[2]*c[2] + c[3]*c[3] )
-end
-
-function direction( a, b )
-	local c = { b[1]-a[1], b[2]-a[2], b[3]-a[3] }
-	local clen = math.sqrt( c[1]*c[1] + c[2]*c[2] + c[3]*c[3] )
-	return { c[1] / clen, c[2] / clen, c[3] / clen }
 end
