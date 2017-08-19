@@ -166,6 +166,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Region.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="SystemInfo.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="ThreadPool.cpp" />
     <ClCompile Include="Utils.cpp" />
@@ -198,6 +199,7 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Swap.h" />
     <ClInclude Include="SwapArray.h" />
+    <ClInclude Include="SystemInfo.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="Utils.h" />

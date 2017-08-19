@@ -103,6 +103,9 @@
     <ClCompile Include="ThreadPool.cpp">
       <Filter>Source Files\Threading</Filter>
     </ClCompile>
+    <ClCompile Include="SystemInfo.cpp">
+      <Filter>Source Files\Debug</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -194,6 +197,9 @@
     </ClInclude>
     <ClInclude Include="Queue.h">
       <Filter>Source Files\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemInfo.h">
+      <Filter>Source Files\Debug</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -10,6 +10,7 @@
 #include "LuaBinds.h"
 #include "Assets.h"
 #include "ThreadPool.h"
+#include "SystemInfo.h"
 
 #define THREAD_UPDATE_WAIT 1000
 
@@ -104,6 +105,9 @@ int main( int argc, char* argv[] )
 
 			Input input;
 
+			SystemInfo systemInfo;
+			systemInfo.poll();
+
 			CoreData coreData;
 			coreData.perspectiveCamera = &graphics.getPerspectiveCamera();
 			coreData.input = &input;
@@ -111,6 +115,7 @@ int main( int argc, char* argv[] )
 			coreData.graphics = &graphics;
 			coreData.debugShapes = &debugShapes;
 			coreData.assets = &assets;
+			coreData.systemInfo = &systemInfo;
 
 			LuaBinds luaBinds;
 			luaBinds.bind( &coreData );

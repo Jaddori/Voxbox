@@ -1,6 +1,7 @@
 require( "./assets/scripts/utils" )
 require( "./assets/scripts/worker" )
 require( "./assets/scripts/console" )
+require( "./assets/scripts/info" )
 require( "./assets/scripts/camera" )
 
 local workers = {}
@@ -12,6 +13,7 @@ local haveRay = false
 
 function mainLoad()
 	console:load()
+	info:load()
 	
 	workerLoad()
 	workers[1] = Worker:create()
@@ -20,12 +22,14 @@ end
 
 function mainUnload()
 	console:unload()
+	info:unload()
 	
 	workerUnload()
 end
 
 function mainUpdate()
 	console:update()
+	info:update()
 	
 	if not console.visible then
 		camera:update()
@@ -50,6 +54,7 @@ end
 
 function mainRender()
 	console:render()
+	info:render()
 	
 	workers[1]:render()
 	

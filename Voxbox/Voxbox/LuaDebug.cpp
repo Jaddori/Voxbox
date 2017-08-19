@@ -54,6 +54,24 @@ namespace LuaDebug
 
 		lua_setglobal( lua, "DebugShapes" );
 
+		// metatable for system info
+		luaL_newmetatable( lua, "systemInfoMeta" );
+		luaL_Reg systemInfoRegs[] =
+		{
+			{ "poll",		poll },
+			{ "getCores",	getCores },
+			{ "getThreads",	getThreads },
+			{ "getRam",		getRam },
+			{ "getVsync",	getVsync },
+			{ NULL, NULL }
+		};
+
+		luaL_setfuncs( lua, systemInfoRegs, 0 );
+		lua_pushvalue( lua, -1 );
+		lua_setfield( lua, -2, "__index" );
+
+		lua_setglobal( lua, "SystemInfo" );
+
 		g_coreData = coreData;
 	}
 
@@ -255,5 +273,59 @@ namespace LuaDebug
 		g_coreData->debugShapes->setVisible( visible );
 
 		return 0;
+	}
+
+	// system info
+	int poll( lua_State* lua )
+	{
+		LUA_ASSERT_ARGS( 0 );
+
+		g_coreData->systemInfo->poll();
+
+		return 0;
+	}
+
+	int getCores( lua_State* lua )
+	{
+		LUA_ASSERT_ARGS( 0 );
+
+		// push result
+		int cores = g_coreData->systemInfo->getCores();
+		lua_pushnumber( lua, cores );
+
+		return 1;
+	}
+
+	int getThreads( lua_State* lua )
+	{
+		LUA_ASSERT_ARGS( 0 );
+
+		// push result
+		int threads = g_coreData->systemInfo->getThreads();
+		lua_pushnumber( lua, threads );
+
+		return 1;
+	}
+
+	int getRam( lua_State* lua )
+	{
+		LUA_ASSERT_ARGS( 0 );
+
+		// push result
+		int ram = g_coreData->systemInfo->getRam();
+		lua_pushnumber( lua, ram );
+
+		return 1;
+	}
+
+	int getVsync( lua_State* lua )
+	{
+		LUA_ASSERT_ARGS( 0 );
+
+		// push result
+		bool vsync = g_coreData->systemInfo->getVsync();
+		lua_pushboolean( lua, vsync );
+
+		return 1;
 	}
 }

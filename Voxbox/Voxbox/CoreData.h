@@ -6,6 +6,7 @@ class World;
 class Graphics;
 class DebugShapes;
 class Assets;
+class SystemInfo;
 struct CoreData
 {
 	Camera* perspectiveCamera;
@@ -14,4 +15,5 @@ struct CoreData
 	Graphics* graphics;
 	DebugShapes* debugShapes;
 	Assets* assets;
+	SystemInfo* systemInfo;
 };

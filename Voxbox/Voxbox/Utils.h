@@ -30,3 +30,29 @@ inline void projectVector( const glm::vec3& onto, const glm::vec3& v, glm::vec3&
 	float ontoLength = glm::length( onto );
 	result = ( glm::dot( v, onto ) / ( ontoLength * ontoLength ) ) * onto;
 }
+
+enum
+{
+	UNIT_BYTES = 0,
+	UNIT_KILOBYTES = 1024,
+	UNIT_MEGABYTES = 1024*1024,
+	UNIT_GIGABYTES = 1024*1024*1024
+};
+
+inline float convertBytes( int bytes, int newUnit )
+{
+	return (float)bytes / (float)newUnit;
+}
+
+inline float shrinkBytes( int bytes, int& newUnit )
+{
+	newUnit = UNIT_BYTES;
+	if( bytes > UNIT_GIGABYTES )
+		newUnit = UNIT_GIGABYTES;
+	else if( bytes > UNIT_MEGABYTES )
+		newUnit = UNIT_MEGABYTES;
+	else if( bytes > UNIT_KILOBYTES )
+		newUnit = UNIT_KILOBYTES;
+	
+	return convertBytes( bytes, newUnit );
+}

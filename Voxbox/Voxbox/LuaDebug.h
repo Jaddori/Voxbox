@@ -2,6 +2,7 @@
 
 #include "BaseIncludes.h"
 #include "DebugShapes.h"
+#include "SystemInfo.h"
 
 namespace LuaDebug
 {
@@ -22,4 +23,11 @@ namespace LuaDebug
 	int addOBB( lua_State* lua );
 	int ignoreDepth( lua_State* lua );
 	int setVisible( lua_State* lua );
+
+	// system info
+	int poll( lua_State* lua );
+	int getCores( lua_State* lua );
+	int getThreads( lua_State* lua );
+	int getRam( lua_State* lua );
+	int getVsync( lua_State* lua );
 };
