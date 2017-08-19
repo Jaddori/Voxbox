@@ -3,14 +3,15 @@ require( "./assets/scripts/utils" )
 function workerLoad()
 	Worker =
 	{
-		position = {0,0,0},
+		--position = {0,0,0},
+		position = vec3(),
 		size = {2,4},
 		texture = Assets.loadTexture( "./assets/textures/worker.dds" ),
 		uv = {0,0,0.25,0.5},
 		alive = false,
 		path = {},
 		curPathNode = 0,
-		direction = {0,0,0}
+		direction = vec3()
 	}
 	
 	Worker.setTarget = function( self, worldBlock )
@@ -37,9 +38,11 @@ function workerLoad()
 			--local dir = Vec3.direction( self.position, target )
 			Vec3.direction( self.position, target, self.direction )
 			
-			local movement = {0,0,0}
-			Vec3.mul( self.direction, 0.05, movement )
-			Vec3.addeq( self.position, movement )
+			--local movement = {0,0,0}
+			--Vec3.mul( self.direction, 0.05, movement )
+			--Vec3.addeq( self.position, movement )
+			
+			self.position = self.position + ( self.direction * 0.05 )
 			
 			if Vec3.distance( self.position, target ) < 0.1 then
 				self.curPathNode = self.curPathNode - 1

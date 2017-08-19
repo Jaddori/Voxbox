@@ -9,14 +9,14 @@ namespace LuaCore
 	// vec2
 	namespace vec2
 	{
+		int create( lua_State* lua );
+
 		int add( lua_State* lua );
-		int addeq( lua_State* lua );
 		int sub( lua_State* lua );
-		int subeq( lua_State* lua );
 		int mul( lua_State* lua );
-		int muleq( lua_State* lua );
 		int div( lua_State* lua );
-		int diveq( lua_State* lua );
+		int neg( lua_State* lua );
+		int eq( lua_State* lua );
 
 		int length( lua_State* lua );
 		int normalize( lua_State* lua );
@@ -30,14 +30,14 @@ namespace LuaCore
 	// vec3
 	namespace vec3
 	{
+		int create( lua_State* lua );
+
 		int add( lua_State* lua );
-		int addeq( lua_State* lua );
 		int sub( lua_State* lua );
-		int subeq( lua_State* lua );
 		int mul( lua_State* lua );
-		int muleq( lua_State* lua );
 		int div( lua_State* lua );
-		int diveq( lua_State* lua );
+		int neg( lua_State* lua );
+		int eq( lua_State* lua );
 
 		int length( lua_State* lua );
 		int normalize( lua_State* lua );
@@ -51,14 +51,14 @@ namespace LuaCore
 	// vec4
 	namespace vec4
 	{
+		int create( lua_State* lua );
+
 		int add( lua_State* lua );
-		int addeq( lua_State* lua );
 		int sub( lua_State* lua );
-		int subeq( lua_State* lua );
 		int mul( lua_State* lua );
-		int muleq( lua_State* lua );
 		int div( lua_State* lua );
-		int diveq( lua_State* lua );
+		int neg( lua_State* lua );
+		int eq( lua_State* lua );
 
 		int length( lua_State* lua );
 		int normalize( lua_State* lua );
