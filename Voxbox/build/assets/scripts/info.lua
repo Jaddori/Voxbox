@@ -11,11 +11,13 @@ function info:load()
 	info.cores = 0
 	info.threads = 0
 	info.ram = 0
+	info.luaRam = 0
 	info.vsync = true
 	
 	info.coreText = ""
 	info.threadText = ""
 	info.ramText = ""
+	info.luaRamText = ""
 	info.vsyncText = ""
 	
 	local yoffset = 0.0
@@ -28,16 +30,19 @@ function info:load()
 	info.ramPosition = { info.bounds[1], info.bounds[2] + yoffset }
 	
 	yoffset = yoffset + info.font.height
+	info.luaRamPosition = { info.bounds[1], info.bounds[2] + yoffset }
+	
+	yoffset = yoffset + info.font.height
 	info.vsyncPosition = { info.bounds[1], info.bounds[2] + yoffset }
 	
-	info.elapsedTime = 0
+	info.elapsedTime = INFO_POLL_FREQUENCY
 end
 
 function info:unload()
 end
 
 function info:update()
-	info.elapsedTime = info.elapsedTime + 0.01
+	info.elapsedTime = info.elapsedTime + 0.005
 	if info.elapsedTime > INFO_POLL_FREQUENCY then
 		info.elapsedTime = 0
 		
@@ -45,11 +50,17 @@ function info:update()
 		info.cores = SystemInfo.getCores()
 		info.threads = SystemInfo.getThreads()
 		info.ram = SystemInfo.getRam()
+		info.luaRam = collectgarbage("count") * UNIT_KILOBYTES
 		info.vsync = SystemInfo.getVsync()
 		
 		info.coreText = tostring( info.cores ) .. " available cores"
 		info.threadText = tostring( info.threads ) .. " running threads"
-		info.ramText = tostring( info.ram ) .. " b ram"
+		
+		local shrunkenBytes, newUnit = Core.shrinkBytes( info.ram )
+		info.ramText = "RAM: " .. byteString( shrunkenBytes, newUnit )
+		
+		shrunkenBytes, newUnit = Core.shrinkBytes( info.luaRam )
+		info.luaRamText = "Lua RAM: " .. byteString( shrunkenBytes, newUnit )
 		
 		if info.vsync then
 			info.vsyncText = "VSYNC enabled"
@@ -63,5 +74,6 @@ function info:render()
 	Graphics.queueText( self.font, self.coreText, self.corePosition, INFO_TEXT_COLOR )
 	Graphics.queueText( self.font, self.threadText, self.threadPosition, INFO_TEXT_COLOR )
 	Graphics.queueText( self.font, self.ramText, self.ramPosition, INFO_TEXT_COLOR )
+	Graphics.queueText( self.font, self.luaRamText, self.luaRamPosition, INFO_TEXT_COLOR )
 	Graphics.queueText( self.font, self.vsyncText, self.vsyncPosition, INFO_TEXT_COLOR )
 end

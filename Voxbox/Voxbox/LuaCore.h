@@ -6,6 +6,9 @@ namespace LuaCore
 {
 	void bind( lua_State* lua, CoreData* coreData );
 
+	int convertBytes( lua_State* lua );
+	int shrinkBytes( lua_State* lua );
+
 	// vec2
 	namespace vec2
 	{

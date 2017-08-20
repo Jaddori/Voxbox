@@ -8,6 +8,8 @@ namespace LuaCore
 		luaL_newmetatable( lua, "coreMeta" );
 		luaL_Reg coreRegs[] =
 		{
+			{ "convertBytes",	convertBytes },
+			{ "shrinkBytes",	shrinkBytes },
 			{ NULL, NULL }
 		};
 
@@ -15,6 +17,15 @@ namespace LuaCore
 		lua_pushvalue( lua, -1 );
 		lua_setfield( lua, -2, "__index" );
 		lua_setglobal( lua, "Core" );
+
+		lua_pushnumber( lua, UNIT_BYTES );
+		lua_setglobal( lua, "UNIT_BYTES" );
+		lua_pushnumber( lua, UNIT_KILOBYTES );
+		lua_setglobal( lua, "UNIT_KILOBYTES" );
+		lua_pushnumber( lua, UNIT_MEGABYTES );
+		lua_setglobal( lua, "UNIT_MEGABYTES" );
+		lua_pushnumber( lua, UNIT_GIGABYTES );
+		lua_setglobal( lua, "UNIT_GIGABYTES" );
 
 		// metatable for vec2
 		luaL_newmetatable( lua, "vec2Meta" );
@@ -105,6 +116,43 @@ namespace LuaCore
 		lua_setglobal( lua, "Vec4" );
 
 		lua_register( lua, "vec4", vec4::create );
+	}
+
+	int convertBytes( lua_State* lua )
+	{
+		LUA_ASSERT_ARGS( 2 );
+		LUA_EXPECT_NUMBER( 1 );
+		LUA_EXPECT_NUMBER( 2 );
+
+		// get bytes
+		int bytes = lua_toint( lua, 1 );
+
+		// get new unit
+		int newUnit = lua_toint( lua, 2 );
+
+		// push result
+		int result = ::convertBytes( bytes, newUnit );
+		lua_pushnumber( lua, result );
+
+		return 1;
+	}
+
+	int shrinkBytes( lua_State* lua )
+	{
+		LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_NUMBER( 1 );
+
+		// get bytes
+		int bytes = lua_toint( lua, 1 );
+
+		// push result
+		int newUnit;
+		int result = ::shrinkBytes( bytes, newUnit );
+
+		lua_pushnumber( lua, result );
+		lua_pushnumber( lua, newUnit );
+
+		return 2;
 	}
 
 	// vec2

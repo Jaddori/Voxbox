@@ -22,7 +22,9 @@ void SystemInfo::poll()
 
 	ram = memInfo.PagefileUsage;
 
-	vsync = ( SDL_GL_GetSwapInterval() == 1 );
+	// TODO: Fix this
+	//vsync = ( SDL_GL_GetSwapInterval() == 1 );
+	vsync = true;
 }
 
 int SystemInfo::getRam() const

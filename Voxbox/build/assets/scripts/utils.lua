@@ -28,3 +28,18 @@ function printTable( t )
 		Log.log( VERBOSITY_DEBUG, k .. ": " .. v )
 	end
 end
+
+function byteString( bytes, unit )
+	local result = tostring( bytes )
+	if unit == UNIT_BYTES then
+		result = result .. " b"
+	elseif unit == UNIT_KILOBYTES then
+		result = result .. " kb"
+	elseif unit == UNIT_MEGABYTES then
+		result = result .. " Mb"
+	else
+		result = result .. " Gb"
+	end
+	
+	return result
+end
