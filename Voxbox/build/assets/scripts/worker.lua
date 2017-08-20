@@ -1,5 +1,7 @@
 require( "./assets/scripts/utils" )
 
+local WORKER_SPEED = 0.05
+
 function workerLoad()
 	Worker =
 	{
@@ -10,11 +12,25 @@ function workerLoad()
 		alive = false,
 		path = {},
 		curPathNode = 0,
-		direction = vec3()
+		direction = vec3(),
+		digBlocks = {},
+		curDigBlock = 0,
 	}
 	
 	Worker.setTarget = function( self, worldBlock )
 		self.curPathNode = World.findPath( self.position, worldBlock, self.path )
+	end
+	
+	Worker.dig = function( self, bounds, y )
+		local curBlock = 1
+		for x=bounds[1], bounds[3] do
+			for z=bounds[2], bounds[4] do
+				self.digBlocks[curBlock] = {x,y,z}
+				curBlock = curBlock + 1
+			end
+		end
+		
+		self.curDigBlock = curBlock-1
 	end
 	
 	Worker.create = function( self )
@@ -29,14 +45,34 @@ function workerLoad()
 	end
 
 	Worker.update = function( self, dt )
+		-- update pathing
 		if self.curPathNode > 0 then
 			local target = self.path[self.curPathNode]
 			
 			Vec3.direction( self.position, target, self.direction )
-			self.position = self.position + ( self.direction * 0.05 )
+			self.position = self.position + ( self.direction * WORKER_SPEED )
 			
 			if Vec3.distance( self.position, target ) < 0.1 then
 				self.curPathNode = self.curPathNode - 1
+			end
+		end
+		
+		-- update digging
+		if self.curDigBlock > 0 then
+			-- are we close enough to the block?
+			local target = self.digBlocks[self.curDigBlock]
+			
+			if Vec3.distance( self.position, target ) < 0.1 then
+				-- dig the block
+				local localTarget = {}
+				World.worldToLocal( target, localTarget )
+				
+				World.setBlock( localTarget, 0 )
+				self.curDigBlock = self.curDigBlock - 1
+			else
+				-- move to block
+				Vec3.direction( self.position, target, self.direction )
+				self.position = self.position + ( self.direction * WORKER_SPEED )
 			end
 		end
 	end

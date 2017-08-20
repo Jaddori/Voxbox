@@ -67,14 +67,27 @@ function mainUpdate( dt )
 		end
 	end
 	
-	if haveSelection and Input.buttonDown( Buttons.Middle ) then
-		Camera.unproject( camera.mousePosition, 0.0, rayStart )
-		Camera.unproject( camera.mousePosition, 1.0, rayEnd )
-		
-		if World.hitBlock( rayStart, rayEnd, localBlock ) then
-			World.localToWorld( localBlock, worldBlock )
+	if haveSelection then
+		if Input.buttonDown( Buttons.Middle ) then
+			Camera.unproject( camera.mousePosition, 0.0, rayStart )
+			Camera.unproject( camera.mousePosition, 1.0, rayEnd )
 			
-			copyWorldBlock( endSelection, worldBlock )
+			if World.hitBlock( rayStart, rayEnd, localBlock ) then
+				World.localToWorld( localBlock, worldBlock )
+				
+				copyWorldBlock( endSelection, worldBlock )
+			end
+		end
+		
+		if Input.keyReleased( Keys.Enter ) then
+			local minX = math.min( startSelection[1], endSelection[1] )
+			local minZ = math.min( startSelection[3], endSelection[3] )
+			
+			local maxX = math.max( startSelection[1], endSelection[1] )
+			local maxZ = math.max( startSelection[3], endSelection[3] )
+			
+			Log.log( VERBOSITY_DEBUG, "Starting dig." )
+			workers[1]:dig( {minX,minZ,maxX,maxZ}, startSelection[2] )
 		end
 	end
 end
