@@ -77,51 +77,75 @@ namespace LuaDebug
 
 	int log( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_NUMBER( 1 );
-		LUA_EXPECT_STRING( 2 );
+		LUA_EXPECT_STRING( 2 );*/
 
-		int verbosity = lua_toint( lua, 1 );
-		const char* str = lua_tostring( lua, 2 );
+		LUA_EXPECT_ARGS( 2 )
+		{
+			if( LUA_EXPECT_NUMBER( 1 ) &&
+				LUA_EXPECT_STRING( 2 ) )
+			{
+				int verbosity = lua_toint( lua, 1 );
+				const char* str = lua_tostring( lua, 2 );
 
-		LOG( verbosity, "%s", str );
+				LOG( verbosity, "%s", str );
+			}
+		}
 
 		return 0;
 	}
 
 	int setThreshold( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_NUMBER( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_NUMBER( 1 );*/
 
-		// get threshold
-		int threshold = lua_toint( lua, 1 );
+		LUA_EXPECT_ARGS( 1 ) 
+		{
+			if( LUA_EXPECT_NUMBER( 1 ) )
+			{
+				// get threshold
+				int threshold = lua_toint( lua, 1 );
 
-		LOG_ASSERT( threshold >= VERBOSITY_INFORMATION && threshold <= VERBOSITY_DEBUG, "Bad threshold value: %d", threshold );
-
-		Log::instance().setThreshold( threshold );
+				if( threshold >= VERBOSITY_INFORMATION && threshold <= VERBOSITY_DEBUG )
+				{
+					LOG_ERROR( "Bad threshold value: %d", threshold );
+				}
+				else
+					Log::instance().setThreshold( threshold );
+			}
+		}
 
 		return 0;
 	}
 
 	int getLogMessages( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 3 );
+		/*LUA_ASSERT_ARGS( 3 );
 		LUA_EXPECT_TABLE( 1 );
 		LUA_EXPECT_TABLE( 2 );
-		LUA_EXPECT_NUMBER( 3 );
+		LUA_EXPECT_NUMBER( 3 );*/
 
-		Log::instance().copyMessages( g_logMessages );
-
-		int prevCount = lua_toint( lua, 3 ) - 1;
-		if( prevCount < 0 )
-			prevCount = 0;
-
-		const int MESSAGE_COUNT = g_logMessages.getSize();
-		for( int i=prevCount; i<MESSAGE_COUNT; i++ )
+		LUA_EXPECT_ARGS( 3 )
 		{
-			lua_setstring( lua, 1, i+1, g_logMessages[i].message );
-			lua_setnumber( lua, 2, i+1, g_logMessages[i].verbosity );
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) &&
+				LUA_EXPECT_NUMBER( 3 ) )
+			{
+				Log::instance().copyMessages( g_logMessages );
+
+				int prevCount = lua_toint( lua, 3 ) - 1;
+				if( prevCount < 0 )
+					prevCount = 0;
+
+				const int MESSAGE_COUNT = g_logMessages.getSize();
+				for( int i=prevCount; i<MESSAGE_COUNT; i++ )
+				{
+					lua_setstring( lua, 1, i+1, g_logMessages[i].message );
+					lua_setnumber( lua, 2, i+1, g_logMessages[i].verbosity );
+				}
+			}
 		}
 
 		return 0;
@@ -135,110 +159,145 @@ namespace LuaDebug
 
 	int addLine( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 3 );
+		/*LUA_ASSERT_ARGS( 3 );
 		LUA_EXPECT_TABLE( 1 );
 		LUA_EXPECT_TABLE( 2 );
-		LUA_EXPECT_TABLE( 3 );
+		LUA_EXPECT_TABLE( 3 );*/
 
-		// get start
-		glm::vec3 start;
-		lua_getvec3( lua, 1, start );
+		LUA_EXPECT_ARGS( 3 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) &&
+				LUA_EXPECT_TABLE( 3 ) )
+			{
+				// get start
+				glm::vec3 start;
+				lua_getvec3( lua, 1, start );
 
-		// get end
-		glm::vec3 end;
-		lua_getvec3( lua, 2, end );
+				// get end
+				glm::vec3 end;
+				lua_getvec3( lua, 2, end );
 
-		// get color
-		glm::vec4 color;
-		lua_getvec4( lua, 3, color );
+				// get color
+				glm::vec4 color;
+				lua_getvec4( lua, 3, color );
 
-		g_coreData->debugShapes->addLine( { start, end, color } );
+				g_coreData->debugShapes->addLine( { start, end, color } );
+			}
+		}
 
 		return 0;
 	}
 
 	int addSphere( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 3 );
+		/*LUA_ASSERT_ARGS( 3 );
 		LUA_EXPECT_TABLE( 1 );
 		LUA_EXPECT_NUMBER( 2 );
-		LUA_EXPECT_TABLE( 3 );
+		LUA_EXPECT_TABLE( 3 );*/
 
-		// get position
-		glm::vec3 position;
-		lua_getvec3( lua, 1, position );
+		LUA_EXPECT_ARGS( 3 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_NUMBER( 2 ) &&
+				LUA_EXPECT_TABLE( 3 ) )
+			{
+				// get position
+				glm::vec3 position;
+				lua_getvec3( lua, 1, position );
 
-		// get radius
-		float radius = lua_tofloat( lua, 2 );
+				// get radius
+				float radius = lua_tofloat( lua, 2 );
 
-		// get color
-		glm::vec4 color;
-		lua_getvec4( lua, 3, color );
+				// get color
+				glm::vec4 color;
+				lua_getvec4( lua, 3, color );
 
-		g_coreData->debugShapes->addSphere( { position, radius, color } );
+				g_coreData->debugShapes->addSphere( { position, radius, color } );
+			}
+		}
 
 		return 0;
 	}
 
 	int addAABB( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 3 );
+		/*LUA_ASSERT_ARGS( 3 );
 		LUA_EXPECT_TABLE( 1 );
 		LUA_EXPECT_TABLE( 2 );
-		LUA_EXPECT_TABLE( 3 );
+		LUA_EXPECT_TABLE( 3 );*/
 
-		// get min position
-		glm::vec3 minPosition;
-		lua_getvec3( lua, 1, minPosition );
+		LUA_EXPECT_ARGS( 3 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) &&
+				LUA_EXPECT_TABLE( 3 ) )
+			{
+				// get min position
+				glm::vec3 minPosition;
+				lua_getvec3( lua, 1, minPosition );
 
-		// get max position
-		glm::vec3 maxPosition;
-		lua_getvec3( lua, 2, maxPosition );
+				// get max position
+				glm::vec3 maxPosition;
+				lua_getvec3( lua, 2, maxPosition );
 
-		// get color
-		glm::vec4 color;
-		lua_getvec4( lua, 3, color );
+				// get color
+				glm::vec4 color;
+				lua_getvec4( lua, 3, color );
 
-		g_coreData->debugShapes->addAABB( { minPosition, maxPosition, color } );
+				g_coreData->debugShapes->addAABB( { minPosition, maxPosition, color } );
+			}
+		}
 
 		return 0;
 	}
 
 	int addOBB( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 6 );
+		/*LUA_ASSERT_ARGS( 6 );
 		LUA_EXPECT_TABLE( 1 );
 		LUA_EXPECT_TABLE( 2 );
 		LUA_EXPECT_TABLE( 3 );
 		LUA_EXPECT_TABLE( 4 );
 		LUA_EXPECT_TABLE( 5 );
-		LUA_EXPECT_TABLE( 6 );
+		LUA_EXPECT_TABLE( 6 );*/
 
-		// get position
-		glm::vec3 position;
-		lua_getvec3( lua, 1, position );
+		LUA_EXPECT_ARGS( 6 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) &&
+				LUA_EXPECT_TABLE( 3 ) &&
+				LUA_EXPECT_TABLE( 4 ) &&
+				LUA_EXPECT_TABLE( 5 ) &&
+				LUA_EXPECT_TABLE( 6 ) )
+			{
+				// get position
+				glm::vec3 position;
+				lua_getvec3( lua, 1, position );
 
-		// get x axis
-		glm::vec3 xAxis;
-		lua_getvec3( lua, 2, xAxis );
+				// get x axis
+				glm::vec3 xAxis;
+				lua_getvec3( lua, 2, xAxis );
 
-		// get y axis
-		glm::vec3 yAxis;
-		lua_getvec3( lua, 3, yAxis );
+				// get y axis
+				glm::vec3 yAxis;
+				lua_getvec3( lua, 3, yAxis );
 
-		// get z axis
-		glm::vec3 zAxis;
-		lua_getvec3( lua, 4, zAxis );
+				// get z axis
+				glm::vec3 zAxis;
+				lua_getvec3( lua, 4, zAxis );
 
-		// get extents
-		glm::vec3 extents;
-		lua_getvec3( lua, 5, extents );
+				// get extents
+				glm::vec3 extents;
+				lua_getvec3( lua, 5, extents );
 
-		// get color
-		glm::vec4 color;
-		lua_getvec4( lua, 6, color );
+				// get color
+				glm::vec4 color;
+				lua_getvec4( lua, 6, color );
 
-		g_coreData->debugShapes->addOBB( { position, xAxis, yAxis, zAxis, extents, color } );
+				g_coreData->debugShapes->addOBB( { position, xAxis, yAxis, zAxis, extents, color } );
+			}
+		}
 
 		return 0;
 	}
@@ -247,30 +306,41 @@ namespace LuaDebug
 	{
 		int args = lua_gettop( lua );
 
-		LOG_ASSERT( args <= 1, "Expected less than 2 arguments. Got %d.", args );
-
-		bool ignore = true;
-		if( args == 1 )
+		if( args <= 1 )
 		{
-			LUA_EXPECT_BOOL( 1 );
-
-			ignore = lua_tobool( lua, 1 );
+			LOG_ERROR( "Expected less than 2 arguments. Got %d.", args );
 		}
+		else
+		{
+			bool ignore = true;
+			if( args == 1 )
+			{
+				LUA_EXPECT_BOOL( 1 );
 
-		g_coreData->debugShapes->setIgnoreDepth( ignore );
+				ignore = lua_tobool( lua, 1 );
+			}
+
+			g_coreData->debugShapes->setIgnoreDepth( ignore );
+		}
 
 		return 0;
 	}
 
 	int setVisible( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_BOOL( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_BOOL( 1 );*/
 
-		// get visible
-		bool visible = lua_tobool( lua, 1 );
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_BOOL( 1 ) )
+			{
+				// get visible
+				bool visible = lua_tobool( lua, 1 );
 
-		g_coreData->debugShapes->setVisible( visible );
+				g_coreData->debugShapes->setVisible( visible );
+			}
+		}
 
 		return 0;
 	}
@@ -278,7 +348,7 @@ namespace LuaDebug
 	// system info
 	int poll( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 0 );
+		//LUA_ASSERT_ARGS( 0 );
 
 		g_coreData->systemInfo->poll();
 
@@ -287,7 +357,7 @@ namespace LuaDebug
 
 	int getCores( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 0 );
+		//LUA_ASSERT_ARGS( 0 );
 
 		// push result
 		int cores = g_coreData->systemInfo->getCores();
@@ -298,7 +368,7 @@ namespace LuaDebug
 
 	int getThreads( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 0 );
+		//LUA_ASSERT_ARGS( 0 );
 
 		// push result
 		int threads = g_coreData->systemInfo->getThreads();
@@ -309,7 +379,7 @@ namespace LuaDebug
 
 	int getRam( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 0 );
+		//LUA_ASSERT_ARGS( 0 );
 
 		// push result
 		int ram = g_coreData->systemInfo->getRam();
@@ -320,7 +390,7 @@ namespace LuaDebug
 
 	int getVsync( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 0 );
+		//LUA_ASSERT_ARGS( 0 );
 
 		// push result
 		bool vsync = g_coreData->systemInfo->getVsync();

@@ -57,10 +57,10 @@ function info:update( dt )
 		self.threadText = tostring( self.threads ) .. " running threads"
 		
 		local shrunkenBytes, newUnit = Core.shrinkBytes( self.ram )
-		self.ramText = "RAM: " .. byteString( shrunkenBytes, newUnit )
+		self.ramText = "RAM: " .. byteString( math.floor(shrunkenBytes), newUnit )
 		
 		shrunkenBytes, newUnit = Core.shrinkBytes( self.luaRam )
-		self.luaRamText = "Lua RAM: " .. byteString( shrunkenBytes, newUnit )
+		self.luaRamText = "Lua RAM: " .. byteString( math.floor(shrunkenBytes), newUnit )
 		
 		if self.vsync then
 			self.vsyncText = "VSYNC enabled"

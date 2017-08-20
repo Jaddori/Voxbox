@@ -4,17 +4,71 @@
 #include "glm.hpp"
 #include "lua.hpp"
 
-#define LUA_ASSERT_ARGS( expected ) \
+/*#define LUA_ASSERT_ARGS( expected ) \
 	{ \
 		int args = lua_gettop( lua ); \
 		LOG_ASSERT( args == expected, "Expected " #expected " argument(s) to " __FUNCTION__ ", got %d", args ); \
 	}
 
-#define LUA_EXPECT_BOOL( num ) LOG_ASSERT( lua_isboolean( lua, num ), "Expected bool argument #" #num )
-#define LUA_EXPECT_NUMBER( num ) LOG_ASSERT( lua_isnumber( lua, num ),"Expected number argument #" #num )
-#define LUA_EXPECT_STRING( num ) LOG_ASSERT( lua_isstring( lua, num ),"Expected string argument #" #num )
-#define LUA_EXPECT_USERDATA( num ) LOG_ASSERT( lua_isuserdata( lua, num ), "Expected userdata argument #" #num )
-#define LUA_EXPECT_TABLE( num ) LOG_ASSERT( lua_istable( lua, num ), "Expected table argument #" #num )
+#define LUA_ASSERT_BOOL( num ) LOG_ASSERT( lua_isboolean( lua, num ), "Expected bool argument #" #num )
+#define LUA_ASSERT_NUMBER( num ) LOG_ASSERT( lua_isnumber( lua, num ),"Expected number argument #" #num )
+#define LUA_ASSERT_STRING( num ) LOG_ASSERT( lua_isstring( lua, num ),"Expected string argument #" #num )
+#define LUA_ASSERT_USERDATA( num ) LOG_ASSERT( lua_isuserdata( lua, num ), "Expected userdata argument #" #num )
+#define LUA_ASSERT_TABLE( num ) LOG_ASSERT( lua_istable( lua, num ), "Expected table argument #" #num )*/
+
+#define LUA_EXPECT_ARGS( expected ) \
+	int args = lua_gettop( lua ); \
+	if( args != expected ) \
+	{ \
+		LOG_ERROR( "Expected " #expected " argument(s). Got %d.", args ); \
+	} \
+	else
+
+#define LUA_EXPECT_BOOL( index ) isbool( lua, index )
+#define LUA_EXPECT_NUMBER( index ) isnumber( lua, index )
+#define LUA_EXPECT_STRING( index ) isstring( lua, index )
+#define LUA_EXPECT_USERDATA( index ) isuserdata( lua, index )
+#define LUA_EXPECT_TABLE( index ) istable( lua, index )
+
+inline bool isbool( lua_State* lua, int index )
+{
+	bool result = ( lua_isboolean( lua, index ) != 0 );
+	if( !result )
+		LOG_ERROR( "Expected bool as argument #%d.", index );
+	return result;
+}
+
+inline bool isnumber( lua_State* lua, int index )
+{
+	bool result = ( lua_isnumber( lua, index ) != 0 );
+	if( !result )
+		LOG_ERROR( "Expected number as argument #%d.", index );
+	return result;
+}
+
+inline bool isstring( lua_State* lua, int index )
+{
+	bool result = ( lua_isstring( lua, index ) != 0 );
+	if( !result )
+		LOG_ERROR( "Expected string as argument #%d.", index );
+	return result;
+}
+
+inline bool isuserdata( lua_State* lua, int index )
+{
+	bool result = ( lua_isuserdata( lua, index ) != 0 );
+	if( !result )
+		LOG_ERROR( "Expected userdata as argument #%d.", index );
+	return result;
+}
+
+inline bool istable( lua_State* lua, int index )
+{
+	bool result = ( lua_istable( lua, index ) != 0 );
+	if( !result )
+		LOG_ERROR( "Expected table as argument #%d.", index );
+	return result;
+}
 
 #define lua_tofloat( state, index ) (float)lua_tonumber( state, index )
 #define lua_toint( state, index) (int)lua_tonumber( state, index )

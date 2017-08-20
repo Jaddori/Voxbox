@@ -53,122 +53,207 @@ namespace LuaInput
 
 	int keyDown( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
+		//LUA_ASSERT_ARGS( 1 );
 
-		int key = getKey( lua, 1 );
-		lua_pushboolean( lua, g_coreData->input->keyDown( key ) );
+		int result = 0;
+		LUA_EXPECT_ARGS( 1 )
+		{
+			int key = getKey( lua, 1 );
+			if( key >= 0 )
+			{
+				lua_pushboolean( lua, g_coreData->input->keyDown( key ) );
+				result = 1;
+			}
+		}
 
-		return 1;
+		return result;
 	}
 
 	int keyUp( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
+		//LUA_ASSERT_ARGS( 1 );
 
-		int key = getKey( lua, 1 );
-		lua_pushboolean( lua, g_coreData->input->keyUp( key ) );
+		int result = 0;
+		LUA_EXPECT_ARGS( 1 )
+		{
+			int key = getKey( lua, 1 );
+			if( key >= 0 )
+			{
+				lua_pushboolean( lua, g_coreData->input->keyUp( key ) );
+				result = 1;
+			}
+		}
 
-		return 1;
+		return result;
 	}
 
 	int keyPressed( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
+		//LUA_ASSERT_ARGS( 1 );
 
-		int key = getKey( lua, 1 );
-		lua_pushboolean( lua, g_coreData->input->keyPressed( key ) );
+		int result = 0;
+		LUA_EXPECT_ARGS( 1 )
+		{
+			int key = getKey( lua, 1 );
+			if( key >= 0 )
+			{
+				lua_pushboolean( lua, g_coreData->input->keyPressed( key ) );
+				result = 1;
+			}
+		}
 
-		return 1;
+		return result;
 	}
 
 	int keyReleased( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
+		//LUA_ASSERT_ARGS( 1 );
 
-		int key = getKey( lua, 1 );
-		lua_pushboolean( lua, g_coreData->input->keyReleased( key ) );
+		int result = 0;
+		LUA_EXPECT_ARGS( 1 )
+		{
+			int key = getKey( lua, 1 );
+			if( key >= 0 )
+			{
+				lua_pushboolean( lua, g_coreData->input->keyReleased( key ) );
+				result = 1;
+			}
+		}
 
-		return 1;
+		return result;
 	}
 
 	int keyRepeated( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
+		//LUA_ASSERT_ARGS( 1 );
 
-		int key = getKey( lua, 1 );
-		lua_pushboolean( lua, g_coreData->input->keyRepeated( key ) );
+		int result = 0;
+		LUA_EXPECT_ARGS( 1 )
+		{
+			int key = getKey( lua, 1 );
+			if( key >= 0 )
+			{
+				lua_pushboolean( lua, g_coreData->input->keyRepeated( key ) );
+				result = 1;
+			}
+		}
 
-		return 1;
+		return result;
 	}
 
 	int buttonDown( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_NUMBER( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_NUMBER( 1 );*/
 
-		int button = (int)lua_tonumber( lua, 1 );
-		lua_pushboolean( lua, g_coreData->input->buttonDown( button ) );
+		int result = 0;
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_NUMBER( 1 ) )
+			{
+				int button = lua_toint( lua, 1 );
+				lua_pushboolean( lua, g_coreData->input->buttonDown( button ) );
 
-		return 1;
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int buttonUp( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_NUMBER( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_NUMBER( 1 );*/
 
-		int button = (int)lua_tonumber( lua, 1 );
-		lua_pushboolean( lua, g_coreData->input->buttonUp( button ) );
+		int result = 0;
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_NUMBER( 1 ) )
+			{
+				int button = lua_toint( lua, 1 );
+				lua_pushboolean( lua, g_coreData->input->buttonUp( button ) );
+				result = 1;
+			}
+		}
 
-		return 1;
+		return result;
 	}
 
 	int buttonPressed( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_NUMBER( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_NUMBER( 1 );*/
 
-		int button = (int)lua_tonumber( lua, 1 );
-		lua_pushboolean( lua, g_coreData->input->buttonPressed( button ) );
+		int result = 0;
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_NUMBER( 1 ) )
+			{
+				int button = lua_toint( lua, 1 );
+				lua_pushboolean( lua, g_coreData->input->buttonPressed( button ) );
+				result = 1;
+			}
+		}
 
-		return 1;
+		return result;
 	}
 
 	int buttonReleased( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_NUMBER( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_NUMBER( 1 );*/
 
-		int button = (int)lua_tonumber( lua, 1 );
-		lua_pushboolean( lua, g_coreData->input->buttonReleased( button ) );
+		int result = 0;
+		LUA_EXPECT_ARGS( 1 ) 
+		{
+			if( LUA_EXPECT_NUMBER( 1 ) )
+			{
+				int button = lua_toint( lua, 1 );
+				lua_pushboolean( lua, g_coreData->input->buttonReleased( button ) );
+				result = 1;
+			}
+		}
 
-		return 1;
+		return result;
 	}
 
 	int getMousePosition( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_TABLE( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_TABLE( 1 );*/
 
-		Point result = g_coreData->input->getMousePosition();
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				Point result = g_coreData->input->getMousePosition();
 
-		// set result
-		lua_setnumber( lua, 1, 1, result.x );
-		lua_setnumber( lua, 1, 2, result.y );
+				// set result
+				lua_setnumber( lua, 1, 1, result.x );
+				lua_setnumber( lua, 1, 2, result.y );
+			}
+		}
 
 		return 0;
 	}
 
 	int getMouseDelta( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_TABLE( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_TABLE( 1 );*/
 
-		Point result = g_coreData->input->getMouseDelta();
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				Point result = g_coreData->input->getMouseDelta();
 
-		// set result
-		lua_setnumber( lua, 1, 1, result.x );
-		lua_setnumber( lua, 1, 2, result.y );
+				// set result
+				lua_setnumber( lua, 1, 1, result.x );
+				lua_setnumber( lua, 1, 2, result.y );
+			}
+		}
 
 		return 0;
 	}
@@ -198,7 +283,8 @@ namespace LuaInput
 		}
 		else
 		{
-			LOG_ASSERT( lua_tonumber( lua, 1 ) || lua_tostring( lua, index ), "Bad argument #%d type.", index );
+			//LOG_ASSERT( lua_tonumber( lua, 1 ) || lua_tostring( lua, index ), "Bad argument #%d type.", index );
+			LOG_ERROR( "Bad argument #%d type.", index );
 		}
 
 		return key;

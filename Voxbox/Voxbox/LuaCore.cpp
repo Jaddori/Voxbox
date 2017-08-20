@@ -126,44 +126,63 @@ namespace LuaCore
 
 	int convertBytes( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_NUMBER( 1 );
-		LUA_EXPECT_NUMBER( 2 );
+		LUA_EXPECT_NUMBER( 2 );*/
 
-		// get bytes
-		int bytes = lua_toint( lua, 1 );
+		int result = 0;
+		LUA_EXPECT_ARGS( 2 )
+		{
+			if( LUA_EXPECT_NUMBER( 1 ) &&
+				LUA_EXPECT_NUMBER( 2 ) )
+			{
+				// get bytes
+				int bytes = lua_toint( lua, 1 );
 
-		// get new unit
-		int newUnit = lua_toint( lua, 2 );
+				// get new unit
+				int newUnit = lua_toint( lua, 2 );
 
-		// push result
-		int result = ::convertBytes( bytes, newUnit );
-		lua_pushnumber( lua, result );
+				// push result
+				float convertedBytes = ::convertBytes( bytes, newUnit );
+				lua_pushnumber( lua, convertedBytes );
 
-		return 1;
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int shrinkBytes( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_NUMBER( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_NUMBER( 1 );*/
 
-		// get bytes
-		int bytes = lua_toint( lua, 1 );
+		int result = 0;
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_NUMBER( 1 ) )
+			{
+				// get bytes
+				int bytes = lua_toint( lua, 1 );
 
-		// push result
-		int newUnit;
-		int result = ::shrinkBytes( bytes, newUnit );
+				// push result
+				int newUnit;
+				float shrunkenBytes = ::shrinkBytes( bytes, newUnit );
 
-		lua_pushnumber( lua, result );
-		lua_pushnumber( lua, newUnit );
+				lua_pushnumber( lua, shrunkenBytes );
+				lua_pushnumber( lua, newUnit );
 
-		return 2;
+				result = 2;
+			}
+		}
+
+		return result;
 	}
 
 	int exit( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 0 );
+		//LUA_ASSERT_ARGS( 0 );
 
 		*g_coreData->running = false;
 		*g_coreData->executing = false;
@@ -173,7 +192,7 @@ namespace LuaCore
 
 	int restart( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 0 );
+		//LUA_ASSERT_ARGS( 0 );
 
 		*g_coreData->running = false;
 
@@ -183,300 +202,436 @@ namespace LuaCore
 	// vec2
 	int vec2::create( lua_State* lua )
 	{
+		int result = 0;
+
 		int args = lua_gettop( lua );
-		LOG_ASSERT( args == 0 || args == 2, "Expected 0 or 2 arguments. Got %d.", args );
-
-		lua_newtable( lua );
-
-		float x = 0.0f, y = 0.0f;
-
-		if( args == 2 )
+		if( args != 0 && args != 2 )
 		{
-			LUA_EXPECT_NUMBER( 1 );
-			LUA_EXPECT_NUMBER( 2 );
+			LOG_ERROR( "Expected 0 or 2 arguments. Got %d.", args );
+		}
+		else
+		{
+			lua_newtable( lua );
 
-			x = lua_tofloat( lua, 1 );
-			y = lua_tofloat( lua, 2 );
+			float x = 0.0f, y = 0.0f;
+
+			if( args == 2 )
+			{
+				if( LUA_EXPECT_NUMBER( 1 ) &&
+					LUA_EXPECT_NUMBER( 2 ) )
+				{
+					x = lua_tofloat( lua, 1 );
+					y = lua_tofloat( lua, 2 );
+				}
+			}
+
+			lua_setnumber( lua, -2, 1, x );
+			lua_setnumber( lua, -2, 2, y );
+
+			luaL_setmetatable( lua, "vec2Meta" );
+			result = 1;
 		}
 
-		lua_setnumber( lua, -2, 1, x );
-		lua_setnumber( lua, -2, 2, y );
-
-		luaL_setmetatable( lua, "vec2Meta" );
-
-		return 1;
+		return result;
 	}
 
 	int vec2::add( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_TABLE( 1 );
-		LUA_EXPECT_TABLE( 2 );
+		LUA_EXPECT_TABLE( 2 );*/
 
-		// get a
-		glm::vec2 a;
-		lua_getvec2( lua, 1, a );
+		int result = 0;
+		LUA_EXPECT_ARGS( 2 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) )
+			{
+				// get a
+				glm::vec2 a;
+				lua_getvec2( lua, 1, a );
 
-		// get b
-		glm::vec2 b;
-		lua_getvec2( lua, 2, b );
+				// get b
+				glm::vec2 b;
+				lua_getvec2( lua, 2, b );
 
-		// push result
-		glm::vec2 result = a + b;
-		lua_newtable( lua );
-		lua_setvec2( lua, -2, result );
-		luaL_setmetatable( lua, "vec2Meta" );
+				// push result
+				glm::vec2 v = a + b;
+				lua_newtable( lua );
+				lua_setvec2( lua, -2, v );
+				luaL_setmetatable( lua, "vec2Meta" );
 
-		return 1;
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int vec2::sub( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_TABLE( 1 );
-		LUA_EXPECT_TABLE( 2 );
+		LUA_EXPECT_TABLE( 2 );*/
 
-		// get a
-		glm::vec2 a;
-		lua_getvec2( lua, 1, a );
+		int result = 0;
+		LUA_EXPECT_ARGS( 2 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) )
+			{
+				// get a
+				glm::vec2 a;
+				lua_getvec2( lua, 1, a );
 
-		// get b
-		glm::vec2 b;
-		lua_getvec2( lua, 2, b );
+				// get b
+				glm::vec2 b;
+				lua_getvec2( lua, 2, b );
 
-		// push result
-		glm::vec2 result = a - b;
-		lua_newtable( lua );
-		lua_setvec2( lua, -2, result );
-		luaL_setmetatable( lua, "vec2Meta" );
+				// push result
+				glm::vec2 v = a - b;
+				lua_newtable( lua );
+				lua_setvec2( lua, -2, v );
+				luaL_setmetatable( lua, "vec2Meta" );
 
-		return 1;
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int vec2::mul( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_TABLE( 1 );
-		LOG_ASSERT( lua_istable( lua, 2 ) || lua_isnumber( lua, 2 ), "Expected table or number as argument #2." );
+		LOG_ASSERT( lua_istable( lua, 2 ) || lua_isnumber( lua, 2 ), "Expected table or number as argument #2." );*/
 
-		glm::vec2 result;
-
-		// get a
-		glm::vec2 a;
-		lua_getvec2( lua, 1, a );
-
-		if( lua_istable( lua, 2 ) )
+		int result = 0;
+		LUA_EXPECT_ARGS( 2 )
 		{
-			// get b
-			glm::vec2 b;
-			lua_getvec2( lua, 2, b );
-			result = a * b;
-		}
-		else
-		{
-			// get b
-			float b = lua_tofloat( lua, 2 );
-			result = a * b;
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				if( !lua_istable( lua, 2 ) && !lua_isnumber( lua, 2 ) )
+				{
+					LOG_ERROR( "Expected table or number as argument #2." );
+				}
+				else
+				{
+					glm::vec2 v;
+
+					// get a
+					glm::vec2 a;
+					lua_getvec2( lua, 1, a );
+
+					if( lua_istable( lua, 2 ) )
+					{
+						// get b
+						glm::vec2 b;
+						lua_getvec2( lua, 2, b );
+						v = a * b;
+					}
+					else
+					{
+						// get b
+						float b = lua_tofloat( lua, 2 );
+						v = a * b;
+					}
+
+					// push result
+					lua_newtable( lua );
+					lua_setvec2( lua, -2, v );
+					luaL_setmetatable( lua, "vec2Meta" );
+
+					result = 1;
+				}
+			}
 		}
 
-		// push result
-		lua_newtable( lua );
-		lua_setvec2( lua, -2, result );
-		luaL_setmetatable( lua, "vec2Meta" );
-
-		return 1;
+		return result;
 	}
 
 	int vec2::div( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_TABLE( 1 );
-		LOG_ASSERT( lua_istable( lua, 2 ) || lua_isnumber( lua, 2 ), "Expected table or number as argument #2." );
+		LOG_ASSERT( lua_istable( lua, 2 ) || lua_isnumber( lua, 2 ), "Expected table or number as argument #2." );*/
 
-		glm::vec2 result;
-
-		// get a
-		glm::vec2 a;
-		lua_getvec2( lua, 1, a );
-
-		if( lua_istable( lua, 2 ) )
+		int result = 0;
+		LUA_EXPECT_ARGS( 2 )
 		{
-			// get b
-			glm::vec2 b;
-			lua_getvec2( lua, 2, b );
-			result = a / b;
-		}
-		else
-		{
-			// get b
-			float b = lua_tofloat( lua, 2 );
-			result = a / b;
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				if( !lua_istable( lua, 2 ) && !lua_isnumber( lua, 2 ) )
+				{
+					LOG_ERROR( "Expected table or number as argument #2." );
+				}
+				else
+				{
+					glm::vec2 v;
+
+					// get a
+					glm::vec2 a;
+					lua_getvec2( lua, 1, a );
+
+					if( lua_istable( lua, 2 ) )
+					{
+						// get b
+						glm::vec2 b;
+						lua_getvec2( lua, 2, b );
+						v = a / b;
+					}
+					else
+					{
+						// get b
+						float b = lua_tofloat( lua, 2 );
+						v = a / b;
+					}
+
+					// push result
+					lua_newtable( lua );
+					lua_setvec2( lua, -2, v );
+					luaL_setmetatable( lua, "vec2Meta" );
+
+					result = 1;
+				}
+			}
 		}
 
-		// push result
-		lua_newtable( lua );
-		lua_setvec2( lua, -2, result );
-		luaL_setmetatable( lua, "vec2Meta" );
-
-		return 1;
+		return result;
 	}
 
 	int vec2::neg( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_TABLE( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_TABLE( 1 );*/
 
-		// get vec2
-		glm::vec2 v;
-		lua_getvec2( lua, 1, v );
+		int result = 0;
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				// get vec2
+				glm::vec2 v;
+				lua_getvec2( lua, 1, v );
 
-		// push result
-		glm::vec2 result = -v;
-		lua_newtable( lua );
-		lua_setvec2( lua, -2, result );
-		luaL_setmetatable( lua, "vec2Meta" );
+				// push result
+				glm::vec2 u = -v;
+				lua_newtable( lua );
+				lua_setvec2( lua, -2, u );
+				luaL_setmetatable( lua, "vec2Meta" );
 
-		return 1;
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int vec2::eq( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_TABLE( 1 );
-		LUA_EXPECT_TABLE( 2 );
+		LUA_EXPECT_TABLE( 2 );*/
 
-		// get a
-		glm::vec2 a;
-		lua_getvec2( lua, 1, a );
+		int result = 0;
+		LUA_EXPECT_ARGS( 2 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) )
+			{
+				// get a
+				glm::vec2 a;
+				lua_getvec2( lua, 1, a );
 
-		// get b
-		glm::vec2 b;
-		lua_getvec2( lua, 2, b );
+				// get b
+				glm::vec2 b;
+				lua_getvec2( lua, 2, b );
 
-		// push result
-		lua_pushboolean( lua, a == b );
-		return 1;
+				// push result
+				lua_pushboolean( lua, a == b );
+
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int vec2::length( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_TABLE( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_TABLE( 1 );*/
 
-		// get vec2
-		glm::vec2 v;
-		lua_getvec2( lua, 1, v );
+		int result = 0;
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				// get vec2
+				glm::vec2 v;
+				lua_getvec2( lua, 1, v );
 
-		// push result
-		float len = glm::length( v );
-		lua_pushnumber( lua, len );
+				// push result
+				float len = glm::length( v );
+				lua_pushnumber( lua, len );
 
-		return 1;
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int vec2::normalize( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_TABLE( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_TABLE( 1 );*/
 
-		// get vec2
-		glm::vec2 v;
-		lua_getvec2( lua, 1, v );
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				// get vec2
+				glm::vec2 v;
+				lua_getvec2( lua, 1, v );
 
-		// set result
-		v = glm::normalize( v );
-		lua_setvec2( lua, 1, v );
+				// set result
+				v = glm::normalize( v );
+				lua_setvec2( lua, 1, v );
+			}
+		}
 
 		return 0;
 	}
 
 	int vec2::distance( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_TABLE( 1 );
-		LUA_EXPECT_TABLE( 2 );
+		LUA_EXPECT_TABLE( 2 );*/
 
-		// get a
-		glm::vec2 a;
-		lua_getvec2( lua, 1, a );
+		int result = 0;
+		LUA_EXPECT_ARGS( 2 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) )
+			{
+				// get a
+				glm::vec2 a;
+				lua_getvec2( lua, 1, a );
 
-		// get b
-		glm::vec2 b;
-		lua_getvec2( lua, 2, b );
+				// get b
+				glm::vec2 b;
+				lua_getvec2( lua, 2, b );
 
-		// push result
-		float dist = glm::distance( a, b );
-		lua_pushnumber( lua, dist );
+				// push result
+				float dist = glm::distance( a, b );
+				lua_pushnumber( lua, dist );
 
-		return 1;
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int vec2::direction( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 3 );
+		/*LUA_ASSERT_ARGS( 3 );
 		LUA_EXPECT_TABLE( 1 );
 		LUA_EXPECT_TABLE( 2 );
-		LUA_EXPECT_TABLE( 3 );
+		LUA_EXPECT_TABLE( 3 );*/
 
-		// get a
-		glm::vec2 a;
-		lua_getvec2( lua, 1, a );
+		LUA_EXPECT_ARGS( 3 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) &&
+				LUA_EXPECT_TABLE( 3 ) )
+			{
+				// get a
+				glm::vec2 a;
+				lua_getvec2( lua, 1, a );
 
-		// get b
-		glm::vec2 b;
-		lua_getvec2( lua, 2, b );
+				// get b
+				glm::vec2 b;
+				lua_getvec2( lua, 2, b );
 
-		// set result
-		glm::vec2 dir = glm::normalize( b-a );
-		lua_setvec2( lua, 3, dir );
+				// set result
+				glm::vec2 dir = glm::normalize( b-a );
+				lua_setvec2( lua, 3, dir );
+			}
+		}
 
 		return 0;
 	}
 
 	int vec2::print( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_TABLE( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_TABLE( 1 );*/
 
-		// get vec2
-		glm::vec2 v;
-		lua_getvec2( lua, 1, v );
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				// get vec2
+				glm::vec2 v;
+				lua_getvec2( lua, 1, v );
 
-		// print vec2
-		LOG_DEBUG( "(%f,%f)", v.x, v.y );
+				// print vec2
+				LOG_DEBUG( "(%f,%f)", v.x, v.y );
+			}
+		}
 
 		return 0;
 	}
 
 	int vec2::tostring( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_TABLE( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_TABLE( 1 );*/
 
-		// get vec2
-		glm::vec2 v;
-		lua_getvec2( lua, 1, v );
+		int result = 0;
+		LUA_EXPECT_ARGS( 1 ) 
+		{
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				// get vec2
+				glm::vec2 v;
+				lua_getvec2( lua, 1, v );
 
-		// push result
-		char buf[32];
-		snprintf( buf, 32, "(%f,%f)", v.x, v.y );
-		lua_pushstring( lua, buf );
+				// push result
+				char buf[32];
+				snprintf( buf, 32, "(%f,%f)", v.x, v.y );
+				lua_pushstring( lua, buf );
 
-		return 1;
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int vec2::copy( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_TABLE( 1 );
-		LUA_EXPECT_TABLE( 2 );
+		LUA_EXPECT_TABLE( 2 );*/
 
-		// get vec2
-		glm::vec2 v;
-		lua_getvec2( lua, 1, v );
+		LUA_EXPECT_ARGS( 2 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) )
+			{
+				// get vec2
+				glm::vec2 v;
+				lua_getvec2( lua, 1, v );
 
-		// set result
-		lua_setvec2( lua, 2, v );
+				// set result
+				lua_setvec2( lua, 2, v );
+			}	
+		}
 
 		return 0;
 	}
@@ -484,303 +639,437 @@ namespace LuaCore
 	// vec3
 	int vec3::create( lua_State* lua )
 	{
+		int result = 0;
+
 		int args = lua_gettop( lua );
-		LOG_ASSERT( args == 0 || args == 3, "Expected 0 or 3 arguments. Got %d.", args );
-
-		lua_newtable( lua );
-
-		float x = 0.0f, y = 0.0f, z = 0.0f;
-
-		if( args == 3 )
+		if( args != 0 && args != 3 )
 		{
-			LUA_EXPECT_NUMBER( 1 );
-			LUA_EXPECT_NUMBER( 2 );
-			LUA_EXPECT_NUMBER( 3 );
+			LOG_ERROR( "Expected 0 or 3 arguments. Got %d.", args );
+		}
+		else
+		{
+			lua_newtable( lua );
 
-			x = lua_tofloat( lua, 1 );
-			y = lua_tofloat( lua, 2 );
-			z = lua_tofloat( lua, 3 );
+			float x = 0.0f, y = 0.0f, z = 0.0f;
+
+			if( args == 3 )
+			{
+				LUA_EXPECT_NUMBER( 1 );
+				LUA_EXPECT_NUMBER( 2 );
+				LUA_EXPECT_NUMBER( 3 );
+
+				x = lua_tofloat( lua, 1 );
+				y = lua_tofloat( lua, 2 );
+				z = lua_tofloat( lua, 3 );
+			}
+
+			lua_setnumber( lua, -2, 1, x );
+			lua_setnumber( lua, -2, 2, y );
+			lua_setnumber( lua, -2, 3, z );
+
+			luaL_setmetatable( lua, "vec3Meta" );
+
+			result = 1;
 		}
 
-		lua_setnumber( lua, -2, 1, x );
-		lua_setnumber( lua, -2, 2, y );
-		lua_setnumber( lua, -2, 3, z );
-
-		luaL_setmetatable( lua, "vec3Meta" );
-
-		return 1;
+		return result;
 	}
 
 	int vec3::add( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_TABLE( 1 );
-		LUA_EXPECT_TABLE( 2 );
+		LUA_EXPECT_TABLE( 2 );*/
 
-		// get a
-		glm::vec3 a;
-		lua_getvec3( lua, 1, a );
+		int result = 0;
+		LUA_EXPECT_ARGS( 2 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) )
+			{
+				// get a
+				glm::vec3 a;
+				lua_getvec3( lua, 1, a );
 
-		// get b
-		glm::vec3 b;
-		lua_getvec3( lua, 2, b );
+				// get b
+				glm::vec3 b;
+				lua_getvec3( lua, 2, b );
 
-		// push result
-		glm::vec3 result = a + b;
-		lua_newtable( lua );
-		lua_setvec3( lua, -2, result );
-		luaL_setmetatable( lua, "vec3Meta" );
+				// push result
+				glm::vec3 v = a + b;
+				lua_newtable( lua );
+				lua_setvec3( lua, -2, v );
+				luaL_setmetatable( lua, "vec3Meta" );
 
-		return 1;
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int vec3::sub( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_TABLE( 1 );
-		LUA_EXPECT_TABLE( 2 );
+		LUA_EXPECT_TABLE( 2 );*/
 
-		// get a
-		glm::vec3 a;
-		lua_getvec3( lua, 1, a );
+		int result = 0;
+		LUA_EXPECT_ARGS( 2 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) )
+			{
+				// get a
+				glm::vec3 a;
+				lua_getvec3( lua, 1, a );
 
-		// get b
-		glm::vec3 b;
-		lua_getvec3( lua, 2, b );
+				// get b
+				glm::vec3 b;
+				lua_getvec3( lua, 2, b );
 
-		// push result
-		glm::vec3 result = a - b;
-		lua_newtable( lua );
-		lua_setvec3( lua, -2, result );
-		luaL_setmetatable( lua, "vec3Meta" );
+				// push result
+				glm::vec3 v = a - b;
+				lua_newtable( lua );
+				lua_setvec3( lua, -2, v );
+				luaL_setmetatable( lua, "vec3Meta" );
+
+				result = 1;
+			}
+		}
 		
-		return 1;
+		return result;
 	}
 
 	int vec3::mul( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_TABLE( 1 );
-		LOG_ASSERT( lua_istable( lua, 2 ) || lua_isnumber( lua, 2 ), "Expected table or number as argument #2." );
+		LOG_ASSERT( lua_istable( lua, 2 ) || lua_isnumber( lua, 2 ), "Expected table or number as argument #2." );*/
 
-		glm::vec3 result;
-
-		// get a
-		glm::vec3 a;
-		lua_getvec3( lua, 1, a );
-
-		if( lua_istable( lua, 2 ) )
+		int result = 0;
+		LUA_EXPECT_ARGS( 2 )
 		{
-			// get b
-			glm::vec3 b;
-			lua_getvec3( lua, 2, b );
-			result = a * b;
-		}
-		else
-		{
-			// get b
-			float b = lua_tofloat( lua, 2 );
-			result = a * b;
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				if( !lua_istable( lua, 2 ) && !lua_isnumber( lua, 2 ) )
+				{
+					LOG_ERROR( "Expected table or number as argument #2." );
+				}
+				else
+				{
+					glm::vec3 v;
+
+					// get a
+					glm::vec3 a;
+					lua_getvec3( lua, 1, a );
+
+					if( lua_istable( lua, 2 ) )
+					{
+						// get b
+						glm::vec3 b;
+						lua_getvec3( lua, 2, b );
+						v = a * b;
+					}
+					else
+					{
+						// get b
+						float b = lua_tofloat( lua, 2 );
+						v = a * b;
+					}
+
+					// push result
+					lua_newtable( lua );
+					lua_setvec3( lua, -2, v );
+					luaL_setmetatable( lua, "vec3Meta" );
+
+					result = 1;
+				}
+			}
 		}
 
-		// push result
-		lua_newtable( lua );
-		lua_setvec3( lua, -2, result );
-		luaL_setmetatable( lua, "vec3Meta" );
-
-		return 1;
+		return result;
 	}
 
 	int vec3::div( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_TABLE( 1 );
-		LOG_ASSERT( lua_istable( lua, 2 ) || lua_isnumber( lua, 2 ), "Expected table or number as argument #2." );
+		LOG_ASSERT( lua_istable( lua, 2 ) || lua_isnumber( lua, 2 ), "Expected table or number as argument #2." );*/
 
-		glm::vec3 result;
-
-		// get a
-		glm::vec3 a;
-		lua_getvec3( lua, 1, a );
-
-		if( lua_istable( lua, 2 ) )
+		int result = 0;
+		LUA_EXPECT_ARGS( 2 )
 		{
-			// get b
-			glm::vec3 b;
-			lua_getvec3( lua, 2, b );
-			result = a / b;
-		}
-		else
-		{
-			// get b
-			float b = lua_tofloat( lua, 2 );
-			result = a / b;
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				if( !lua_istable( lua, 2 ) && !lua_isnumber( lua, 2 ) )
+				{
+					LOG_ERROR( "Expected table or number as argument #2." );
+				}
+				else
+				{
+					glm::vec3 v;
+
+					// get a
+					glm::vec3 a;
+					lua_getvec3( lua, 1, a );
+
+					if( lua_istable( lua, 2 ) )
+					{
+						// get b
+						glm::vec3 b;
+						lua_getvec3( lua, 2, b );
+						v = a / b;
+					}
+					else
+					{
+						// get b
+						float b = lua_tofloat( lua, 2 );
+						v = a / b;
+					}
+
+					// push result
+					lua_newtable( lua );
+					lua_setvec3( lua, -2, v );
+					luaL_setmetatable( lua, "vec3Meta" );
+
+					result = 1;
+				}
+			}
 		}
 
-		// push result
-		lua_newtable( lua );
-		lua_setvec3( lua, -2, result );
-		luaL_setmetatable( lua, "vec3Meta" );
-
-		return 1;
+		return result;
 	}
 
 	int vec3::neg( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_TABLE( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_TABLE( 1 );*/
 
-		// get vec3
-		glm::vec3 v;
-		lua_getvec3( lua, 1, v );
+		int result = 0;
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				// get vec3
+				glm::vec3 v;
+				lua_getvec3( lua, 1, v );
 
-		// push result
-		glm::vec3 result = -v;
-		lua_newtable( lua );
-		lua_setvec3( lua, -2, result );
-		luaL_setmetatable( lua, "vec3Meta" );
+				// push result
+				glm::vec3 u = -v;
+				lua_newtable( lua );
+				lua_setvec3( lua, -2, u );
+				luaL_setmetatable( lua, "vec3Meta" );
 
-		return 1;
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int vec3::eq( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_TABLE( 1 );
-		LUA_EXPECT_TABLE( 2 );
+		LUA_EXPECT_TABLE( 2 );*/
 
-		// get a
-		glm::vec3 a;
-		lua_getvec3( lua, 1, a );
+		int result = 0;
+		LUA_EXPECT_ARGS( 2 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) )
+			{
+				// get a
+				glm::vec3 a;
+				lua_getvec3( lua, 1, a );
 
-		// get b
-		glm::vec3 b;
-		lua_getvec3( lua, 2, b );
+				// get b
+				glm::vec3 b;
+				lua_getvec3( lua, 2, b );
 
-		// push result
-		lua_pushboolean( lua, a == b );
-		return 1;
+				// push result
+				lua_pushboolean( lua, a == b );
+
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int vec3::length( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_TABLE( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_TABLE( 1 );*/
 
-		// get vec3
-		glm::vec3 v;
-		lua_getvec3( lua, 1, v );
+		int result = 0;
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				// get vec3
+				glm::vec3 v;
+				lua_getvec3( lua, 1, v );
 
-		// push result
-		float len = glm::length( v );
-		lua_pushnumber( lua, len );
+				// push result
+				float len = glm::length( v );
+				lua_pushnumber( lua, len );
 
-		return 1;
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int vec3::normalize( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_TABLE( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_TABLE( 1 );*/
 
-		// get vec3
-		glm::vec3 v;
-		lua_getvec3( lua, 1, v );
+		LUA_EXPECT_ARGS( 1 );
+		if( LUA_EXPECT_TABLE( 1 ) )
+		{
+			// get vec3
+			glm::vec3 v;
+			lua_getvec3( lua, 1, v );
 
-		// set result
-		v = glm::normalize( v );
-		lua_setvec3( lua, 1, v );
+			// set result
+			v = glm::normalize( v );
+			lua_setvec3( lua, 1, v );
+		}
 
 		return 0;
 	}
 
 	int vec3::distance( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_TABLE( 1 );
-		LUA_EXPECT_TABLE( 2 );
+		LUA_EXPECT_TABLE( 2 );*/
 
-		// get a
-		glm::vec3 a;
-		lua_getvec3( lua, 1, a );
+		int result = 0;
+		LUA_EXPECT_ARGS( 2 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) )
+			{
+				// get a
+				glm::vec3 a;
+				lua_getvec3( lua, 1, a );
 
-		// get b
-		glm::vec3 b;
-		lua_getvec3( lua, 2, b );
+				// get b
+				glm::vec3 b;
+				lua_getvec3( lua, 2, b );
 
-		// push result
-		float dist = glm::distance( a, b );
-		lua_pushnumber( lua, dist );
+				// push result
+				float dist = glm::distance( a, b );
+				lua_pushnumber( lua, dist );
 
-		return 1;
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int vec3::direction( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 3 );
+		/*LUA_ASSERT_ARGS( 3 );
 		LUA_EXPECT_TABLE( 1 );
 		LUA_EXPECT_TABLE( 2 );
-		LUA_EXPECT_TABLE( 3 );
+		LUA_EXPECT_TABLE( 3 );*/
 
-		// get a
-		glm::vec3 a;
-		lua_getvec3( lua, 1, a );
+		LUA_EXPECT_ARGS( 3 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) &&
+				LUA_EXPECT_TABLE( 3 ) )
+			{
+				// get a
+				glm::vec3 a;
+				lua_getvec3( lua, 1, a );
 
-		// get b
-		glm::vec3 b;
-		lua_getvec3( lua, 2, b );
+				// get b
+				glm::vec3 b;
+				lua_getvec3( lua, 2, b );
 
-		// set result
-		glm::vec3 dir = glm::normalize( b - a );
-		lua_setvec3( lua, 3, dir );
+				// set result
+				glm::vec3 dir = glm::normalize( b - a );
+				lua_setvec3( lua, 3, dir );
+			}
+		}
 
 		return 0;
 	}
 
 	int vec3::print( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_TABLE( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_TABLE( 1 );*/
 
-		// get vec3
-		glm::vec3 v;
-		lua_getvec3( lua, 1, v );
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				// get vec3
+				glm::vec3 v;
+				lua_getvec3( lua, 1, v );
 
-		// print vec3
-		LOG_DEBUG( "(%f,%f)", v.x, v.y );
+				// print vec3
+				LOG_DEBUG( "(%f,%f)", v.x, v.y );
+			}
+		}
 
 		return 0;
 	}
 
 	int vec3::tostring( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_TABLE( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_TABLE( 1 );*/
 
-		// get vec3
-		glm::vec3 v;
-		lua_getvec3( lua, 1, v );
+		int result = 0;
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				// get vec3
+				glm::vec3 v;
+				lua_getvec3( lua, 1, v );
 
-		// push result
-		char buf[32];
-		snprintf( buf, 32, "(%f,%f,%f)", v.x, v.y, v.z );
-		lua_pushstring( lua, buf );
+				// push result
+				char buf[32];
+				snprintf( buf, 32, "(%f,%f,%f)", v.x, v.y, v.z );
+				lua_pushstring( lua, buf );
 
-		return 1;
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int vec3::copy( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_TABLE( 1 );
-		LUA_EXPECT_TABLE( 2 );
+		LUA_EXPECT_TABLE( 2 );*/
 
-		// get vec3
-		glm::vec3 v;
-		lua_getvec3( lua, 1, v );
+		LUA_EXPECT_ARGS( 2 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) )
+			{
+				// get vec3
+				glm::vec3 v;
+				lua_getvec3( lua, 1, v );
 
-		// set result
-		lua_setvec3( lua, 2, v );
+				// set result
+				lua_setvec3( lua, 2, v );
+			}
+		}
 
 		return 0;
 	}
@@ -788,306 +1077,443 @@ namespace LuaCore
 	// vec4
 	int vec4::create( lua_State* lua )
 	{
+		int result = 0;
+
 		int args = lua_gettop( lua );
-		LOG_ASSERT( args == 0 || args == 4, "Expected 0 or 4 arguments. Got %d.", args );
-
-		lua_newtable( lua );
-
-		float x = 0.0f, y = 0.0f, z = 0.0f, w = 0.0f;
-
-		if( args == 4 )
+		if( args != 0 && args != 4 )
 		{
-			LUA_EXPECT_NUMBER( 1 );
-			LUA_EXPECT_NUMBER( 2 );
-			LUA_EXPECT_NUMBER( 3 );
-			LUA_EXPECT_NUMBER( 4 );
+			LOG_ERROR( "Expected 0 or 4 arguments. Got %d.", args );
+		}
+		else
+		{
+			lua_newtable( lua );
 
-			x = lua_tofloat( lua, 1 );
-			y = lua_tofloat( lua, 2 );
-			z = lua_tofloat( lua, 3 );
-			w = lua_tofloat( lua, 4 );
+			float x = 0.0f, y = 0.0f, z = 0.0f, w = 0.0f;
+
+			if( args == 4 )
+			{
+				if( LUA_EXPECT_NUMBER( 1 ) &&
+					LUA_EXPECT_NUMBER( 2 ) &&
+					LUA_EXPECT_NUMBER( 3 ) &&
+					LUA_EXPECT_NUMBER( 4 ) )
+				{
+					x = lua_tofloat( lua, 1 );
+					y = lua_tofloat( lua, 2 );
+					z = lua_tofloat( lua, 3 );
+					w = lua_tofloat( lua, 4 );
+				}
+			}
+
+			lua_setnumber( lua, -2, 1, x );
+			lua_setnumber( lua, -2, 2, y );
+			lua_setnumber( lua, -2, 3, z );
+			lua_setnumber( lua, -2, 4, w );
+
+			luaL_setmetatable( lua, "vec4Meta" );
+
+			result = 1;
 		}
 
-		lua_setnumber( lua, -2, 1, x );
-		lua_setnumber( lua, -2, 2, y );
-		lua_setnumber( lua, -2, 3, z );
-		lua_setnumber( lua, -2, 4, w );
-
-		luaL_setmetatable( lua, "vec4Meta" );
-
-		return 1;
+		return result;
 	}
 
 	int vec4::add( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_TABLE( 1 );
-		LUA_EXPECT_TABLE( 2 );
+		LUA_EXPECT_TABLE( 2 );*/
 
-		// get a
-		glm::vec4 a;
-		lua_getvec4( lua, 1, a );
+		int result = 0;
+		LUA_EXPECT_ARGS( 2 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) )
+			{
+				// get a
+				glm::vec4 a;
+				lua_getvec4( lua, 1, a );
 
-		// get b
-		glm::vec4 b;
-		lua_getvec4( lua, 2, b );
+				// get b
+				glm::vec4 b;
+				lua_getvec4( lua, 2, b );
 
-		// push result
-		glm::vec4 result = a + b;
-		lua_newtable( lua );
-		lua_setvec4( lua, -2, result );
-		luaL_setmetatable( lua, "vec4Meta" );
+				// push result
+				glm::vec4 v = a + b;
+				lua_newtable( lua );
+				lua_setvec4( lua, -2, v );
+				luaL_setmetatable( lua, "vec4Meta" );
 
-		return 1;
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int vec4::sub( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_TABLE( 1 );
-		LUA_EXPECT_TABLE( 2 );
+		LUA_EXPECT_TABLE( 2 );*/
 
-		// get a
-		glm::vec4 a;
-		lua_getvec4( lua, 1, a );
+		int result = 0;
+		LUA_EXPECT_ARGS( 2 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) )
+			{
+				// get a
+				glm::vec4 a;
+				lua_getvec4( lua, 1, a );
 
-		// get b
-		glm::vec4 b;
-		lua_getvec4( lua, 2, b );
+				// get b
+				glm::vec4 b;
+				lua_getvec4( lua, 2, b );
 
-		// push result
-		glm::vec4 result = a - b;
-		lua_newtable( lua );
-		lua_setvec4( lua, -2, result );
-		luaL_setmetatable( lua, "vec4Meta" );
+				// push result
+				glm::vec4 v = a - b;
+				lua_newtable( lua );
+				lua_setvec4( lua, -2, v );
+				luaL_setmetatable( lua, "vec4Meta" );
 
-		return 1;
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int vec4::mul( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_TABLE( 1 );
-		LOG_ASSERT( lua_istable( lua, 2 ) || lua_isnumber( lua, 2 ), "Expected table or number as argument #2." );
+		LOG_ASSERT( lua_istable( lua, 2 ) || lua_isnumber( lua, 2 ), "Expected table or number as argument #2." );*/
 
-		glm::vec4 result;
-
-		// get a
-		glm::vec4 a;
-		lua_getvec4( lua, 1, a );
-
-		if( lua_istable( lua, 2 ) )
+		int result = 0;
+		LUA_EXPECT_ARGS( 2 )
 		{
-			// get b
-			glm::vec4 b;
-			lua_getvec4( lua, 2, b );
-			result = a * b;
-		}
-		else
-		{
-			// get b
-			float b = lua_tofloat( lua, 2 );
-			result = a * b;
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				if( !lua_istable( lua, 2 ) && !lua_istable( lua, 2 ) )
+				{
+					LOG_ERROR( "Expected table or number as argument #2." );
+				}
+				else
+				{
+					glm::vec4 v;
+
+					// get a
+					glm::vec4 a;
+					lua_getvec4( lua, 1, a );
+
+					if( lua_istable( lua, 2 ) )
+					{
+						// get b
+						glm::vec4 b;
+						lua_getvec4( lua, 2, b );
+						v = a * b;
+					}
+					else
+					{
+						// get b
+						float b = lua_tofloat( lua, 2 );
+						v = a * b;
+					}
+
+					// push result
+					lua_newtable( lua );
+					lua_setvec4( lua, -2, v );
+					luaL_setmetatable( lua, "vec4Meta" );
+
+					result = 1;
+				}
+			}
 		}
 
-		// push result
-		lua_newtable( lua );
-		lua_setvec4( lua, -2, result );
-		luaL_setmetatable( lua, "vec4Meta" );
-
-		return 1;
+		return result;
 	}
 
 	int vec4::div( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_TABLE( 1 );
-		LOG_ASSERT( lua_istable( lua, 2 ) || lua_isnumber( lua, 2 ), "Expected table or number as argument #2." );
+		LOG_ASSERT( lua_istable( lua, 2 ) || lua_isnumber( lua, 2 ), "Expected table or number as argument #2." );*/
 
-		glm::vec4 result;
-
-		// get a
-		glm::vec4 a;
-		lua_getvec4( lua, 1, a );
-
-		if( lua_istable( lua, 2 ) )
+		int result = 0;
+		LUA_EXPECT_ARGS( 2 )
 		{
-			// get b
-			glm::vec4 b;
-			lua_getvec4( lua, 2, b );
-			result = a / b;
-		}
-		else
-		{
-			// get b
-			float b = lua_tofloat( lua, 2 );
-			result = a / b;
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				if( !lua_istable( lua, 2 ) && !lua_isnumber( lua, 2 ) )
+				{
+					LOG_ERROR( "Expected table or number as argument #2." );
+				}
+				else
+				{
+					glm::vec4 v;
+
+					// get a
+					glm::vec4 a;
+					lua_getvec4( lua, 1, a );
+
+					if( lua_istable( lua, 2 ) )
+					{
+						// get b
+						glm::vec4 b;
+						lua_getvec4( lua, 2, b );
+						v = a / b;
+					}
+					else
+					{
+						// get b
+						float b = lua_tofloat( lua, 2 );
+						v = a / b;
+					}
+
+					// push result
+					lua_newtable( lua );
+					lua_setvec4( lua, -2, v );
+					luaL_setmetatable( lua, "vec4Meta" );
+
+					result = 1;
+				}
+			}
 		}
 
-		// push result
-		lua_newtable( lua );
-		lua_setvec4( lua, -2, result );
-		luaL_setmetatable( lua, "vec4Meta" );
-
-		return 1;
+		return result;
 	}
 
 	int vec4::neg( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_TABLE( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_TABLE( 1 );*/
 
-		// get vec4
-		glm::vec4 v;
-		lua_getvec4( lua, 1, v );
+		int result = 0;
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				// get vec4
+				glm::vec4 v;
+				lua_getvec4( lua, 1, v );
 
-		// push result
-		glm::vec4 result = -v;
-		lua_newtable( lua );
-		lua_setvec4( lua, -2, result );
-		luaL_setmetatable( lua, "vec4Meta" );
+				// push result
+				glm::vec4 u = -v;
+				lua_newtable( lua );
+				lua_setvec4( lua, -2, u );
+				luaL_setmetatable( lua, "vec4Meta" );
 
-		return 1;
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int vec4::eq( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_TABLE( 1 );
-		LUA_EXPECT_TABLE( 2 );
+		LUA_EXPECT_TABLE( 2 );*/
 
-		// get a
-		glm::vec4 a;
-		lua_getvec4( lua, 1, a );
+		int result = 0;
+		LUA_EXPECT_ARGS( 2 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) )
+			{
+				// get a
+				glm::vec4 a;
+				lua_getvec4( lua, 1, a );
 
-		// get b
-		glm::vec4 b;
-		lua_getvec4( lua, 2, b );
+				// get b
+				glm::vec4 b;
+				lua_getvec4( lua, 2, b );
 
-		// push result
-		lua_pushboolean( lua, a == b );
-		return 1;
+				// push result
+				lua_pushboolean( lua, a == b );
+
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int vec4::length( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_TABLE( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_TABLE( 1 );*/
 
-		// get vec4
-		glm::vec4 v;
-		lua_getvec4( lua, 1, v );
+		int result = 0;
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				// get vec4
+				glm::vec4 v;
+				lua_getvec4( lua, 1, v );
 
-		// push result
-		float len = glm::length( v );
-		lua_pushnumber( lua, len );
+				// push result
+				float len = glm::length( v );
+				lua_pushnumber( lua, len );
 
-		return 1;
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int vec4::normalize( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_TABLE( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_TABLE( 1 );*/
 
-		// get vec4
-		glm::vec4 v;
-		lua_getvec4( lua, 1, v );
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				// get vec4
+				glm::vec4 v;
+				lua_getvec4( lua, 1, v );
 
-		// set result
-		v = glm::normalize( v );
-		lua_setvec4( lua, 1, v );
+				// set result
+				v = glm::normalize( v );
+				lua_setvec4( lua, 1, v );
+			}
+		}
 
 		return 0;
 	}
 
 	int vec4::distance( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_TABLE( 1 );
-		LUA_EXPECT_TABLE( 2 );
+		LUA_EXPECT_TABLE( 2 );*/
 
-		// get a
-		glm::vec4 a;
-		lua_getvec4( lua, 1, a );
+		int result = 0;
+		LUA_EXPECT_ARGS( 2 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) )
+			{
+				// get a
+				glm::vec4 a;
+				lua_getvec4( lua, 1, a );
 
-		// get b
-		glm::vec4 b;
-		lua_getvec4( lua, 2, b );
+				// get b
+				glm::vec4 b;
+				lua_getvec4( lua, 2, b );
 
-		// push result
-		float dist = glm::distance( a, b );
-		lua_pushnumber( lua, dist );
+				// push result
+				float dist = glm::distance( a, b );
+				lua_pushnumber( lua, dist );
 
-		return 1;
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int vec4::direction( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 3 );
+		/*LUA_ASSERT_ARGS( 3 );
 		LUA_EXPECT_TABLE( 1 );
 		LUA_EXPECT_TABLE( 2 );
-		LUA_EXPECT_TABLE( 3 );
+		LUA_EXPECT_TABLE( 3 );*/
 
-		// get a
-		glm::vec4 a;
-		lua_getvec4( lua, 1, a );
+		LUA_EXPECT_ARGS( 3 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) &&
+				LUA_EXPECT_TABLE( 3 ) )
+			{
+				// get a
+				glm::vec4 a;
+				lua_getvec4( lua, 1, a );
 
-		// get b
-		glm::vec4 b;
-		lua_getvec4( lua, 2, b );
+				// get b
+				glm::vec4 b;
+				lua_getvec4( lua, 2, b );
 
-		// set result
-		glm::vec4 dir = glm::normalize( b - a );
-		lua_setvec4( lua, 3, dir );
+				// set result
+				glm::vec4 dir = glm::normalize( b - a );
+				lua_setvec4( lua, 3, dir );
+			}
+		}
 
 		return 0;
 	}
 
 	int vec4::print( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_TABLE( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_TABLE( 1 );*/
 
-		// get vec4 
-		glm::vec4 v;
-		lua_getvec4( lua, 1, v );
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				// get vec4 
+				glm::vec4 v;
+				lua_getvec4( lua, 1, v );
 
-		// print vec4
-		LOG_DEBUG( "(%f,%f,%f,%f)", v.x, v.y, v.z, v.w );
+				// print vec4
+				LOG_DEBUG( "(%f,%f,%f,%f)", v.x, v.y, v.z, v.w );
+			}
+		}
 
 		return 0;
 	}
 
 	int vec4::tostring( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 1 );
-		LUA_EXPECT_TABLE( 1 );
+		/*LUA_ASSERT_ARGS( 1 );
+		LUA_EXPECT_TABLE( 1 );*/
 
-		// get vec4
-		glm::vec4 v;
-		lua_getvec4( lua, 1, v );
+		int result = 0;
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				// get vec4
+				glm::vec4 v;
+				lua_getvec4( lua, 1, v );
 
-		// push result
-		char buf[32];
-		snprintf( buf, 32, "(%f,%f,%f,%f)", v.x, v.y, v.z, v.w );
-		lua_pushstring( lua, buf );
+				// push result
+				char buf[32];
+				snprintf( buf, 32, "(%f,%f,%f,%f)", v.x, v.y, v.z, v.w );
+				lua_pushstring( lua, buf );
 
-		return 1;
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int vec4::copy( lua_State* lua )
 	{
-		LUA_ASSERT_ARGS( 2 );
+		/*LUA_ASSERT_ARGS( 2 );
 		LUA_EXPECT_TABLE( 1 );
-		LUA_EXPECT_TABLE( 2 );
+		LUA_EXPECT_TABLE( 2 );*/
 
-		// get vec4
-		glm::vec4 v;
-		lua_getvec4( lua, 1, v );
+		LUA_EXPECT_ARGS( 2 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_TABLE( 2 ) )
+			{
+				// get vec4
+				glm::vec4 v;
+				lua_getvec4( lua, 1, v );
 
-		// set result
-		lua_setvec4( lua, 2, v);
+				// set result
+				lua_setvec4( lua, 2, v);
+			}
+		}
 
 		return 0;
 	}
