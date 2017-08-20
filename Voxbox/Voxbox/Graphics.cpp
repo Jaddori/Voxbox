@@ -402,6 +402,11 @@ void Graphics::queueText( Font* font, const char* text, const glm::vec2& positio
 			Glyph& glyph = collection.glyphs[writeIndex].append();
 
 			glyph.position = position + offset;
+
+			// avoid sub-pixel positions
+			glyph.position.x = (int)( glyph.position.x + 0.5f );
+			glyph.position.y = (int)( glyph.position.y + 0.5f );
+
 			glyph.uv = font->getUV( c );
 			glyph.size.x = (float)font->getWidth( c );
 			glyph.size.y = (float)font->getHeight();
