@@ -48,7 +48,7 @@ end
 function console:unload()
 end
 
-function console:update()
+function console:update( dt )
 	-- get messages from log
 	self.threshold = Log.getThreshold()
 	Log.getMessages( self.messages, self.verbosities, self.prevMessageCount )
@@ -120,7 +120,7 @@ function console:update()
 		end
 		
 		-- flash caret
-		self.input.caretElapsed = self.input.caretElapsed - 0.01
+		self.input.caretElapsed = self.input.caretElapsed - dt
 		if self.input.caretElapsed < 0.0 then
 			self.input.caretElapsed = CONSOLE_INPUT_CARET_FLASH_TIME
 			self.input.caretVisible = not self.input.caretVisible
@@ -140,7 +140,7 @@ function console:update()
 	end
 	
 	if self.flashTime > 0.0 then
-		self.flashTime = self.flashTime - 0.01
+		self.flashTime = self.flashTime - dt
 	end
 end
 

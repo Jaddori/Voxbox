@@ -33,6 +33,8 @@ DWORD WINAPI update( LPVOID args )
 	DebugShapes& debugShapes	=	*data->coreData->debugShapes;
 	LuaBinds& luaBinds			=	*data->luaBinds;
 
+	long lastTick = SDL_GetTicks();
+
 	while( *data->coreData->running )
 	{
 		DWORD result = WaitForSingleObject( data->renderDone, THREAD_UPDATE_WAIT );
@@ -47,7 +49,11 @@ DWORD WINAPI update( LPVOID args )
 			const Frustum& frustum = perspectiveCamera.getFrustum();
 			world.queueChunks( data->coreData, frustum );
 
-			luaBinds.update();
+			long curTick = SDL_GetTicks();
+			float deltaTime = ( curTick - lastTick ) * 0.001f; // delta time in seconds
+			lastTick = curTick;
+
+			luaBinds.update( deltaTime );
 			luaBinds.render();
 
 			ReleaseSemaphore( data->updateDone, 1, NULL );

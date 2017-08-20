@@ -6,66 +6,66 @@ local INFO_TEXT_COLOR = { 1, 1, 1, 1 }
 info = {}
 
 function info:load()
-	info.font = Assets.loadFont( "./assets/fonts/verdana12.bin", "./assets/fonts/verdana12.dds" )
-	info.bounds = { WINDOW_WIDTH-INFO_WIDTH, 0, INFO_WIDTH, INFO_HEIGHT }
-	info.cores = 0
-	info.threads = 0
-	info.ram = 0
-	info.luaRam = 0
-	info.vsync = true
+	self.font = Assets.loadFont( "./assets/fonts/verdana12.bin", "./assets/fonts/verdana12.dds" )
+	self.bounds = { WINDOW_WIDTH-INFO_WIDTH, 0, INFO_WIDTH, INFO_HEIGHT }
+	self.cores = 0
+	self.threads = 0
+	self.ram = 0
+	self.luaRam = 0
+	self.vsync = true
 	
-	info.coreText = ""
-	info.threadText = ""
-	info.ramText = ""
-	info.luaRamText = ""
-	info.vsyncText = ""
+	self.coreText = ""
+	self.threadText = ""
+	self.ramText = ""
+	self.luaRamText = ""
+	self.vsyncText = ""
 	
 	local yoffset = 0.0
-	info.corePosition = { info.bounds[1], info.bounds[2] + yoffset }
+	self.corePosition = { self.bounds[1], self.bounds[2] + yoffset }
 	
-	yoffset = yoffset + info.font.height
-	info.threadPosition = { info.bounds[1], info.bounds[2] + yoffset }
+	yoffset = yoffset + self.font.height
+	self.threadPosition = { self.bounds[1], self.bounds[2] + yoffset }
 	
-	yoffset = yoffset + info.font.height
-	info.ramPosition = { info.bounds[1], info.bounds[2] + yoffset }
+	yoffset = yoffset + self.font.height
+	self.ramPosition = { self.bounds[1], self.bounds[2] + yoffset }
 	
-	yoffset = yoffset + info.font.height
-	info.luaRamPosition = { info.bounds[1], info.bounds[2] + yoffset }
+	yoffset = yoffset + self.font.height
+	self.luaRamPosition = { self.bounds[1], self.bounds[2] + yoffset }
 	
-	yoffset = yoffset + info.font.height
-	info.vsyncPosition = { info.bounds[1], info.bounds[2] + yoffset }
+	yoffset = yoffset + self.font.height
+	self.vsyncPosition = { self.bounds[1], self.bounds[2] + yoffset }
 	
-	info.elapsedTime = INFO_POLL_FREQUENCY
+	self.elapsedTime = INFO_POLL_FREQUENCY
 end
 
 function info:unload()
 end
 
-function info:update()
-	info.elapsedTime = info.elapsedTime + 0.005
-	if info.elapsedTime > INFO_POLL_FREQUENCY then
-		info.elapsedTime = 0
+function info:update( dt )
+	self.elapsedTime = self.elapsedTime + dt
+	if self.elapsedTime > INFO_POLL_FREQUENCY then
+		self.elapsedTime = 0
 		
 		SystemInfo.poll()
-		info.cores = SystemInfo.getCores()
-		info.threads = SystemInfo.getThreads()
-		info.ram = SystemInfo.getRam()
-		info.luaRam = collectgarbage("count") * UNIT_KILOBYTES
-		info.vsync = SystemInfo.getVsync()
+		self.cores = SystemInfo.getCores()
+		self.threads = SystemInfo.getThreads()
+		self.ram = SystemInfo.getRam()
+		self.luaRam = collectgarbage("count") * UNIT_KILOBYTES
+		self.vsync = SystemInfo.getVsync()
 		
-		info.coreText = tostring( info.cores ) .. " available cores"
-		info.threadText = tostring( info.threads ) .. " running threads"
+		self.coreText = tostring( self.cores ) .. " available cores"
+		self.threadText = tostring( self.threads ) .. " running threads"
 		
-		local shrunkenBytes, newUnit = Core.shrinkBytes( info.ram )
-		info.ramText = "RAM: " .. byteString( shrunkenBytes, newUnit )
+		local shrunkenBytes, newUnit = Core.shrinkBytes( self.ram )
+		self.ramText = "RAM: " .. byteString( shrunkenBytes, newUnit )
 		
-		shrunkenBytes, newUnit = Core.shrinkBytes( info.luaRam )
-		info.luaRamText = "Lua RAM: " .. byteString( shrunkenBytes, newUnit )
+		shrunkenBytes, newUnit = Core.shrinkBytes( self.luaRam )
+		self.luaRamText = "Lua RAM: " .. byteString( shrunkenBytes, newUnit )
 		
-		if info.vsync then
-			info.vsyncText = "VSYNC enabled"
+		if self.vsync then
+			self.vsyncText = "VSYNC enabled"
 		else
-			info.vsyncText = "VSYNC disabled"
+			self.vsyncText = "VSYNC disabled"
 		end
 	end
 end

@@ -27,15 +27,15 @@ function mainUnload()
 	workerUnload()
 end
 
-function mainUpdate()
-	console:update()
-	info:update()
+function mainUpdate( dt )
+	console:update( dt )
+	info:update( dt )
 	
 	if not console.visible then
-		camera:update()
+		camera:update( dt )
 	end
 	
-	workers[1]:update()
+	workers[1]:update( dt )
 	
 	if Input.buttonReleased( Buttons.Right ) then
 		Camera.unproject( camera.mousePosition, 0.0, rayStart )

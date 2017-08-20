@@ -4,7 +4,7 @@ camera =
 	mouseDelta = {0,0},
 }
 
-function camera:update()
+function camera:update( dt )
 	-- get mouse position and mouse delta
 	Input.getMousePosition( self.mousePosition )
 	Input.getMouseDelta( self.mouseDelta )

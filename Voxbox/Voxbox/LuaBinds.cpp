@@ -97,6 +97,20 @@ bool LuaBinds::bind( CoreData* coreData )
 	return valid;
 }
 
+void LuaBinds::update( float deltaTime )
+{
+	LOG_ASSERT( valid, "Trying to update with invalid state." );
+
+	lua_rawgeti( lua, LUA_REGISTRYINDEX, updateFunctionReference );
+	lua_pushnumber( lua, deltaTime );
+	if( lua_pcall( lua, 1, 0, 0, ) != 0 )
+	{
+		LOG_ERROR( "Failed to run update function." );
+		LOG_ERROR( "%s", lua_tostring( lua, -1 ) );
+		valid = false;
+	}
+}
+
 bool LuaBinds::getValid() const
 {
 	return valid;

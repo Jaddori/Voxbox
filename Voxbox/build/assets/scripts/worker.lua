@@ -3,7 +3,6 @@ require( "./assets/scripts/utils" )
 function workerLoad()
 	Worker =
 	{
-		--position = {0,0,0},
 		position = vec3(),
 		size = {2,4},
 		texture = Assets.loadTexture( "./assets/textures/worker.dds" ),
@@ -16,8 +15,6 @@ function workerLoad()
 	
 	Worker.setTarget = function( self, worldBlock )
 		self.curPathNode = World.findPath( self.position, worldBlock, self.path )
-		Log.log( VERBOSITY_DEBUG, "Cur path node: " .. tostring(self.curPathNode) )
-		Log.log( VERBOSITY_DEBUG, "Path nodes: " .. tostring(#self.path) )
 	end
 	
 	Worker.create = function( self )
@@ -31,17 +28,11 @@ function workerLoad()
 	Worker.destroy = function( self )
 	end
 
-	Worker.update = function( self )
+	Worker.update = function( self, dt )
 		if self.curPathNode > 0 then
 			local target = self.path[self.curPathNode]
 			
-			--local dir = Vec3.direction( self.position, target )
 			Vec3.direction( self.position, target, self.direction )
-			
-			--local movement = {0,0,0}
-			--Vec3.mul( self.direction, 0.05, movement )
-			--Vec3.addeq( self.position, movement )
-			
 			self.position = self.position + ( self.direction * 0.05 )
 			
 			if Vec3.distance( self.position, target ) < 0.1 then

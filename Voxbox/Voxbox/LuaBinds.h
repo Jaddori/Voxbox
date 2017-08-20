@@ -22,7 +22,7 @@ public:
 
 	inline void load() { run( loadFunctionReference ); }
 	inline void unload() { run( unloadFunctionReference ); }
-	inline void update() { run( updateFunctionReference ); }
+	void update( float deltaTime );
 	inline void render() { run( renderFunctionReference ); }
 
 	bool getValid() const;
