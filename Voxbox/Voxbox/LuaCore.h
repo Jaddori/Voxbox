@@ -8,6 +8,8 @@ namespace LuaCore
 
 	int convertBytes( lua_State* lua );
 	int shrinkBytes( lua_State* lua );
+	int exit( lua_State* lua );
+	int restart( lua_State* lua );
 
 	// vec2
 	namespace vec2

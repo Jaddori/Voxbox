@@ -2,6 +2,8 @@
 
 namespace LuaCore
 {
+	static CoreData* g_coreData;
+
 	void bind( lua_State* lua, CoreData* coreData )
 	{
 		// metatable for core
@@ -10,6 +12,8 @@ namespace LuaCore
 		{
 			{ "convertBytes",	convertBytes },
 			{ "shrinkBytes",	shrinkBytes },
+			{ "exit",			exit },
+			{ "restart",		restart },
 			{ NULL, NULL }
 		};
 
@@ -116,6 +120,8 @@ namespace LuaCore
 		lua_setglobal( lua, "Vec4" );
 
 		lua_register( lua, "vec4", vec4::create );
+
+		g_coreData = coreData;
 	}
 
 	int convertBytes( lua_State* lua )
@@ -153,6 +159,25 @@ namespace LuaCore
 		lua_pushnumber( lua, newUnit );
 
 		return 2;
+	}
+
+	int exit( lua_State* lua )
+	{
+		LUA_ASSERT_ARGS( 0 );
+
+		*g_coreData->running = false;
+		*g_coreData->executing = false;
+
+		return 0;
+	}
+
+	int restart( lua_State* lua )
+	{
+		LUA_ASSERT_ARGS( 0 );
+
+		*g_coreData->running = false;
+
+		return 0;
 	}
 
 	// vec2

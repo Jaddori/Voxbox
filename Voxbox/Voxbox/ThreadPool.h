@@ -3,7 +3,7 @@
 #include "BaseIncludes.h"
 
 #define THREAD_POOL_MAX_THREADS 2
-#define THREAD_POOL_TIMEOUT 1000
+#define THREAD_POOL_TIMEOUT 100
 
 typedef void (Task)( void* args );
 struct Job

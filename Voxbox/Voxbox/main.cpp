@@ -18,7 +18,6 @@ struct ThreadData
 {
 	CoreData* coreData;
 	LuaBinds* luaBinds;
-	bool running;
 	HANDLE updateDone;
 	HANDLE renderDone;
 };
@@ -34,13 +33,16 @@ DWORD WINAPI update( LPVOID args )
 	DebugShapes& debugShapes	=	*data->coreData->debugShapes;
 	LuaBinds& luaBinds			=	*data->luaBinds;
 
-	while( data->running )
+	while( *data->coreData->running )
 	{
 		DWORD result = WaitForSingleObject( data->renderDone, THREAD_UPDATE_WAIT );
 		if( result == WAIT_OBJECT_0 )
 		{
 			if( input.keyReleased( SDL_SCANCODE_ESCAPE ) )
-				data->running = false;
+			{
+				*data->coreData->running = false;
+				*data->coreData->executing = false;
+			}
 
 			const Frustum& frustum = perspectiveCamera.getFrustum();
 			world.queueChunks( data->coreData, frustum );
@@ -84,108 +86,118 @@ int main( int argc, char* argv[] )
 			glEnable( GL_DEPTH_TEST );
 			glEnable( GL_CULL_FACE );
 			SDL_GL_SetSwapInterval( 1 );
-			//srand( time( 0 ) );
-			srand( 1337 );
 
-			ThreadPool threadPool;
-			threadPool.load();
-
-			Assets assets;
-
-			Graphics graphics;
-			graphics.load( &assets );
-			graphics.getPerspectiveCamera().setPosition( glm::vec3( 0.0f, 0.0f, -10.0f ) );
-
-			World world;
-			world.load( &threadPool );
-
-			DebugShapes debugShapes;
-			debugShapes.load();
-			debugShapes.upload();
-
-			Input input;
-
-			SystemInfo systemInfo;
-			systemInfo.poll();
-
-			CoreData coreData;
-			coreData.perspectiveCamera = &graphics.getPerspectiveCamera();
-			coreData.input = &input;
-			coreData.world = &world;
-			coreData.graphics = &graphics;
-			coreData.debugShapes = &debugShapes;
-			coreData.assets = &assets;
-			coreData.systemInfo = &systemInfo;
-			 
-			LuaBinds luaBinds;
-			luaBinds.bind( &coreData );
-			luaBinds.load();
-
-			ThreadData threadData;
-			threadData.coreData = &coreData;
-			threadData.luaBinds = &luaBinds;
-			threadData.running = true;
-			threadData.updateDone = CreateSemaphore( NULL, 0, 1, NULL );
-			threadData.renderDone = CreateSemaphore( NULL, 1, 1, NULL );
-			HANDLE updateThread = CreateThread( NULL, 0, update, &threadData, 0, NULL );
-
-			long fpsTimer = SDL_GetTicks();
-			int fps = 0;
-
-			while( threadData.running )
+			bool executing = true;
+			while( executing )
 			{
-				if( WaitForSingleObject( threadData.updateDone, INFINITE ) == WAIT_OBJECT_0 )
+				bool running = true;
+
+				//srand( time( 0 ) );
+				srand( 1337 );
+
+				ThreadPool threadPool;
+				threadPool.load();
+
+				Assets assets;
+
+				Graphics graphics;
+				graphics.load( &assets );
+				graphics.getPerspectiveCamera().setPosition( glm::vec3( 0.0f, 0.0f, -10.0f ) );
+
+				World world;
+				world.load( &threadPool );
+
+				DebugShapes debugShapes;
+				debugShapes.load();
+				debugShapes.upload();
+
+				Input input;
+
+				SystemInfo systemInfo;
+				systemInfo.poll();
+
+				CoreData coreData;
+				coreData.perspectiveCamera = &graphics.getPerspectiveCamera();
+				coreData.input = &input;
+				coreData.world = &world;
+				coreData.graphics = &graphics;
+				coreData.debugShapes = &debugShapes;
+				coreData.assets = &assets;
+				coreData.systemInfo = &systemInfo;
+				coreData.running = &running;
+				coreData.executing = &executing;
+			 
+				LuaBinds luaBinds;
+				luaBinds.bind( &coreData );
+				luaBinds.load();
+
+				ThreadData threadData;
+				threadData.coreData = &coreData;
+				threadData.luaBinds = &luaBinds;
+				threadData.updateDone = CreateSemaphore( NULL, 0, 1, NULL );
+				threadData.renderDone = CreateSemaphore( NULL, 1, 1, NULL );
+				HANDLE updateThread = CreateThread( NULL, 0, update, &threadData, 0, NULL );
+
+				long fpsTimer = SDL_GetTicks();
+				int fps = 0;
+
+				while( running )
 				{
-					input.reset();
-
-					// events
-					SDL_Event e;
-					while( SDL_PollEvent( &e ) )
+					if( WaitForSingleObject( threadData.updateDone, INFINITE ) == WAIT_OBJECT_0 )
 					{
-						if( e.type == SDL_QUIT )
-							threadData.running = false;
+						input.reset();
 
-						input.update( &e );
+						// events
+						SDL_Event e;
+						while( SDL_PollEvent( &e ) )
+						{
+							input.update( &e );
+						}
+
+						// finalize objects
+						assets.upload();
+						graphics.finalize();
+						debugShapes.finalize();
+
+						world.upload();
+
+						threadPool.schedule();
+
+						ReleaseSemaphore( threadData.renderDone, 1, NULL );
 					}
 
-					// finalize objects
-					assets.upload();
-					graphics.finalize();
-					debugShapes.finalize();
+					// render
+					glClearColor( 0.15f, 0.15f, 0.15f, 0.0f );
+					glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-					world.upload();
+					graphics.render();
 
-					threadPool.schedule();
+					debugShapes.render( graphics.getPerspectiveCamera().getProjectionMatrix(), graphics.getPerspectiveCamera().getViewMatrix() );
 
-					ReleaseSemaphore( threadData.renderDone, 1, NULL );
+					SDL_GL_SwapWindow( window );
+
+					long ticks = SDL_GetTicks();
+					if( ticks - fpsTimer > 1000 )
+					{
+						//printf( "Fps: %d\n", fps );
+
+						fpsTimer = ticks;
+						fps = 0;
+					}
+					else
+						fps++;
 				}
 
-				// render
-				glClearColor( 0.15f, 0.15f, 0.15f, 0.0f );
-				glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+				luaBinds.unload();
+				threadPool.unload();
+				assets.unload();
+				graphics.unload();
+				world.unload();
+				debugShapes.unload();
 
-				graphics.render();
-
-				debugShapes.render( graphics.getPerspectiveCamera().getProjectionMatrix(), graphics.getPerspectiveCamera().getViewMatrix() );
-
-				SDL_GL_SwapWindow( window );
-
-				long ticks = SDL_GetTicks();
-				if( ticks - fpsTimer > 1000 )
-				{
-					//printf( "Fps: %d\n", fps );
-
-					fpsTimer = ticks;
-					fps = 0;
-				}
-				else
-					fps++;
+				LOG_INFO( "Waiting for update thread to finish." );
+				WaitForSingleObject( updateThread, INFINITE );
 			}
-
-			threadPool.unload();
-
-			LOG_INFO( "Waiting for update thread to finish." );
-			WaitForSingleObject( updateThread, INFINITE );
 
 			LOG_INFO( "Deleting OpenGL context." );
 			SDL_GL_DeleteContext( context );

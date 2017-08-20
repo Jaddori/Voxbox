@@ -16,4 +16,5 @@ struct CoreData
 	DebugShapes* debugShapes;
 	Assets* assets;
 	SystemInfo* systemInfo;
+	bool* running, *executing;
 };
