@@ -10,6 +10,7 @@
 #define GRAPHICS_MAX_GLYPHS 128
 #define GRAPHICS_MAX_QUADS 128
 #define GRAPHICS_MAX_BILLBOARDS 128
+#define GRAPHICS_MAX_BLOCKS 128
 
 struct Glyph
 {
@@ -53,6 +54,18 @@ struct BillboardCollection
 	Array<Billboard> billboards[2];
 };
 
+struct Block
+{
+	glm::vec3 position;
+	glm::vec4 color;
+};
+
+struct BlockCollection
+{
+	//Texture* texture;
+	Array<Block> blocks[2];
+};
+
 class Graphics
 {
 public:
@@ -66,6 +79,7 @@ public:
 	void render();
 
 	void queueChunk( Chunk* chunk );
+	void queueBlock( const glm::vec3& position, const glm::vec4& color );
 	void queueText( Font* font, const char* text, const glm::vec2& position, const glm::vec4& color );
 	void queueQuad( const glm::vec2& position, const glm::vec2& size, const glm::vec4& uv, float opacity, Texture* texture );
 	void queueBillboard( const glm::vec3& position, const glm::vec2& size, const glm::vec4& uv, bool spherical, Texture* texture );
@@ -87,6 +101,18 @@ private:
 	GLint chunkOffsetLocation;
 
 	Array<Chunk*> chunks[2];
+
+	// rendering blocks
+	Shader blockShader;
+	GLint blockProjectionMatrixLocation;
+	GLint blockViewMatrixLocation;
+	
+	GLuint blockVAO;
+	GLuint blockVBO;
+	GLuint blockIBO;
+	GLuint blockUBO;
+
+	Array<BlockCollection> blockCollections;
 	
 	// rendering text
 	Shader textShader;

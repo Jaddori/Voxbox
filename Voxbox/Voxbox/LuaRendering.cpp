@@ -11,6 +11,7 @@ namespace LuaRendering
 		luaL_Reg graphicsRegs[] =
 		{
 			{ "queueChunk",			queueChunk },
+			{ "queueBlock",			queueBlock },
 			{ "queueText",			queueText },
 			{ "queueQuad",			queueQuad },
 			{ "queueBillboard",		queueBillboard },
@@ -27,6 +28,25 @@ namespace LuaRendering
 
 	int queueChunk( lua_State* lua )
 	{
+		return 0;
+	}
+
+	int queueBlock( lua_State* lua )
+	{
+		LUA_ASSERT_ARGS( 2 );
+		LUA_EXPECT_TABLE( 1 );
+		LUA_EXPECT_TABLE( 2 );
+
+		// get position
+		glm::vec3 position;
+		lua_getvec3( lua, 1, position );
+
+		// get opacity
+		glm::vec4 color;
+		lua_getvec4( lua, 2, color );
+
+		g_coreData->graphics->queueBlock( position, color );
+
 		return 0;
 	}
 

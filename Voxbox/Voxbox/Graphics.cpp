@@ -2,6 +2,8 @@
 
 Graphics::Graphics()
 	: chunkViewMatrixLocation( 0 ), chunkProjectionMatrixLocation( 0 ), chunkOffsetLocation( 0 ),
+	blockViewMatrixLocation( 0 ), blockProjectionMatrixLocation( 0 ),
+	blockVAO( 0 ), blockVBO( 0 ), blockIBO( 0 ), blockUBO( 0 ),
 	textProjectionMatrixLocation( 0 ), textVAO( 0 ), textVBO( 0 ),
 	quadProjectionMatrixLocation( 0 ), quadVAO( 0 ), quadVBO( 0 ),
 	billboardProjectionMatrixLocation( 0 ), billboardViewMatrixLocation( 0 ),
@@ -42,19 +44,132 @@ bool Graphics::load( Assets* assets )
 	}
 
 	LOG_INFO( "Loading block atlas." );
-	/*if( blockAtlas.load( "./assets/textures/blocks.dds" ) )
-	{
-		blockAtlas.upload();
-	}
-	else
-	{
-		LOG( VERBOSITY_ERROR, "Graphics.cpp - Failed to load block atlas." );
-		result = false;
-	}*/
 	blockAtlas = assets->loadTexture( "./assets/textures/blocks.dds" );
 	if( blockAtlas == nullptr )
 	{
 		LOG_ERROR( "Failed to load block atlas." );
+		result = false;
+	}
+
+	LOG_INFO( "Loading block shader." );
+	if( blockShader.load( "./assets/shaders/block.vs",
+							nullptr,
+							"./assets/shaders/block.fs" ) )
+	{
+		LOG_INFO( "Retrieving uniform locations from block shader." );
+		blockViewMatrixLocation = blockShader.getLocation( "viewMatrix" );
+		blockProjectionMatrixLocation = blockShader.getLocation( "projectionMatrix" );
+
+		LOG_INFO( "Generating vertex data for block shader." );
+		glGenVertexArrays( 1, &blockVAO );
+		glBindVertexArray( blockVAO );
+
+		glEnableVertexAttribArray( 0 );
+		glEnableVertexAttribArray( 1 );
+		glEnableVertexAttribArray( 2 );
+
+		glGenBuffers( 1, &blockVBO );
+		glGenBuffers( 1, &blockIBO );
+
+		glBindBuffer( GL_ARRAY_BUFFER, blockVBO );
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, blockIBO );
+		
+		const glm::vec3 frontBotLeft( -0.01f, -0.01f, -0.01f );
+		const glm::vec3 frontTopLeft( -0.01f,  1.01f, -0.01f );
+		const glm::vec3 frontBotRight( 1.01f, -0.01f, -0.01f );
+		const glm::vec3 frontTopRight( 1.01f,  1.01f, -0.01f );
+
+		const glm::vec3 backBotLeft( -0.01f, -0.01f, 1.01f );
+		const glm::vec3 backTopLeft( -0.01f,  1.01f, 1.01f );
+		const glm::vec3 backBotRight( 1.01f, -0.01f, 1.01f );
+		const glm::vec3 backTopRight( 1.01f,  1.01f, 1.01f );
+
+		glm::vec3 vdata[] =
+		{
+			// front
+			frontBotLeft,
+			frontTopLeft,
+			frontBotRight,
+			frontTopRight,
+
+			// back
+			backBotRight,
+			backTopRight,
+			backBotLeft,
+			backTopLeft,
+
+			// left
+			backBotLeft,
+			backTopLeft,
+			frontBotLeft,
+			frontTopLeft,
+
+			// right
+			frontBotRight,
+			frontTopRight,
+			backBotRight,
+			backTopRight,
+
+			// top
+			frontTopLeft,
+			backTopLeft,
+			frontTopRight,
+			backTopRight,
+
+			// bottom
+			backBotLeft,
+			frontBotLeft,
+			backBotRight,
+			frontBotRight
+		};
+
+		GLuint idata[] =
+		{
+			// front
+			0, 1, 2,
+			1, 3, 2,
+
+			// back
+			4, 5, 6,
+			5, 7, 6,
+
+			// left
+			8, 9, 10,
+			9, 11, 10,
+
+			// right
+			12, 13, 14,
+			13, 15, 14,
+
+			// top
+			16, 17, 18,
+			17, 19, 18,
+
+			// bottom
+			20, 21, 22,
+			21, 23, 22,
+		};
+
+		glBufferData( GL_ARRAY_BUFFER, sizeof(vdata), vdata, GL_STATIC_DRAW );
+		glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(idata), idata, GL_STATIC_DRAW );
+
+		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*3, 0 );
+
+		glGenBuffers( 1, &blockUBO );
+		glBindBuffer( GL_ARRAY_BUFFER, blockUBO );
+		glBufferData( GL_ARRAY_BUFFER, sizeof(Block)*GRAPHICS_MAX_BLOCKS, nullptr, GL_STREAM_DRAW );
+
+		glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, sizeof(Block), 0 );
+		glVertexAttribPointer( 2, 4, GL_FLOAT, GL_FALSE, sizeof(Block), (void*)(sizeof(glm::vec3)) );
+
+		glVertexAttribDivisor( 1, 1 );
+		glVertexAttribDivisor( 2, 1 );
+
+		glBindVertexArray( 0 );
+	}
+	else
+	{
+		LOG_ERROR( "Failed to load block shader." );
 		result = false;
 	}
 
@@ -169,7 +284,20 @@ void Graphics::unload()
 	LOG_INFO( "Unloading." );
 
 	chunkShader.unload();
+	blockShader.unload();
 	textShader.unload();
+	quadShader.unload();
+	billboardShader.unload();
+
+	if( blockVAO )
+	{
+		glDeleteVertexArrays( 1, &blockVAO );
+		glDeleteBuffers( 1, &blockVBO );
+		glDeleteBuffers( 1, &blockIBO );
+		glDeleteBuffers( 1, &blockUBO );
+	}
+
+	blockVAO = blockVBO = blockIBO = blockUBO = 0;
 
 	if( textVAO )
 	{
@@ -203,11 +331,17 @@ void Graphics::finalize()
 	orthographicCamera.finalize();
 
 	// swap index
-	writeIndex = ( writeIndex + 1 ) % 2;
-	readIndex = ( readIndex + 1 ) % 2;
+	//writeIndex = ( writeIndex + 1 ) % 2;
+	//readIndex = ( readIndex + 1 ) % 2;
+	swap( writeIndex, readIndex );
 
 	// swap chunks
 	chunks[writeIndex].clear();
+
+	// swap blocks
+	const int BLOCK_COLLECTION_COUNT = blockCollections.getSize();
+	for( int i=0; i<BLOCK_COLLECTION_COUNT; i++ )
+		blockCollections[i].blocks[writeIndex].clear();
 
 	// swap glyphs
 	const int GLYPH_COLLECTION_COUNT = glyphCollections.getSize();
@@ -239,6 +373,41 @@ void Graphics::render()
 		chunks[readIndex][i]->render();
 
 	glBindTexture( GL_TEXTURE_2D, 0 ); // prevent binding leaks
+
+	// render blocks
+	glEnable( GL_BLEND );
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+	blockShader.bind();
+	blockShader.setMat4( blockProjectionMatrixLocation, perspectiveCamera.getProjectionMatrix() );
+	blockShader.setMat4( blockViewMatrixLocation, perspectiveCamera.getViewMatrix() );
+
+	glBindVertexArray( blockVAO );
+	glBindBuffer( GL_ARRAY_BUFFER, blockUBO );
+
+	const int BLOCK_COLLECTION_COUNT = blockCollections.getSize();
+	for( int curCollection = 0; curCollection < BLOCK_COLLECTION_COUNT; curCollection++ )
+	{
+		BlockCollection& collection = blockCollections[curCollection];
+
+		const int BLOCK_COUNT = collection.blocks[readIndex].getSize();
+		int offset = 0;
+		while( offset < BLOCK_COUNT )
+		{
+			int count = BLOCK_COUNT - offset;
+			if( count > GRAPHICS_MAX_BLOCKS )
+				count = GRAPHICS_MAX_BLOCKS;
+			
+			glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(Block)*count, collection.blocks[readIndex].getData() + offset );
+			glDrawElementsInstanced( GL_TRIANGLES, 6*6, GL_UNSIGNED_INT, nullptr, count );
+
+			offset += count;
+		}
+	}
+
+	glDisable( GL_BLEND );
+
+	glBindVertexArray( 0 );
 
 	// render billboards
 	billboardShader.bind();
@@ -358,6 +527,22 @@ void Graphics::render()
 void Graphics::queueChunk( Chunk* chunk )
 {
 	chunks[writeIndex].add( chunk );
+}
+
+void Graphics::queueBlock( const glm::vec3& position, const glm::vec4& color )
+{
+	if( blockCollections.getSize() <= 0 )
+	{
+		BlockCollection& collection = blockCollections.append();
+		collection.blocks[writeIndex].expand( GRAPHICS_MAX_BLOCKS );
+		collection.blocks[readIndex].expand( GRAPHICS_MAX_BLOCKS );
+	}
+
+	BlockCollection& collection = blockCollections[0];
+
+	Block& block = collection.blocks[writeIndex].append();
+	block.position = position;
+	block.color = color;
 }
 
 void Graphics::queueText( Font* font, const char* text, const glm::vec2& position, const glm::vec4& color )

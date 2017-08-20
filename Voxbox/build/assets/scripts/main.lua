@@ -61,4 +61,10 @@ function mainRender()
 	if haveRay then
 		DebugShapes.addLine( rayStart, rayEnd, {1,1,0,1} )
 	end
+	
+	---[[
+	Graphics.queueBlock( {6,31, 25}, {1,0,0,0.6} )
+	Graphics.queueBlock( {6,31, 26}, {1,0,0,0.6} )
+	Graphics.queueBlock( {5,31, 25}, {1,0,0,0.6} )
+	Graphics.queueBlock( {5,31, 26}, {1,0,0,0.6} )--]]
 end
