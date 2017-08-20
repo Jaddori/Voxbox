@@ -157,6 +157,8 @@ int main( int argc, char* argv[] )
 						SDL_Event e;
 						while( SDL_PollEvent( &e ) )
 						{
+							if( e.type == SDL_QUIT )
+								executing = running = false;
 							input.update( &e );
 						}
 
@@ -194,15 +196,15 @@ int main( int argc, char* argv[] )
 						fps++;
 				}
 
+				LOG_INFO( "Waiting for update thread to finish." );
+				WaitForSingleObject( updateThread, INFINITE );
+
 				luaBinds.unload();
 				threadPool.unload();
 				assets.unload();
 				graphics.unload();
 				world.unload();
-				debugShapes.unload();
-
-				LOG_INFO( "Waiting for update thread to finish." );
-				WaitForSingleObject( updateThread, INFINITE );
+				debugShapes.unload();				
 			}
 
 			LOG_INFO( "Deleting OpenGL context." );
