@@ -116,7 +116,7 @@ int main( int argc, char* argv[] )
 			coreData.debugShapes = &debugShapes;
 			coreData.assets = &assets;
 			coreData.systemInfo = &systemInfo;
-
+			 
 			LuaBinds luaBinds;
 			luaBinds.bind( &coreData );
 			luaBinds.load();

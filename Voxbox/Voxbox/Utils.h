@@ -56,3 +56,11 @@ inline float shrinkBytes( int bytes, int& newUnit )
 	
 	return convertBytes( bytes, newUnit );
 }
+
+template<typename T>
+inline void swap( T& a, T& b )
+{
+	T temp = a;
+	a = b;
+	b = temp;
+}

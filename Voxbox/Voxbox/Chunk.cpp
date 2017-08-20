@@ -1,7 +1,7 @@
 #include "Chunk.h"
 
 Chunk::Chunk()
-	: vao( 0 ), vbo( 0 ), ibo( 0 ),
+	: writeIndex( 0 ), readIndex( 1 ),
 	vertices( nullptr ), indices( nullptr ),
 	valid( false ), uploaded( false ), dirty( false )
 {
@@ -14,6 +14,10 @@ Chunk::Chunk()
 		blocks[at( 5, y, 5 )] = y % 3;
 	}
 #endif
+
+	vao[0] = vao[1] = 0;
+	vbo[0] = vbo[1] = 0;
+	ibo[0] = ibo[1] = 0;
 }
 
 Chunk::~Chunk()
@@ -24,32 +28,35 @@ void Chunk::upload()
 {
 	LOG_ASSERT( vertices != nullptr && indices != nullptr, "Trying to upload chunk without generating faces first." );
 
-	if( vao == 0 )
+	if( vao[0] == 0 )
 	{
-		glGenVertexArrays( 1, &vao );
-		glBindVertexArray( vao );
+		glGenVertexArrays( 2, vao );
+		glGenBuffers( 2, vbo );
+		glGenBuffers( 2, ibo );
 
-		glEnableVertexAttribArray( 0 );
-		glEnableVertexAttribArray( 1 );
+		for( int i=0; i<2; i++ )
+		{
+			glBindVertexArray( vao[i] );
 
-		glGenBuffers( 1, &vbo );
-		glGenBuffers( 1, &ibo );
+			glEnableVertexAttribArray( 0 );
+			glEnableVertexAttribArray( 1 );
 
-		glBindBuffer( GL_ARRAY_BUFFER, vbo );
-		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
+			glBindBuffer( GL_ARRAY_BUFFER, vbo[i] );
+			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo[i] );
 
-		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0 );
-		glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec3)) );
+			glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0 );
+			glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec3)) );
 
-		glBindVertexArray( 0 );
+			glBindVertexArray( 0 );
+		}
 	}
 
-	glBindVertexArray( vao );
-	glBindBuffer( GL_ARRAY_BUFFER, vbo );
+	glBindVertexArray( vao[writeIndex] );
+	glBindBuffer( GL_ARRAY_BUFFER, vbo[writeIndex] );
 	glBufferData( GL_ARRAY_BUFFER, sizeof(Vertex)*numVertices, vertices, GL_DYNAMIC_DRAW );
 
-	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo );
-	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*numIndices, indices, GL_DYNAMIC_DRAW );
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ibo[writeIndex] );
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*numIndices[writeIndex], indices, GL_DYNAMIC_DRAW );
 	glBindVertexArray( 0 );
 
 	delete[] vertices;
@@ -59,15 +66,17 @@ void Chunk::upload()
 	indices = nullptr;
 
 	uploaded = true;
+
+	swap( writeIndex, readIndex );
 }
 
 void Chunk::unload()
 {
-	if( vao > 0 )
+	if( vao[0] > 0 )
 	{
-		glDeleteVertexArrays( 1, &vao );
-		glDeleteBuffers( 1, &vbo );
-		glDeleteBuffers( 1, &ibo );
+		glDeleteVertexArrays( 2, vao );
+		glDeleteBuffers( 2, vbo );
+		glDeleteBuffers( 2, ibo );
 	}
 }
 
@@ -82,7 +91,7 @@ void Chunk::calculateFaces()
 		}
 
 		numVertices = 0;
-		numIndices = 0;
+		numIndices[writeIndex] = 0;
 		for( int y=0; y<CHUNK_SIZE; y++ )
 		{
 			for( int z=0; z<CHUNK_SIZE; z++ )
@@ -158,25 +167,25 @@ void Chunk::addHorizontalFace( const glm::vec3& position, const glm::vec3& direc
 
 	if( invert )
 	{
-		indices[numIndices] = numVertices;
-		indices[numIndices+1] = numVertices+2;
-		indices[numIndices+2] = numVertices+1;
-		indices[numIndices+3] = numVertices+2;
-		indices[numIndices+4] = numVertices+3;
-		indices[numIndices+5] = numVertices+1;
+		indices[numIndices[writeIndex]] = numVertices;
+		indices[numIndices[writeIndex]+1] = numVertices+2;
+		indices[numIndices[writeIndex]+2] = numVertices+1;
+		indices[numIndices[writeIndex]+3] = numVertices+2;
+		indices[numIndices[writeIndex]+4] = numVertices+3;
+		indices[numIndices[writeIndex]+5] = numVertices+1;
 	}
 	else
 	{
-		indices[numIndices] = numVertices;
-		indices[numIndices+1] = numVertices+1;
-		indices[numIndices+2] = numVertices+2;
-		indices[numIndices+3] = numVertices+1;
-		indices[numIndices+4] = numVertices+3;
-		indices[numIndices+5] = numVertices+2;
+		indices[numIndices[writeIndex]] = numVertices;
+		indices[numIndices[writeIndex]+1] = numVertices+1;
+		indices[numIndices[writeIndex]+2] = numVertices+2;
+		indices[numIndices[writeIndex]+3] = numVertices+1;
+		indices[numIndices[writeIndex]+4] = numVertices+3;
+		indices[numIndices[writeIndex]+5] = numVertices+2;
 	}
 
 	numVertices += 4;
-	numIndices += 6;
+	numIndices[writeIndex] += 6;
 }
 
 void Chunk::addVerticalFace( const glm::vec3& position, const glm::vec2& uvOffset, bool invert )
@@ -197,25 +206,25 @@ void Chunk::addVerticalFace( const glm::vec3& position, const glm::vec2& uvOffse
 
 	if( invert )
 	{
-		indices[numIndices] = numVertices;
-		indices[numIndices+1] = numVertices+2;
-		indices[numIndices+2] = numVertices+1;
-		indices[numIndices+3] = numVertices+2;
-		indices[numIndices+4] = numVertices+3;
-		indices[numIndices+5] = numVertices+1;
+		indices[numIndices[writeIndex]] = numVertices;
+		indices[numIndices[writeIndex]+1] = numVertices+2;
+		indices[numIndices[writeIndex]+2] = numVertices+1;
+		indices[numIndices[writeIndex]+3] = numVertices+2;
+		indices[numIndices[writeIndex]+4] = numVertices+3;
+		indices[numIndices[writeIndex]+5] = numVertices+1;
 	}
 	else
 	{
-		indices[numIndices] = numVertices;
-		indices[numIndices+1] = numVertices+1;
-		indices[numIndices+2] = numVertices+2;
-		indices[numIndices+3] = numVertices+1;
-		indices[numIndices+4] = numVertices+3;
-		indices[numIndices+5] = numVertices+2;
+		indices[numIndices[writeIndex]] = numVertices;
+		indices[numIndices[writeIndex]+1] = numVertices+1;
+		indices[numIndices[writeIndex]+2] = numVertices+2;
+		indices[numIndices[writeIndex]+3] = numVertices+1;
+		indices[numIndices[writeIndex]+4] = numVertices+3;
+		indices[numIndices[writeIndex]+5] = numVertices+2;
 	}
 
 	numVertices += 4;
-	numIndices += 6;
+	numIndices[writeIndex] += 6;
 }
 
 void Chunk::noise( int x, int z )
@@ -244,8 +253,8 @@ void Chunk::noise( int x, int z )
 
 void Chunk::render()
 {
-	glBindVertexArray( vao );
-	glDrawElements( GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, 0 );
+	glBindVertexArray( vao[readIndex] );
+	glDrawElements( GL_TRIANGLES, numIndices[readIndex], GL_UNSIGNED_INT, 0 );
 	glBindVertexArray( 0 );
 }
 

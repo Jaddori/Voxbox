@@ -73,13 +73,14 @@ private:
 	Vertex* vertices;
 	GLuint* indices;
 	int numVertices;
-	int numIndices;
+	int numIndices[2];
 
-	GLuint vao;
-	GLuint vbo;
-	GLuint ibo;
+	GLuint vao[2];
+	GLuint vbo[2];
+	GLuint ibo[2];
 
 	bool valid;
 	bool uploaded;
 	bool dirty;
+	int writeIndex, readIndex;
 };
