@@ -1,5 +1,6 @@
 -Clean up main
--Regions
--Threading facilities
--Mouse pointer projection into 3d space
--Getting height of chunk at position
+-Debug info about the camera
+
+-Digging
+-Building
+-RTS GUI

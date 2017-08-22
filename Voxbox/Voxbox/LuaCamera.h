@@ -10,7 +10,8 @@ namespace LuaCamera
 	int project( lua_State* lua );
 	int unproject( lua_State* lua );
 
-	int updatePosition( lua_State* lua );
+	int relativeMovement( lua_State* lua );
+	int absoluteMovement( lua_State* lua );
 	int updateDirection( lua_State* lua );
 	
 	int setPosition( lua_State* lua );

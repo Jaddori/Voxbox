@@ -10,17 +10,18 @@ namespace LuaCamera
 		luaL_newmetatable( lua, "cameraMeta" );
 		luaL_Reg cameraRegs[] =
 		{
-			{ "project",project },
-			{ "unproject",unproject },
+			{ "project",			project },
+			{ "unproject",			unproject },
 
-			{ "updatePosition", updatePosition },
-			{ "updateDirection", updateDirection },
+			{ "relativeMovement",	relativeMovement },
+			{ "absoluteMovement",	absoluteMovement },
+			{ "updateDirection",	updateDirection },
 			
-			{ "setPosition", setPosition },
-			{ "setDirection", setDirection },
+			{ "setPosition",		setPosition },
+			{ "setDirection",		setDirection },
 
-			{ "getPosition", getPosition },
-			{ "getDirection", getDirection },
+			{ "getPosition",		getPosition },
+			{ "getDirection",		getDirection },
 			{ NULL, NULL }
 		};
 
@@ -91,7 +92,7 @@ namespace LuaCamera
 		return 0;
 	}
 
-	int updatePosition( lua_State* lua )
+	int relativeMovement( lua_State* lua )
 	{
 		/*LUA_ASSERT_ARGS( 1 );
 		LUA_EXPECT_TABLE( 1 );*/
@@ -104,7 +105,24 @@ namespace LuaCamera
 				glm::vec3 localMovement;
 				lua_getvec3( lua, 1, localMovement );
 
-				g_coreData->perspectiveCamera->updatePosition( localMovement );
+				g_coreData->perspectiveCamera->relativeMovement( localMovement );
+			}
+		}
+
+		return 0;
+	}
+
+	int absoluteMovement( lua_State* lua )
+	{
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				// get world movement
+				glm::vec3 worldMovement;
+				lua_getvec3( lua, 1, worldMovement );
+
+				g_coreData->perspectiveCamera->absoluteMovement( worldMovement );
 			}
 		}
 

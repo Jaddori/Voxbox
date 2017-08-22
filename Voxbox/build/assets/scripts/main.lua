@@ -15,13 +15,22 @@ local startSelection = {0,0,0}
 local endSelection = {0,0,0}
 local haveSelection = false
 
+local unitSelectionStart = vec2()
+local unitSelectionEnd = vec2()
+local unitSelectionMin = vec2()
+local unitSelectionMax = vec2()
+local unitSelectionSize = vec2()
+local haveUnitSelection = false
+local selectedWorker = {}
+
 function mainLoad()
 	console:load()
 	info:load()
+	camera:load()
 	
 	workerLoad()
 	workers[1] = Worker:create()
-	workers[1].position = { 5, 31+1, 25 }
+	workers[1].position = vec3( 5, 31+1, 25 )
 end
 
 function mainUnload()
@@ -41,7 +50,7 @@ function mainUpdate( dt )
 	
 	workers[1]:update( dt )
 	
-	if Input.buttonReleased( Buttons.Right ) then
+	--[[if Input.buttonReleased( Buttons.Right ) then
 		Camera.unproject( camera.mousePosition, 0.0, rayStart )
 		Camera.unproject( camera.mousePosition, 1.0, rayEnd )
 		
@@ -89,6 +98,48 @@ function mainUpdate( dt )
 			Log.log( VERBOSITY_DEBUG, "Starting dig." )
 			workers[1]:dig( {minX,minZ,maxX,maxZ}, startSelection[2] )
 		end
+	end--]]
+	
+	-- check for unit selection
+	if Input.buttonPressed( Buttons.Left ) then
+		camera.mousePosition:copy( unitSelectionStart )
+	end
+	
+	if Input.buttonDown( Buttons.Left ) then
+		camera.mousePosition:copy( unitSelectionEnd )
+		
+		unitSelectionMin[1] = math.min(unitSelectionStart[1], unitSelectionEnd[1])
+		unitSelectionMin[2] = math.min(unitSelectionStart[2], unitSelectionEnd[2])
+		
+		unitSelectionMax[1] = math.max( unitSelectionStart[1], unitSelectionEnd[1] )
+		unitSelectionMax[2] = math.max( unitSelectionStart[2], unitSelectionEnd[2] )
+		
+		unitSelectionSize = unitSelectionMax - unitSelectionMin
+		
+		haveUnitSelection = true
+	else
+		haveUnitSelection = false
+	end
+	
+	if Input.buttonReleased( Buttons.Left ) then
+		for i=1, #workers do
+			local worldPosition = vec3()
+			workers[i].position:copy( worldPosition )
+			
+			local windowPosition = {0,0}
+			Camera.project( worldPosition, windowPosition )
+			
+			-- check if workers window position is inside the selection box
+			if windowPosition[1] > unitSelectionMin[1] and
+				windowPosition[1] < unitSelectionMax[1] and
+				windowPosition[2] > unitSelectionMin[2] and
+				windowPosition[2] < unitSelectionMax[2] then
+				workers[i].selected = true
+				selectedWorker = workers[i]
+			else
+				workers[i].selected = false
+			end
+		end
 	end
 end
 
@@ -115,5 +166,10 @@ function mainRender()
 				Graphics.queueBlock( {x, y, z}, {1,0,0,0.5} )
 			end
 		end
+	end
+	
+	-- render unit selection quad
+	if haveUnitSelection then
+		Graphics.queueQuad( unitSelectionStart, unitSelectionSize, {0,0,0,0}, 0.85 )
 	end
 end

@@ -51,7 +51,7 @@ void Camera::unproject( const Point& windowCoordinates, float depth, glm::vec3& 
 	result = glm::unProject( glm::vec3( windowCoordinates.x, WINDOW_HEIGHT - windowCoordinates.y, depth ), viewMatrix.getWrite(), projectionMatrix.getWrite(), WINDOW_VIEWPORT );
 }
 
-void Camera::updatePosition( const glm::vec3& localMovement )
+void Camera::relativeMovement( const glm::vec3& localMovement )
 {
 	// move backwards and forwards
 	if( fabs( localMovement.z ) > EPSILON )
@@ -75,6 +75,14 @@ void Camera::updatePosition( const glm::vec3& localMovement )
 		glm::vec3 up( 0.0f, 1.0f, 0.0f );
 		position += up * localMovement.y;
 	}
+
+	dirtyViewMatrix = true;
+	dirtyFrustum = true;
+}
+
+void Camera::absoluteMovement( const glm::vec3& worldMovement )
+{
+	position += worldMovement;
 
 	dirtyViewMatrix = true;
 	dirtyFrustum = true;
@@ -134,7 +142,27 @@ void Camera::setPosition( const glm::vec3& p )
 
 void Camera::setDirection( const glm::vec3& d )
 {
-	direction = d;
+	direction = glm::normalize( d );
+
+	// calculate angles
+	verticalAngle = glm::asin( d.y );
+
+	float acva = glm::acos( verticalAngle );
+
+	if( acva < EPSILON || acva > EPSILON )
+		horizontalAngle = glm::acos( d.z / glm::cos( verticalAngle ) );
+	else
+		horizontalAngle = glm::acos( 0.0f );
+
+	// calculate up vector
+	glm::vec3 right = glm::vec3(
+		glm::sin( horizontalAngle - 3.14f * 0.5f ),
+		0,
+		glm::cos( horizontalAngle - 3.14f * 0.5f )
+	);
+
+	up = glm::cross( right, direction.getWrite() );
+
 	dirtyViewMatrix = true;
 	dirtyFrustum = true;
 }

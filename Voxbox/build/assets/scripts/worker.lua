@@ -15,6 +15,7 @@ function workerLoad()
 		direction = vec3(),
 		digBlocks = {},
 		curDigBlock = 0,
+		selected = false,
 	}
 	
 	Worker.setTarget = function( self, worldBlock )
@@ -79,8 +80,12 @@ function workerLoad()
 
 	Worker.render = function( self )
 		if self.alive then
-			Graphics.queueBillboard( self.position, self.size, self.uv, false, self.texture )
-			DebugShapes.addSphere( self.position, 2.0, {0.0, 0.0, 1.0, 1.0} )
+			local renderPosition = { self.position[1], self.position[2]+self.size[2]*0.5, self.position[3] }
+			Graphics.queueBillboard( renderPosition, self.size, self.uv, false, self.texture )
+			
+			if self.selected then
+				DebugShapes.addSphere( self.position, 2.0, {0.0, 0.0, 1.0, 1.0} )
+			end
 			
 			if #self.path > 0 then
 				for i=#self.path, 1, -1 do

@@ -580,7 +580,7 @@ namespace LuaCore
 				lua_getvec2( lua, 1, v );
 
 				// print vec2
-				LOG_DEBUG( "(%f,%f)", v.x, v.y );
+				LOG_DEBUG( "(%.2f,%.2f)", v.x, v.y );
 			}
 		}
 
@@ -603,7 +603,7 @@ namespace LuaCore
 
 				// push result
 				char buf[32];
-				snprintf( buf, 32, "(%f,%f)", v.x, v.y );
+				snprintf( buf, 32, "(%.2f,%.2f)", v.x, v.y );
 				lua_pushstring( lua, buf );
 
 				result = 1;
@@ -1018,7 +1018,7 @@ namespace LuaCore
 				lua_getvec3( lua, 1, v );
 
 				// print vec3
-				LOG_DEBUG( "(%f,%f)", v.x, v.y );
+				LOG_DEBUG( "(%.2f,%.2f,%.2f)", v.x, v.y, v.z );
 			}
 		}
 
@@ -1041,7 +1041,7 @@ namespace LuaCore
 
 				// push result
 				char buf[32];
-				snprintf( buf, 32, "(%f,%f,%f)", v.x, v.y, v.z );
+				snprintf( buf, 32, "(%.2f,%.2f,%.2f)", v.x, v.y, v.z );
 				lua_pushstring( lua, buf );
 
 				result = 1;
@@ -1462,7 +1462,7 @@ namespace LuaCore
 				lua_getvec4( lua, 1, v );
 
 				// print vec4
-				LOG_DEBUG( "(%f,%f,%f,%f)", v.x, v.y, v.z, v.w );
+				LOG_DEBUG( "(%.2f,%.2f,%.2f,%.2f)", v.x, v.y, v.z, v.w );
 			}
 		}
 
@@ -1485,7 +1485,7 @@ namespace LuaCore
 
 				// push result
 				char buf[32];
-				snprintf( buf, 32, "(%f,%f,%f,%f)", v.x, v.y, v.z, v.w );
+				snprintf( buf, 32, "(%.2f,%.2f,%.2f,%.2f)", v.x, v.y, v.z, v.w );
 				lua_pushstring( lua, buf );
 
 				result = 1;

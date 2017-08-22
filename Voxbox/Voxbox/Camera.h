@@ -15,7 +15,8 @@ public:
 	void project( const glm::vec3& worldCoordinates, Point& result );
 	void unproject( const Point& windowCoordinates, float depth, glm::vec3& result );
 
-	void updatePosition( const glm::vec3& localMovement );
+	void relativeMovement( const glm::vec3& localMovement );
+	void absoluteMovement( const glm::vec3& worldMovement );
 	void updateDirection( int deltaX, int deltaY );
 	void updatePerspective( float width, float height );
 	void updateOrthographic( float width, float height );

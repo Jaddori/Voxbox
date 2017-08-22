@@ -13,12 +13,17 @@ function info:load()
 	self.ram = 0
 	self.luaRam = 0
 	self.vsync = true
+	self.cameraPosition = vec3()
+	self.cameraDirection = vec3()
 	
 	self.coreText = ""
 	self.threadText = ""
 	self.ramText = ""
 	self.luaRamText = ""
 	self.vsyncText = ""
+	self.cameraLabel = "Camera:"
+	self.cameraPositionText = ""
+	self.cameraDirectionText = ""
 	
 	local yoffset = 0.0
 	self.corePosition = { self.bounds[1], self.bounds[2] + yoffset }
@@ -34,6 +39,15 @@ function info:load()
 	
 	yoffset = yoffset + self.font.height
 	self.vsyncPosition = { self.bounds[1], self.bounds[2] + yoffset }
+	
+	yoffset = yoffset + self.font.height
+	self.cameraLabelPosition = { self.bounds[1], self.bounds[2] + yoffset }
+	
+	yoffset = yoffset + self.font.height
+	self.cameraPositionPosition = { self.bounds[1], self.bounds[2] + yoffset }
+	
+	yoffset = yoffset + self.font.height
+	self.cameraDirectionPosition = { self.bounds[1], self.bounds[2] + yoffset }
 	
 	self.elapsedTime = INFO_POLL_FREQUENCY
 end
@@ -67,6 +81,13 @@ function info:update( dt )
 		else
 			self.vsyncText = "VSYNC disabled"
 		end
+		
+		-- get camera information
+		Camera.getPosition( self.cameraPosition )
+		Camera.getDirection( self.cameraDirection )
+		
+		self.cameraPositionText = self.cameraPosition:tostring()
+		self.cameraDirectionText = self.cameraDirection:tostring()
 	end
 end
 
@@ -76,4 +97,7 @@ function info:render()
 	Graphics.queueText( self.font, self.ramText, self.ramPosition, INFO_TEXT_COLOR )
 	Graphics.queueText( self.font, self.luaRamText, self.luaRamPosition, INFO_TEXT_COLOR )
 	Graphics.queueText( self.font, self.vsyncText, self.vsyncPosition, INFO_TEXT_COLOR )
+	Graphics.queueText( self.font, self.cameraLabel, self.cameraLabelPosition, INFO_TEXT_COLOR )
+	Graphics.queueText( self.font, self.cameraPositionText, self.cameraPositionPosition, INFO_TEXT_COLOR )
+	Graphics.queueText( self.font, self.cameraDirectionText, self.cameraDirectionPosition, INFO_TEXT_COLOR )
 end

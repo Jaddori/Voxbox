@@ -40,10 +40,16 @@ DWORD WINAPI update( LPVOID args )
 		DWORD result = WaitForSingleObject( data->renderDone, THREAD_UPDATE_WAIT );
 		if( result == WAIT_OBJECT_0 )
 		{
+			// stop execution
 			if( input.keyReleased( SDL_SCANCODE_ESCAPE ) )
 			{
 				*data->coreData->running = false;
 				*data->coreData->executing = false;
+			}
+			// restart game
+			else if( input.keyReleased( SDL_SCANCODE_TAB ) )
+			{
+				*data->coreData->running = false;
 			}
 
 			const Frustum& frustum = perspectiveCamera.getFrustum();
