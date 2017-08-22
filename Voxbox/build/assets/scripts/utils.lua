@@ -43,3 +43,19 @@ function byteString( bytes, unit )
 	
 	return result
 end
+
+function makeRectangle( a, b, rect )
+	rekt[1] = math.min( a[1], b[1] )
+	rekt[2] = math.min( a[3], b[3] )
+	rekt[3] = math.max( a[1], b[1] )
+	rekt[4] = math.max( a[3], b[3] )
+end
+
+function makeCube( a, b, cube )
+	cube[1] = math.min( a[1], b[1] )
+	cube[2] = math.min( a[2], b[2] )
+	cube[3] = math.min( a[3], b[3] )
+	cube[4] = math.max( a[1], b[1] )
+	cube[5] = math.max( a[2], b[2] )
+	cube[6] = math.max( a[3], b[3] )
+end

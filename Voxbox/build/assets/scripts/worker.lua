@@ -15,6 +15,8 @@ function workerLoad()
 		direction = vec3(),
 		digBlocks = {},
 		curDigBlock = 0,
+		buildBlocks = {},
+		curBuildBlock = 0,
 		selected = false,
 	}
 	
@@ -22,16 +24,38 @@ function workerLoad()
 		self.curPathNode = World.findPath( self.position, worldBlock, self.path )
 	end
 	
-	Worker.dig = function( self, bounds, y )
+	Worker.dig = function( self, bounds )
 		local curBlock = 1
-		for x=bounds[1], bounds[3] do
-			for z=bounds[2], bounds[4] do
-				self.digBlocks[curBlock] = {x,y,z}
-				curBlock = curBlock + 1
+		for x=bounds[1], bounds[4] do
+			for y=bounds[2], bounds[5] do
+				for z=bounds[3], bounds[6] do
+					self.digBlocks[curBlock] = {x,y,z}
+					curBlock = curBlock + 1
+				end
 			end
 		end
 		
 		self.curDigBlock = curBlock-1
+		
+		-- remove any build blocks
+		self.curBuildBlock = 0
+	end
+	
+	Worker.build = function( self, bounds )
+		local curBlock = 1
+		for x=bounds[1], bounds[4] do
+			for y=bounds[2], bounds[5] do
+				for z=bounds[3], bounds[6] do
+					self.buildBlocks[curBlock] = {x,y,z}
+					curBlock = curBlock+1
+				end
+			end
+		end
+		
+		self.curBuildBlock = curBlock-1
+		
+		-- remove any dig blocks
+		self.curDigBlock = 0
 	end
 	
 	Worker.create = function( self )
@@ -63,7 +87,7 @@ function workerLoad()
 			-- are we close enough to the block?
 			local target = self.digBlocks[self.curDigBlock]
 			
-			if Vec3.distance( self.position, target ) < 0.1 then
+			if self.position:distance( target ) < 0.1 then
 				-- dig the block
 				local localTarget = {}
 				World.worldToLocal( target, localTarget )
@@ -73,6 +97,24 @@ function workerLoad()
 			else
 				-- move to block
 				Vec3.direction( self.position, target, self.direction )
+				self.position = self.position + ( self.direction * WORKER_SPEED )
+			end
+		end
+		
+		-- update building
+		if self.curBuildBlock > 0 then
+			local target = self.buildBlocks[self.curBuildBlock]
+			
+			if self.position:distance( target ) < 0.1 then
+				-- build the block
+				local localTarget = {}
+				World.worldToLocal( target, localTarget )
+				
+				World.setBlock( localTarget, 2 )
+				self.curBuildBlock = self.curBuildBlock - 1
+			else
+				-- move to block
+				self.position:direction( target, self.direction )
 				self.position = self.position + ( self.direction * WORKER_SPEED )
 			end
 		end

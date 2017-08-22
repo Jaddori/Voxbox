@@ -23,6 +23,7 @@ namespace LuaInput
 
 			{ "getMousePosition",	getMousePosition },
 			{ "getMouseDelta",		getMouseDelta },
+			{ "getMouseWheel",		getMouseWheel },
 			{ "textInput",			textInput },
 			{ NULL, NULL }
 		};
@@ -37,8 +38,21 @@ namespace LuaInput
 		lua_setnumber( lua, "Console", SDL_SCANCODE_GRAVE );
 		lua_setnumber( lua, "Enter", SDL_SCANCODE_RETURN );
 		lua_setnumber( lua, "Backspace", SDL_SCANCODE_BACKSPACE );
+		lua_setnumber( lua, "Space", SDL_SCANCODE_SPACE );
+
 		lua_setnumber( lua, "Up", SDL_SCANCODE_UP );
 		lua_setnumber( lua, "Down", SDL_SCANCODE_DOWN );
+		lua_setnumber( lua, "Zero", SDL_SCANCODE_0 );
+		lua_setnumber( lua, "One", SDL_SCANCODE_1 );
+		lua_setnumber( lua, "Two", SDL_SCANCODE_2 );
+		lua_setnumber( lua, "Three", SDL_SCANCODE_3 );
+		lua_setnumber( lua, "Four", SDL_SCANCODE_4 );
+		lua_setnumber( lua, "Five", SDL_SCANCODE_5 );
+		lua_setnumber( lua, "Six", SDL_SCANCODE_6 );
+		lua_setnumber( lua, "Seven", SDL_SCANCODE_7 );
+		lua_setnumber( lua, "Eight", SDL_SCANCODE_8 );
+		lua_setnumber( lua, "Nine", SDL_SCANCODE_9 );
+
 		lua_setglobal( lua, "Keys" );
 
 		// button constants
@@ -256,6 +270,12 @@ namespace LuaInput
 		}
 
 		return 0;
+	}
+
+	int getMouseWheel( lua_State* lua )
+	{
+		lua_pushnumber( lua, g_coreData->input->getMouseWheel() );
+		return 1;
 	}
 
 	int textInput( lua_State* lua )

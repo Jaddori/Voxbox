@@ -19,6 +19,8 @@ namespace LuaInput
 
 	int getMousePosition( lua_State* lua );
 	int getMouseDelta( lua_State* lua );
+	int getMouseWheel( lua_State* lua );
+	int getMouseWheelDelta( lua_State* lua );
 	int textInput( lua_State* lua );
 
 	// helper functions

@@ -29,7 +29,6 @@ public:
 	Point getMousePosition() const;
 	Point getMouseDelta() const;
 	int getMouseWheel() const;
-	int getMouseWheelDelta() const;
 	const char* getTextInput() const;
 
 private:
@@ -42,7 +41,6 @@ private:
 	Point mousePosition;
 	Point prevMousePosition;
 	int mouseWheel;
-	int prevMouseWheel;
 
 	char textInput[INPUT_MAX_TEXT_INPUT];
 };

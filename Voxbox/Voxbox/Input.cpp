@@ -21,7 +21,7 @@ void Input::reset()
 	memset( repeatedKeys, 0, INPUT_MAX_KEYS );
 	memcpy( prevButtons, buttons, INPUT_MAX_BUTTONS );
 	prevMousePosition = mousePosition;
-	prevMouseWheel = mouseWheel;
+	mouseWheel = 0;
 	textInput[0] = 0;
 }
 
@@ -140,11 +140,6 @@ Point Input::getMouseDelta() const
 int Input::getMouseWheel() const
 {
 	return mouseWheel;
-}
-
-int Input::getMouseWheelDelta() const
-{
-	return ( prevMouseWheel - mouseWheel );
 }
 
 const char* Input::getTextInput() const

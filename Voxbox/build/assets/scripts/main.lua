@@ -5,15 +5,6 @@ require( "./assets/scripts/info" )
 require( "./assets/scripts/camera" )
 
 local workers = {}
-local rayStart = {}
-local rayEnd = {}
-local localBlock = {}
-local worldBlock = {}
-local haveRay = false
-
-local startSelection = {0,0,0}
-local endSelection = {0,0,0}
-local haveSelection = false
 
 local unitSelectionStart = vec2()
 local unitSelectionEnd = vec2()
@@ -22,6 +13,20 @@ local unitSelectionMax = vec2()
 local unitSelectionSize = vec2()
 local haveUnitSelection = false
 local selectedWorker = {}
+
+local ACTION_DIG = 1
+local ACTION_BUILD = 2
+local currentAction = ACTION_DIG
+
+local action =
+{
+	previewBlock = vec3(),
+	havePreview = false,
+	startSelection = vec3(),
+	endSelection = vec3(),
+	selectionBounds = {0,0,0,0,0,0},
+	haveSelection = false,
+}
 
 function mainLoad()
 	console:load()
@@ -50,62 +55,12 @@ function mainUpdate( dt )
 	
 	workers[1]:update( dt )
 	
-	--[[if Input.buttonReleased( Buttons.Right ) then
-		Camera.unproject( camera.mousePosition, 0.0, rayStart )
-		Camera.unproject( camera.mousePosition, 1.0, rayEnd )
-		
-		if World.hitBlock( rayStart, rayEnd, localBlock ) then
-			World.localToWorld( localBlock, worldBlock )
-			
-			workers[1]:setTarget( worldBlock )
-			World.setBlock( localBlock, 10 )
-		end
-		
-		haveRay = true
-	end
-	
-	if Input.buttonPressed( Buttons.Middle ) then
-		Camera.unproject( camera.mousePosition, 0.0, rayStart )
-		Camera.unproject( camera.mousePosition, 1.0, rayEnd )
-		
-		if World.hitBlock( rayStart, rayEnd, localBlock ) then
-			World.localToWorld( localBlock, worldBlock )
-			
-			copyWorldBlock( startSelection, worldBlock )
-			haveSelection = true
-		end
-	end
-	
-	if haveSelection then
-		if Input.buttonDown( Buttons.Middle ) then
-			Camera.unproject( camera.mousePosition, 0.0, rayStart )
-			Camera.unproject( camera.mousePosition, 1.0, rayEnd )
-			
-			if World.hitBlock( rayStart, rayEnd, localBlock ) then
-				World.localToWorld( localBlock, worldBlock )
-				
-				copyWorldBlock( endSelection, worldBlock )
-			end
-		end
-		
-		if Input.keyReleased( Keys.Enter ) then
-			local minX = math.min( startSelection[1], endSelection[1] )
-			local minZ = math.min( startSelection[3], endSelection[3] )
-			
-			local maxX = math.max( startSelection[1], endSelection[1] )
-			local maxZ = math.max( startSelection[3], endSelection[3] )
-			
-			Log.log( VERBOSITY_DEBUG, "Starting dig." )
-			workers[1]:dig( {minX,minZ,maxX,maxZ}, startSelection[2] )
-		end
-	end--]]
-	
 	-- check for unit selection
-	if Input.buttonPressed( Buttons.Left ) then
+	if Input.buttonPressed( Buttons.Right ) then
 		camera.mousePosition:copy( unitSelectionStart )
 	end
 	
-	if Input.buttonDown( Buttons.Left ) then
+	if Input.buttonDown( Buttons.Right ) then
 		camera.mousePosition:copy( unitSelectionEnd )
 		
 		unitSelectionMin[1] = math.min(unitSelectionStart[1], unitSelectionEnd[1])
@@ -121,7 +76,7 @@ function mainUpdate( dt )
 		haveUnitSelection = false
 	end
 	
-	if Input.buttonReleased( Buttons.Left ) then
+	if Input.buttonReleased( Buttons.Right ) then
 		for i=1, #workers do
 			local worldPosition = vec3()
 			workers[i].position:copy( worldPosition )
@@ -141,6 +96,100 @@ function mainUpdate( dt )
 			end
 		end
 	end
+	
+	-- select action
+	if Input.keyReleased( Keys.One ) then
+		currentAction = ACTION_DIG
+		action.haveSelection = false
+		Log.log( VERBOSITY_DEBUG, "Selected dig action." )
+	elseif Input.keyReleased( Keys.Two ) then
+		currentAction = ACTION_BUILD
+		action.haveSelection = false
+		Log.log( VERBOSITY_DEBUG, "Selected build action." )
+	end
+	
+	-- perform action
+	if currentAction == ACTION_DIG and selectedWorker then
+		-- get preview block
+		if World.hitBlock( camera.rayStart, camera.rayEnd, action.previewBlock ) then
+			World.localToWorld( action.previewBlock, action.previewBlock )
+			action.havePreview = true
+		else
+			action.havePreview = false
+		end
+		
+		if action.havePreview then
+			-- start selection
+			if Input.buttonPressed( Buttons.Left ) then
+				action.previewBlock:copy( action.startSelection )
+				action.haveSelection = true
+			end
+			
+			-- update selection
+			if Input.buttonDown( Buttons.Left ) then
+				action.previewBlock:copy( action.endSelection )
+				makeCube( action.startSelection, action.endSelection, action.selectionBounds )
+			end
+		end
+		
+		if action.haveSelection then
+			local selectionHeight = action.selectionBounds[5] - action.selectionBounds[2]
+		
+			-- size selection
+			local mwheel = Input.getMouseWheel()
+			if mwheel < 0 and selectionHeight > 0 then
+				action.selectionBounds[5] = action.selectionBounds[5] - 1
+			elseif mwheel > 0 then
+				action.selectionBounds[5] = action.selectionBounds[5] + 1
+			end
+			
+			-- execute action
+			if Input.keyReleased( Keys.Space ) then
+				selectedWorker:dig( action.selectionBounds )
+			end
+		end
+	elseif currentAction == ACTION_BUILD and selectedWorker then
+		-- get preview block
+		if World.hitBlock( camera.rayStart, camera.rayEnd, action.previewBlock ) then
+			World.localToWorld( action.previewBlock, action.previewBlock )
+			
+			action.previewBlock[2] = action.previewBlock[2] + 1
+			action.havePreview = true
+		else
+			action.havePreview = false
+		end
+		
+		if action.havePreview then
+			-- start selection
+			if Input.buttonPressed( Buttons.Left ) then
+				action.previewBlock:copy( action.startSelection )
+				action.haveSelection = true
+			end
+			
+			-- update selection
+			if Input.buttonDown( Buttons.Left ) then
+				action.previewBlock:copy( action.endSelection )
+				makeCube( action.startSelection, action.endSelection, action.selectionBounds )
+			end
+		end
+		
+		if action.haveSelection then
+			local selectionHeight = action.selectionBounds[5] - action.selectionBounds[2]
+		
+			-- size selection
+			local mwheel = Input.getMouseWheel()
+			if mwheel < 0 and selectionHeight > 0 then
+				action.selectionBounds[5] = action.selectionBounds[5] - 1
+			elseif mwheel > 0 then
+				action.selectionBounds[5] = action.selectionBounds[5] + 1
+			end
+			
+			-- execution action
+			if Input.keyReleased( Keys.Space ) then
+				selectedWorker:build( action.selectionBounds )
+			end
+		end
+	end
 end
 
 function mainRender()
@@ -149,27 +198,42 @@ function mainRender()
 	
 	workers[1]:render()
 	
-	if haveRay then
-		DebugShapes.addLine( rayStart, rayEnd, {1,1,0,1} )
-	end
-	
-	local y = startSelection[2]
-	local minX = math.min( startSelection[1], endSelection[1] )
-	local minZ = math.min( startSelection[3], endSelection[3] )
-	
-	local maxX = math.max( startSelection[1], endSelection[1] )
-	local maxZ = math.max( startSelection[3], endSelection[3] )
-	
-	if haveSelection then
-		for x=minX, maxX do
-			for z=minZ, maxZ do
-				Graphics.queueBlock( {x, y, z}, {1,0,0,0.5} )
-			end
-		end
-	end
-	
 	-- render unit selection quad
 	if haveUnitSelection then
-		Graphics.queueQuad( unitSelectionStart, unitSelectionSize, {0,0,0,0}, 0.85 )
+		Graphics.queueQuad( unitSelectionMin, unitSelectionSize, {0,0,0,0}, 0.85 )
+	end
+	
+	if currentAction == ACTION_DIG then
+		-- render preview block
+		if action.havePreview then
+			Graphics.queueBlock( action.previewBlock, {1,0,0,0.65} )
+		end
+		
+		-- render selection
+		if action.haveSelection then
+			for x=action.selectionBounds[1], action.selectionBounds[4] do
+				for y=action.selectionBounds[2], action.selectionBounds[5] do
+					for z=action.selectionBounds[3], action.selectionBounds[6] do
+						Graphics.queueBlock( {x,y,z}, {1,0,0,0.5} )
+					end
+				end
+			end
+		end
+	elseif currentAction == ACTION_BUILD then
+		-- render preview block
+		if action.havePreview then
+			Graphics.queueBlock( action.previewBlock, {1,0,0,0.65} )
+		end
+		
+		-- render selection
+		if action.haveSelection then
+			for x=action.selectionBounds[1], action.selectionBounds[4] do
+				for y=action.selectionBounds[2], action.selectionBounds[5] do
+					for z=action.selectionBounds[3], action.selectionBounds[6] do
+						Graphics.queueBlock( {x,y,z}, {1,0,0,0.5} )
+					end
+				end
+			end
+		end
 	end
 end

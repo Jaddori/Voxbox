@@ -1,6 +1,4 @@
 -Clean up main
 -Debug info about the camera
 
--Digging
--Building
 -RTS GUI

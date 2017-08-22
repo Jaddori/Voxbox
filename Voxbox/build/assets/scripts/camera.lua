@@ -2,6 +2,8 @@ camera =
 {
 	mousePosition = vec2(),
 	mouseDelta = vec2(),
+	rayStart = vec3(),
+	rayEnd = vec3(),
 	speed = 0.1,
 	borderWidth = 128,			-- width of the virtual border along the screen edges
 	height = 55,				-- height above the ground
@@ -19,6 +21,10 @@ function camera:update( dt )
 	-- get mouse position and mouse delta
 	Input.getMousePosition( self.mousePosition )
 	Input.getMouseDelta( self.mouseDelta )
+	
+	-- project mouse cursor into 3D space
+	Camera.unproject( self.mousePosition, 0.0, self.rayStart )
+	Camera.unproject( self.mousePosition, 1.0, self.rayEnd )
 
 	if self.debugMode then
 		-- check for direction change
