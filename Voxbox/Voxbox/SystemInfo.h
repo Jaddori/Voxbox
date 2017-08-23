@@ -1,7 +1,9 @@
 #pragma once
 
+#ifdef _WIN32
 #include <Windows.h>
 #include <Psapi.h>
+#endif
 #include "SDL.h"
 #include "ThreadPool.h"
 

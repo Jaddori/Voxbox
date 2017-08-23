@@ -11,6 +11,7 @@
 #include "Assets.h"
 #include "ThreadPool.h"
 #include "SystemInfo.h"
+#include <errno.h>
 
 #define THREAD_UPDATE_WAIT 1000
 
@@ -18,11 +19,11 @@ struct ThreadData
 {
 	CoreData* coreData;
 	LuaBinds* luaBinds;
-	HANDLE updateDone;
-	HANDLE renderDone;
+	SDL_semaphore* updateDone;
+	SDL_semaphore* renderDone;
 };
 
-DWORD WINAPI update( LPVOID args )
+int update( void* args )
 {
 	ThreadData* data = (ThreadData*)args;
 
@@ -37,8 +38,8 @@ DWORD WINAPI update( LPVOID args )
 
 	while( *data->coreData->running )
 	{
-		DWORD result = WaitForSingleObject( data->renderDone, THREAD_UPDATE_WAIT );
-		if( result == WAIT_OBJECT_0 )
+		int result = SDL_SemWaitTimeout( data->renderDone, THREAD_UPDATE_WAIT );
+		if( result == 0 )
 		{
 			// stop execution
 			if( input.keyReleased( SDL_SCANCODE_ESCAPE ) )
@@ -62,7 +63,11 @@ DWORD WINAPI update( LPVOID args )
 			luaBinds.update( deltaTime );
 			luaBinds.render();
 
-			ReleaseSemaphore( data->updateDone, 1, NULL );
+			SDL_SemPost( data->updateDone );
+		}
+		else if( result == -1 )
+		{
+			LOG_ERROR( "Update thread encountered error when waiting on semaphore." );
 		}
 	}
 
@@ -74,6 +79,16 @@ int main( int argc, char* argv[] )
 	LOG_START( "./log.txt" );
 	LOG_WARNINGS();
 	
+	if( SDL_Init( SDL_INIT_EVERYTHING ) < 0 )
+	{
+		LOG_ERROR( "Failed to initialize SDL." );
+		return -1;
+	}
+	
+	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 3 );
+	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 2 );
+	SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
+	
 	SDL_Window* window = SDL_CreateWindow( "Voxbox", WINDOW_X, WINDOW_Y, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL );
 	if( window )
 	{
@@ -84,6 +99,7 @@ int main( int argc, char* argv[] )
 		{
 			LOG_INFO( "OpenGL context created." );
 
+#ifdef _WIN32
 			glewExperimental = GL_TRUE;
 			if( glewInit() == GLEW_OK )
 			{
@@ -94,10 +110,18 @@ int main( int argc, char* argv[] )
 				LOG_ERROR( "Failed to initialize GLEW." );
 				return -1;
 			}
+#endif
+			GLenum er = glGetError();
+			if( er != GL_NO_ERROR )
+				int k = 0;
 
 			glEnable( GL_DEPTH_TEST );
 			glEnable( GL_CULL_FACE );
 			SDL_GL_SetSwapInterval( 1 );
+			
+			er = glGetError();
+			if( er != GL_NO_ERROR )
+				int k = 0;
 
 			bool executing = true;
 			while( executing )
@@ -111,17 +135,33 @@ int main( int argc, char* argv[] )
 				threadPool.load();
 
 				Assets assets;
+				
+				er = glGetError();
+				if( er != GL_NO_ERROR )
+					int k = 0;
 
 				Graphics graphics;
 				graphics.load( &assets );
 				graphics.getPerspectiveCamera().setPosition( glm::vec3( 0.0f, 0.0f, -10.0f ) );
+				
+				er = glGetError();
+				if( er != GL_NO_ERROR )
+					int k = 0;
 
 				World world;
 				world.load( &threadPool );
+				
+				er = glGetError();
+				if( er != GL_NO_ERROR )
+					int k = 0;
 
 				DebugShapes debugShapes;
 				debugShapes.load();
 				debugShapes.upload();
+				
+				er = glGetError();
+				if( er != GL_NO_ERROR )
+					int k = 0;
 
 				Input input;
 
@@ -138,24 +178,35 @@ int main( int argc, char* argv[] )
 				coreData.systemInfo = &systemInfo;
 				coreData.running = &running;
 				coreData.executing = &executing;
+				
+				er = glGetError();
+				if( er != GL_NO_ERROR )
+					int k = 0;
 			 
 				LuaBinds luaBinds;
 				luaBinds.bind( &coreData );
 				luaBinds.load();
+				
+				er = glGetError();
+				if( er != GL_NO_ERROR )
+					int k = 0;
 
 				ThreadData threadData;
 				threadData.coreData = &coreData;
 				threadData.luaBinds = &luaBinds;
-				threadData.updateDone = CreateSemaphore( NULL, 0, 1, NULL );
-				threadData.renderDone = CreateSemaphore( NULL, 1, 1, NULL );
-				HANDLE updateThread = CreateThread( NULL, 0, update, &threadData, 0, NULL );
-
+				
+				threadData.updateDone = SDL_CreateSemaphore( 0 );
+				threadData.renderDone = SDL_CreateSemaphore( 1 );
+				
+				SDL_Thread* updateThread = SDL_CreateThread( update, nullptr, &threadData );
+				
 				long fpsTimer = SDL_GetTicks();
 				int fps = 0;
 
 				while( running )
 				{
-					if( WaitForSingleObject( threadData.updateDone, INFINITE ) == WAIT_OBJECT_0 )
+					int waitResult = SDL_SemWait( threadData.updateDone );
+					if( waitResult == 0 )
 					{
 						input.reset();
 
@@ -172,12 +223,20 @@ int main( int argc, char* argv[] )
 						assets.upload();
 						graphics.finalize();
 						debugShapes.finalize();
+						
+						er = glGetError();
+						if( er != GL_NO_ERROR )
+							int k = 0;
 
 						world.upload();
+						
+						er = glGetError();
+						if( er != GL_NO_ERROR )
+							int k = 0;
 
 						threadPool.schedule();
 
-						ReleaseSemaphore( threadData.renderDone, 1, NULL );
+						SDL_SemPost( threadData.renderDone );
 					}
 
 					// render
@@ -185,8 +244,16 @@ int main( int argc, char* argv[] )
 					glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 					graphics.render();
+					
+					er = glGetError();
+					if( er != GL_NO_ERROR )
+						int k = 0;
 
 					debugShapes.render( graphics.getPerspectiveCamera().getProjectionMatrix(), graphics.getPerspectiveCamera().getViewMatrix() );
+					
+					er = glGetError();
+					if( er != GL_NO_ERROR )
+						int k = 0;
 
 					SDL_GL_SwapWindow( window );
 
@@ -203,7 +270,7 @@ int main( int argc, char* argv[] )
 				}
 
 				LOG_INFO( "Waiting for update thread to finish." );
-				WaitForSingleObject( updateThread, INFINITE );
+				SDL_WaitThread( updateThread, nullptr );
 
 				luaBinds.unload();
 				threadPool.unload();

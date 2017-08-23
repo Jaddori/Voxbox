@@ -3,8 +3,9 @@
 #include <fstream>
 #include "Array.h"
 #include <cassert>
-#include <Windows.h>
+#include "SDL.h"
 
+#ifdef _WIN32
 #define LOG_START( file ) Log::instance().start( file )
 #define LOG_STOP() Log::instance().stop()
 #define LOG_FINALIZE() Log::instance().finalize()
@@ -29,6 +30,25 @@
 #define LOG_WARNING( fmt, ... ) LOG( VERBOSITY_WARNING, fmt, __VA_ARGS__ )
 #define LOG_ERROR( fmt, ... ) LOG( VERBOSITY_ERROR, fmt, __VA_ARGS__ )
 #define LOG_DEBUG( fmt, ... ) LOG( VERBOSITY_DEBUG, fmt, __VA_ARGS__ )
+
+#else
+
+#define LOG_START( ... )
+#define LOG_STOP() 
+#define LOG_FINALIZE() 
+#define LOG( ... ) 
+#define LOG_ASSERT( ... ) 
+#define LOG_THRESHOLD()
+#define LOG_INFORMATIONS()
+#define LOG_WARNINGS()
+#define LOG_ERRORS()
+
+#define LOG_INFO( ... )
+#define LOG_WARNING( ... )
+#define LOG_ERROR( ... )
+#define LOG_DEBUG( ... )
+
+#endif
 
 enum
 {
@@ -72,5 +92,5 @@ private:
 	Array<LogMessage> messages;
 	int threshold;
 
-	HANDLE mutex;
+	SDL_mutex* mutex;
 };

@@ -29,13 +29,13 @@ private:
 	{
 		int id;
 		bool alive, done;
-		HANDLE signal;
+		SDL_semaphore* signal;
 		Job job;
 	};
 
-	static DWORD WINAPI threadWork( LPVOID args );
+	static int threadWork( void* args );
 
-	HANDLE threads[THREAD_POOL_MAX_THREADS];
+	SDL_Thread* threads[THREAD_POOL_MAX_THREADS];
 	ThreadData data[THREAD_POOL_MAX_THREADS];
 
 	Queue<Job> jobs;

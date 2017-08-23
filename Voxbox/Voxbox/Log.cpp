@@ -52,11 +52,9 @@ void Log::addMessage( int verbosity, const char* message )
 
 void Log::copyMessages( Array<LogMessage>& destination )
 {
-	WaitForSingleObject( mutex, INFINITE );
-
+	SDL_LockMutex( mutex );
 	destination.fastCopy( messages );
-
-	ReleaseMutex( mutex );
+	SDL_UnlockMutex( mutex );
 }
 
 void Log::setThreshold( int t )

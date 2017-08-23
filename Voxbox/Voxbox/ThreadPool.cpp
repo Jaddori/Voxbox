@@ -20,8 +20,8 @@ void ThreadPool::load()
 		data[i].id = i;
 		data[i].alive = true;
 		data[i].done = true;
-		data[i].signal = CreateSemaphore( NULL, 0, 1, NULL );
-		threads[i] = CreateThread( NULL, 0, threadWork, &data[i], 0, NULL );
+		data[i].signal = SDL_CreateSemaphore( 0 );
+		threads[i] = SDL_CreateThread( threadWork, nullptr, &data[i] );
 	}
 }
 
@@ -31,11 +31,11 @@ void ThreadPool::unload()
 
 	for( int i=0; i<THREAD_POOL_MAX_THREADS; i++ )
 		data[i].alive = false;
-
-	WaitForMultipleObjects( THREAD_POOL_MAX_THREADS, threads, TRUE, INFINITE );
-
+	
 	for( int i=0; i<THREAD_POOL_MAX_THREADS; i++ )
-		CloseHandle( threads[i] );
+	{
+		SDL_WaitThread( threads[i], nullptr );
+	}
 }
 
 void ThreadPool::queueWork( const Job& job)
@@ -53,13 +53,13 @@ void ThreadPool::schedule()
 		{
 			data[i].done = false;
 			data[i].job = jobs.dequeue();
-				
-			ReleaseSemaphore( data[i].signal, 1, NULL );
+	
+			SDL_SemPost( data[i].signal );
 		}
 	}
 }
 
-DWORD WINAPI ThreadPool::threadWork( LPVOID args )
+int ThreadPool::threadWork( void* args )
 {
 	ThreadData* data = (ThreadData*)args;
 
@@ -68,12 +68,17 @@ DWORD WINAPI ThreadPool::threadWork( LPVOID args )
 	while( data->alive )
 	{
 		// wait for something to do
-		DWORD waitResult = WaitForSingleObject( data->signal, THREAD_POOL_TIMEOUT );
-		if( waitResult == WAIT_OBJECT_0 )
+		int waitResult = SDL_SemWaitTimeout( data->signal, THREAD_POOL_TIMEOUT );
+		if( waitResult == 0 )
 		{
 			data->job.task( data->job.args );
 
 			data->done = true;
+		}
+		else if( waitResult == -1 )
+		{
+			LOG_ERROR( "Error encountered when waiting on semaphore on thread #%d.", data->id );
+			data->alive = false;
 		}
 	}
 

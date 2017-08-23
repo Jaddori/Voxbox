@@ -10,21 +10,24 @@ SystemInfo::~SystemInfo()
 
 void SystemInfo::poll()
 {
-	SYSTEM_INFO sysInfo;
-	GetSystemInfo( &sysInfo );
-
-	cores = sysInfo.dwNumberOfProcessors;
-
-	threads = THREAD_POOL_MAX_THREADS + 2; // +2 = 1 update, 1 render
-
+	cores = SDL_GetCPUCount();
+	threads = THREAD_POOL_MAX_THREADS + 2;
+	
+	// TODO: Fix this
+	//vsync = ( SDL_GL_GetSwapInterval() == 1 );
+	vsync = true;
+	
+#ifdef _WIN32
 	PROCESS_MEMORY_COUNTERS memInfo;
 	GetProcessMemoryInfo( GetCurrentProcess(), &memInfo, sizeof(memInfo) );
 
 	ram = memInfo.PagefileUsage;
-
-	// TODO: Fix this
-	//vsync = ( SDL_GL_GetSwapInterval() == 1 );
-	vsync = true;
+#else
+	struct rusage memInfo;
+	getrusage( RUSAGE_SELF, &memInfo );
+	
+	ram = memInfo.ru_maxrss;
+#endif
 }
 
 int SystemInfo::getRam() const

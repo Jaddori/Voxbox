@@ -48,7 +48,7 @@ private:
 		ulong hash = 5381;
 		int c;
 
-		while (c = *path++)
+		while ((c = *path++))
 			hash = ((hash << 5) + hash) + c;
 
 		return hash;

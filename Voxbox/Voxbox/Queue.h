@@ -14,7 +14,7 @@ public:
 		data = new T[capacity];
 	}
 	Queue( int initialCapacity )
-		: first( -1 ), last( -1 ) capacity( initialCapacity )
+		: first( -1 ), last( -1 ), capacity( initialCapacity )
 	{
 		data = new T[capacity];
 	}

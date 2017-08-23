@@ -1,7 +1,11 @@
 #pragma once
 
 #include "glm.hpp"
+#ifdef _WIN32
 #include "gtc\constants.hpp"
+#else
+#include "constants.hpp"
+#endif
 
 bool rayCheck( const glm::vec3& rayStart, const glm::vec3& rayEnd, const glm::vec3& minPosition, const glm::vec3& maxPosition, glm::vec3* hitPoint = nullptr );
 

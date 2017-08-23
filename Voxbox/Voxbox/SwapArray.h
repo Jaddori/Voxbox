@@ -9,6 +9,6 @@ class SwapArray : public Swap<Array<T>>
 public:
 	void swap() override
 	{
-		data[SWAP_READ].fastCopy( data[SWAP_WRITE] );
+		Swap<Array<T>>::data[SWAP_READ].fastCopy( Swap<Array<T>>::data[SWAP_WRITE] );
 	}
 };

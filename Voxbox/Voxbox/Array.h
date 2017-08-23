@@ -1,5 +1,7 @@
 #pragma once
 
+#include <assert.h>
+
 #define ARRAY_DEFAULT_CAPACITY 10
 
 template<typename T>
