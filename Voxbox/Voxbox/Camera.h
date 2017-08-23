@@ -32,11 +32,16 @@ public:
 	const glm::mat4& getViewMatrix() const;
 	const glm::mat4& getProjectionMatrix() const;
 
+	const glm::vec3& getForward() const;
+	const glm::vec3& getRight() const;
+	const glm::vec3& getUp() const;
+
 private:
 	Swap<Frustum> frustum;
 
 	Swap<glm::vec3> position;
 	Swap<glm::vec3> direction;
+	Swap<glm::vec3> right;
 	Swap<glm::vec3> up;
 
 	float horizontalAngle;

@@ -21,4 +21,7 @@ namespace LuaCamera
 
 	int getPosition( lua_State* lua );
 	int getDirection( lua_State* lua );
+	int getForward( lua_State* lua );
+	int getRight( lua_State* lua );
+	int getUp( lua_State* lua );
 }

@@ -50,24 +50,58 @@ function camera:update( dt )
 			Camera.relativeMovement( movement )
 		end
 	else -- normal RTS camera
-		local movement = vec3()
+		local xmov = 0.0
+		local zmov = 0.0
 	
 		-- check if the user is scrolling the camera to the left
 		if self.mousePosition[1] > 0 and self.mousePosition[1] < self.borderWidth then
-			movement[1] = movement[1] + self.speed
+			xmov = xmov - self.speed
 		elseif self.mousePosition[1] < WINDOW_WIDTH and self.mousePosition[1] > WINDOW_WIDTH - self.borderWidth then -- to the right
-			movement[1] = movement[1] - self.speed
+			xmov = xmov + self.speed
+		end
+		
+		if Input.keyDown( "A" ) then
+			xmov = xmov - self.speed
+		end
+		if Input.keyDown( "D" ) then
+			xmov = xmov + self.speed
 		end
 		
 		-- up
 		if self.mousePosition[2] > 0 and self.mousePosition[2] < self.borderWidth then
-			movement[3] = movement[3] + self.speed
+			zmov = zmov + self.speed
 		elseif self.mousePosition[2] < WINDOW_HEIGHT and self.mousePosition[2] > WINDOW_HEIGHT - self.borderWidth then -- down
-			movement[3] = movement[3] - self.speed
+			zmov = zmov - self.speed
 		end
 		
-		if movement:length() > 0.0 then
-			Camera.absoluteMovement( movement )
+		if Input.keyDown( "W" ) then
+			zmov = zmov + self.speed
+		end
+		
+		if Input.keyDown( "S" ) then
+			zmov = zmov - self.speed
+		end
+		
+		-- x movement
+		if xmov < 0 or xmov > 0 then
+			local right = vec3()
+			Camera.getRight( right )
+			
+			right[2] = 0.0
+			right:normalize()
+			
+			Camera.absoluteMovement( right * xmov )
+		end
+		
+		-- z movement
+		if zmov < 0 or zmov > 0 then
+			local forward = vec3()
+			Camera.getForward( forward )
+			
+			forward[2] = 0.0
+			forward:normalize()
+			
+			Camera.absoluteMovement( forward * zmov )
 		end
 		
 		-- rotation

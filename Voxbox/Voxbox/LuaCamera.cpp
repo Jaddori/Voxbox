@@ -24,6 +24,9 @@ namespace LuaCamera
 
 			{ "getPosition",			getPosition },
 			{ "getDirection",			getDirection },
+			{ "getForward",				getForward },
+			{ "getRight",				getRight },
+			{ "getUp",					getUp },
 			{ NULL, NULL }
 		};
 
@@ -251,10 +254,58 @@ namespace LuaCamera
 		{
 			if( LUA_EXPECT_TABLE( 1 ) )
 			{
-				glm::vec3 direction = g_coreData->perspectiveCamera->getDirection();
+				const glm::vec3& direction = g_coreData->perspectiveCamera->getDirection();
 
 				// set result
 				lua_setvec3( lua, 1, direction );
+			}
+		}
+
+		return 0;
+	}
+
+	int getForward( lua_State* lua )
+	{
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				const glm::vec3& forward = g_coreData->perspectiveCamera->getForward();
+
+				// set result
+				lua_setvec3( lua, 1, forward );
+			}
+		}
+
+		return 0;
+	}
+
+	int getRight( lua_State* lua )
+	{
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				const glm::vec3& right = g_coreData->perspectiveCamera->getRight();
+
+				// set result
+				lua_setvec3( lua, 1, right );
+			}
+		}
+
+		return 0;
+	}
+
+	int getUp( lua_State* lua )
+	{
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) )
+			{
+				const glm::vec3& up = g_coreData->perspectiveCamera->getUp();
+
+				// set result
+				lua_setvec3( lua, 1, up );
 			}
 		}
 

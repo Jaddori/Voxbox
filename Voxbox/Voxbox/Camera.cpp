@@ -3,6 +3,7 @@
 Camera::Camera()
 	: position( glm::vec3( 0.0f ) ),
 	direction( glm::vec3( 0.0f, 0.0f, 1.0f ) ),
+	right( glm::vec3( 1.0f, 0.0f, 0.0f ) ),
 	up( glm::vec3( 0.0f, 1.0f, 0.0f ) ),
 	dirtyViewMatrix( true ), dirtyFrustum( true ),
 	horizontalAngle( 0.0f ), verticalAngle( 0.0f )
@@ -18,6 +19,7 @@ void Camera::finalize()
 {
 	position.swap();
 	direction.swap();
+	right.swap();
 	up.swap();
 
 	if( dirtyViewMatrix )
@@ -110,13 +112,13 @@ void Camera::updateDirection( int deltaX, int deltaY )
 	);
 
 	// calculate up vector
-	glm::vec3 right = glm::vec3(
+	right = glm::vec3(
 		glm::sin( horizontalAngle - 3.14f * 0.5f ),
 		0,
 		glm::cos( horizontalAngle - 3.14f * 0.5f )
 	);
 
-	up = glm::cross( right, direction.getWrite() );
+	up = glm::cross( right.getWrite(), direction.getWrite() );
 
 	dirtyViewMatrix = true;
 	dirtyFrustum = true;
@@ -155,13 +157,13 @@ void Camera::setDirection( const glm::vec3& d )
 		horizontalAngle = glm::acos( 0.0f );
 
 	// calculate up vector
-	glm::vec3 right = glm::vec3(
+	right = glm::vec3(
 		glm::sin( horizontalAngle - 3.14f * 0.5f ),
 		0,
 		glm::cos( horizontalAngle - 3.14f * 0.5f )
 	);
 
-	up = glm::cross( right, direction.getWrite() );
+	up = glm::cross( right.getWrite(), direction.getWrite() );
 
 	dirtyViewMatrix = true;
 	dirtyFrustum = true;
@@ -185,13 +187,13 @@ void Camera::setHorizontalAngle( float angle )
 	);
 
 	// calculate up vector
-	glm::vec3 right = glm::vec3(
+	right = glm::vec3(
 		glm::sin( horizontalAngle - 3.14f * 0.5f ),
 		0,
 		glm::cos( horizontalAngle - 3.14f * 0.5f )
 	);
 
-	up = glm::cross( right, direction.getWrite() );
+	up = glm::cross( right.getWrite(), direction.getWrite() );
 
 	dirtyViewMatrix = true;
 	dirtyFrustum = true;
@@ -213,13 +215,13 @@ void Camera::setVerticalAngle( float angle )
 	);
 
 	// calculate up vector
-	glm::vec3 right = glm::vec3(
+	right = glm::vec3(
 		glm::sin( horizontalAngle - 3.14f * 0.5f ),
 		0,
 		glm::cos( horizontalAngle - 3.14f * 0.5f )
 	);
 
-	up = glm::cross( right, direction.getWrite() );
+	up = glm::cross( right.getWrite(), direction.getWrite() );
 
 	dirtyViewMatrix = true;
 	dirtyFrustum = true;
@@ -248,4 +250,19 @@ const glm::vec3& Camera::getPosition() const
 const glm::vec3& Camera::getDirection() const
 {
 	return direction.getRead();
+}
+
+const glm::vec3& Camera::getForward() const
+{
+	return direction.getWrite();
+}
+
+const glm::vec3& Camera::getRight() const
+{
+	return right.getWrite();
+}
+
+const glm::vec3& Camera::getUp() const
+{
+	return up.getWrite();
 }
