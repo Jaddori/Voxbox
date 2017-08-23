@@ -365,24 +365,12 @@ void Graphics::render()
 	chunkShader.bind();
 	chunkShader.setMat4( chunkProjectionMatrixLocation, perspectiveCamera.getProjectionMatrix() );
 	chunkShader.setMat4( chunkViewMatrixLocation, perspectiveCamera.getViewMatrix() );
-	
-	GLenum er = glGetError();
-	if( er != GL_NO_ERROR )
-		int k = 0;
 
 	blockAtlas->bind();
-	
-	er = glGetError();
-	if( er != GL_NO_ERROR )
-		int k = 0;
 
 	const int CHUNK_COUNT = chunks[readIndex].getSize();
 	for( int i=0; i<CHUNK_COUNT; i++ )
 		chunks[readIndex][i]->render();
-	
-	er = glGetError();
-	if( er != GL_NO_ERROR )
-		int k = 0;
 
 	glBindTexture( GL_TEXTURE_2D, 0 ); // prevent binding leaks
 
@@ -393,18 +381,10 @@ void Graphics::render()
 	blockShader.bind();
 	blockShader.setMat4( blockProjectionMatrixLocation, perspectiveCamera.getProjectionMatrix() );
 	blockShader.setMat4( blockViewMatrixLocation, perspectiveCamera.getViewMatrix() );
-	
-	er = glGetError();
-	if( er != GL_NO_ERROR )
-		int k = 0;
 
 	glBindVertexArray( blockVAO );
 	glBindBuffer( GL_ARRAY_BUFFER, blockUBO );
 	
-	er = glGetError();
-	if( er != GL_NO_ERROR )
-		int k = 0;
-
 	const int BLOCK_COLLECTION_COUNT = blockCollections.getSize();
 	for( int curCollection = 0; curCollection < BLOCK_COLLECTION_COUNT; curCollection++ )
 	{
@@ -424,10 +404,6 @@ void Graphics::render()
 			offset += count;
 		}
 	}
-	
-	er = glGetError();
-	if( er != GL_NO_ERROR )
-		int k = 0;
 
 	glDisable( GL_BLEND );
 
@@ -438,10 +414,6 @@ void Graphics::render()
 	billboardShader.setMat4( billboardProjectionMatrixLocation, perspectiveCamera.getProjectionMatrix() );
 	billboardShader.setMat4( billboardViewMatrixLocation, perspectiveCamera.getViewMatrix() );
 	
-	er = glGetError();
-	if( er != GL_NO_ERROR )
-		int k = 0;
-
 	glBindVertexArray( billboardVAO );
 	glBindBuffer( GL_ARRAY_BUFFER, billboardVBO );
 
@@ -630,7 +602,7 @@ void Graphics::queueText( Font* font, const char* text, const glm::vec2& positio
 			index++;
 		}
 
-		*cur++;
+		cur++;
 	}
 }
 

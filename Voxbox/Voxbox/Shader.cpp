@@ -74,7 +74,7 @@ GLuint Shader::loadShader( const char* path, GLenum type )
 		{
 			// retrieve the length of the file
 			fseek( file, 0, SEEK_END );
-			int len = ftell( file );
+			int len = (int)ftell( file );
 			fseek( file, 0, SEEK_SET );
 
 			// read the file

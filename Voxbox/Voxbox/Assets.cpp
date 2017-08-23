@@ -121,7 +121,7 @@ Font* Assets::loadFont( const char* infoPath, const char* texturePath )
 	ulong hash = hashPath( infoPath );
 
 	LOG_INFO( "Loading font from %s", infoPath );
-	LOG_INFO( "Hash = %ul", hash );
+	LOG_INFO( "Hash = %lu", hash );
 
 	int index = findAsset( fontHashes, hash );
 	if( index < 0 ) // this is a new path

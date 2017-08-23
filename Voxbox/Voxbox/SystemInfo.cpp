@@ -26,7 +26,7 @@ void SystemInfo::poll()
 	struct rusage memInfo;
 	getrusage( RUSAGE_SELF, &memInfo );
 	
-	ram = memInfo.ru_maxrss;
+	ram = (int)memInfo.ru_maxrss;
 #endif
 }
 

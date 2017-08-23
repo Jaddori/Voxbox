@@ -33,6 +33,8 @@ namespace LuaAssets
 			{ "getUV",					getUV },
 			{ NULL, NULL }
 		};
+		
+		luaL_setfuncs( lua, fontRegs, 0 );
 		lua_pushvalue( lua, -1 );
 		lua_setfield( lua, -2, "__index" );
 		lua_setglobal( lua, "Font" );

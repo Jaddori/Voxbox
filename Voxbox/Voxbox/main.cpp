@@ -111,17 +111,10 @@ int main( int argc, char* argv[] )
 				return -1;
 			}
 #endif
-			GLenum er = glGetError();
-			if( er != GL_NO_ERROR )
-				int k = 0;
 
 			glEnable( GL_DEPTH_TEST );
 			glEnable( GL_CULL_FACE );
 			SDL_GL_SetSwapInterval( 1 );
-			
-			er = glGetError();
-			if( er != GL_NO_ERROR )
-				int k = 0;
 
 			bool executing = true;
 			while( executing )
@@ -135,33 +128,17 @@ int main( int argc, char* argv[] )
 				threadPool.load();
 
 				Assets assets;
-				
-				er = glGetError();
-				if( er != GL_NO_ERROR )
-					int k = 0;
 
 				Graphics graphics;
 				graphics.load( &assets );
 				graphics.getPerspectiveCamera().setPosition( glm::vec3( 0.0f, 0.0f, -10.0f ) );
-				
-				er = glGetError();
-				if( er != GL_NO_ERROR )
-					int k = 0;
 
 				World world;
 				world.load( &threadPool );
-				
-				er = glGetError();
-				if( er != GL_NO_ERROR )
-					int k = 0;
 
 				DebugShapes debugShapes;
 				debugShapes.load();
 				debugShapes.upload();
-				
-				er = glGetError();
-				if( er != GL_NO_ERROR )
-					int k = 0;
 
 				Input input;
 
@@ -178,19 +155,11 @@ int main( int argc, char* argv[] )
 				coreData.systemInfo = &systemInfo;
 				coreData.running = &running;
 				coreData.executing = &executing;
-				
-				er = glGetError();
-				if( er != GL_NO_ERROR )
-					int k = 0;
-			 
+			
 				LuaBinds luaBinds;
 				luaBinds.bind( &coreData );
 				luaBinds.load();
-				
-				er = glGetError();
-				if( er != GL_NO_ERROR )
-					int k = 0;
-
+			
 				ThreadData threadData;
 				threadData.coreData = &coreData;
 				threadData.luaBinds = &luaBinds;
@@ -223,16 +192,8 @@ int main( int argc, char* argv[] )
 						assets.upload();
 						graphics.finalize();
 						debugShapes.finalize();
-						
-						er = glGetError();
-						if( er != GL_NO_ERROR )
-							int k = 0;
 
 						world.upload();
-						
-						er = glGetError();
-						if( er != GL_NO_ERROR )
-							int k = 0;
 
 						threadPool.schedule();
 
@@ -244,16 +205,8 @@ int main( int argc, char* argv[] )
 					glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 					graphics.render();
-					
-					er = glGetError();
-					if( er != GL_NO_ERROR )
-						int k = 0;
 
 					debugShapes.render( graphics.getPerspectiveCamera().getProjectionMatrix(), graphics.getPerspectiveCamera().getViewMatrix() );
-					
-					er = glGetError();
-					if( er != GL_NO_ERROR )
-						int k = 0;
 
 					SDL_GL_SwapWindow( window );
 

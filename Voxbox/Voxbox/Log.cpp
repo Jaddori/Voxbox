@@ -3,13 +3,13 @@
 bool Log::start( const char* logfile )
 {
 #if _DEBUG
+	mutex = SDL_CreateMutex();
+	
 	file = fopen( logfile, "w" );
 	if( file )
 	{
 		addMessage( VERBOSITY_INFORMATION, "*** Log started ***" );
 	}
-
-	mutex = CreateMutex( NULL, FALSE, NULL );
 	
 	return ( file != nullptr );
 #else
@@ -23,7 +23,7 @@ void Log::stop()
 	assert( file );
 
 	addMessage( VERBOSITY_INFORMATION, "*** Log stopped ***" );
-	CloseHandle( mutex );
+	SDL_DestroyMutex( mutex );
 	fclose( file );
 #endif
 }
@@ -33,7 +33,7 @@ void Log::addMessage( int verbosity, const char* message )
 #if _DEBUG
 	assert( file );
 
-	WaitForSingleObject( mutex, INFINITE );
+	SDL_LockMutex( mutex );
 
 	fprintf( file, "%s\n", message );
 	fflush( file );
@@ -46,7 +46,7 @@ void Log::addMessage( int verbosity, const char* message )
 
 	messages.add( msg );
 
-	ReleaseMutex( mutex );
+	SDL_UnlockMutex( mutex );
 #endif
 }
 

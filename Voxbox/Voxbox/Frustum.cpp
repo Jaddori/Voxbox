@@ -167,7 +167,6 @@ bool Frustum::pointCollision( glm::vec3& point ) const
 
 	for( int i = 0; i < FRUSTUM_PLANE_AMOUNT && collision; i++ )
 	{
-		float distance = planes[i].distance( point );
 		collision = ( planes[i].distance(point) >= 0.0f );
 	}
 
@@ -240,7 +239,6 @@ void Frustum::addDebugLines( DebugShapes& debugShapes ) const
 bool Frustum::pointPlaneCollision( int plane, const glm::vec3& point ) const
 {
 	bool collision = true;
-	float distance = planes[plane].distance(point);
 	if( planes[plane].distance(point) < 0 )
 	{
 		collision = false;
