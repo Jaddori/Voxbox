@@ -167,6 +167,64 @@ void Camera::setDirection( const glm::vec3& d )
 	dirtyFrustum = true;
 }
 
+void Camera::setHorizontalAngle( float angle )
+{
+	horizontalAngle = angle;
+
+	// clamp angles
+	if( horizontalAngle > 2*PI )
+		horizontalAngle -= 2*PI;
+	else if( horizontalAngle < -2*PI )
+		horizontalAngle += 2*PI;
+
+	// calculate new direction
+	direction = glm::vec3(
+		glm::cos( verticalAngle ) * glm::sin( horizontalAngle ),
+		glm::sin( verticalAngle ),
+		glm::cos( verticalAngle ) * glm::cos( horizontalAngle )
+	);
+
+	// calculate up vector
+	glm::vec3 right = glm::vec3(
+		glm::sin( horizontalAngle - 3.14f * 0.5f ),
+		0,
+		glm::cos( horizontalAngle - 3.14f * 0.5f )
+	);
+
+	up = glm::cross( right, direction.getWrite() );
+
+	dirtyViewMatrix = true;
+	dirtyFrustum = true;
+}
+
+void Camera::setVerticalAngle( float angle )
+{
+	verticalAngle = angle;
+
+	// clamp angles
+	if( fabs( verticalAngle ) > PI*0.5f )
+		verticalAngle = PI*0.5f;
+
+	// calculate new direction
+	direction = glm::vec3(
+		glm::cos( verticalAngle ) * glm::sin( horizontalAngle ),
+		glm::sin( verticalAngle ),
+		glm::cos( verticalAngle ) * glm::cos( horizontalAngle )
+	);
+
+	// calculate up vector
+	glm::vec3 right = glm::vec3(
+		glm::sin( horizontalAngle - 3.14f * 0.5f ),
+		0,
+		glm::cos( horizontalAngle - 3.14f * 0.5f )
+	);
+
+	up = glm::cross( right, direction.getWrite() );
+
+	dirtyViewMatrix = true;
+	dirtyFrustum = true;
+}
+
 const Frustum& Camera::getFrustum() const
 {
 	return frustum.getRead();

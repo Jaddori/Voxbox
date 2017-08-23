@@ -23,6 +23,8 @@ public:
 
 	void setPosition( const glm::vec3& position );
 	void setDirection( const glm::vec3& direction );
+	void setHorizontalAngle( float angle );
+	void setVerticalAngle( float angle );
 
 	const Frustum& getFrustum() const;
 	const glm::vec3& getPosition() const;

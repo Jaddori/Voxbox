@@ -30,8 +30,10 @@ public:
 	Point getMouseDelta() const;
 	int getMouseWheel() const;
 	const char* getTextInput() const;
+	bool getActive() const;
 
 private:
+	bool active;
 	bool keys[INPUT_MAX_KEYS];
 	bool prevKeys[INPUT_MAX_KEYS];
 	bool buttons[INPUT_MAX_BUTTONS];

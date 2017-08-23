@@ -25,6 +25,7 @@ namespace LuaInput
 			{ "getMouseDelta",		getMouseDelta },
 			{ "getMouseWheel",		getMouseWheel },
 			{ "textInput",			textInput },
+			{ "getActive",			getActive },
 			{ NULL, NULL }
 		};
 
@@ -281,6 +282,12 @@ namespace LuaInput
 	int textInput( lua_State* lua )
 	{
 		lua_pushstring( lua, g_coreData->input->getTextInput() );
+		return 1;
+	}
+
+	int getActive( lua_State* lua )
+	{
+		lua_pushboolean( lua, g_coreData->input->getActive() );
 		return 1;
 	}
 

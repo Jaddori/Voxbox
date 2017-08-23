@@ -1,6 +1,7 @@
 #include "Input.h"
 
 Input::Input()
+	: active( true )
 {
 	memset( keys, 0, INPUT_MAX_KEYS );
 	memset( prevKeys, 0, INPUT_MAX_KEYS );
@@ -71,6 +72,20 @@ bool Input::update( SDL_Event* e )
 			memcpy( textInput, e->text.text, sizeof(char)*INPUT_MAX_TEXT_INPUT );
 		} break;
 
+		case SDL_WINDOWEVENT:
+		{
+			if( e->window.event == SDL_WINDOWEVENT_ENTER )
+			{
+				active = true;
+			}
+			else if( e->window.event == SDL_WINDOWEVENT_LEAVE )
+			{
+				active = false;
+			}
+			else
+				handled = false;
+		} break;
+
 		default:
 			handled = false;
 			break;
@@ -82,43 +97,43 @@ bool Input::update( SDL_Event* e )
 bool Input::keyDown( int key )
 {
 	LOG_ASSERT( key >= 0 && key < INPUT_MAX_KEYS, "Bad key argument: %d", key );
-	return keys[key];
+	return ( active && keys[key] );
 }
 
 bool Input::keyPressed( int key )
 {
 	LOG_ASSERT( key >= 0 && key < INPUT_MAX_KEYS, "Bad key argument: %d", key );
-	return ( keys[key] && !prevKeys[key] );
+	return ( active && keys[key] && !prevKeys[key] );
 }
 
 bool Input::keyReleased( int key )
 {
 	LOG_ASSERT( key >= 0 && key < INPUT_MAX_KEYS, "Bad key argument: %d", key );
-	return ( !keys[key] && prevKeys[key] );
+	return ( active && !keys[key] && prevKeys[key] );
 }
 
 bool Input::keyRepeated( int key )
 {
 	LOG_ASSERT( key >= 0 && key < INPUT_MAX_KEYS, "Bad key argument: %d", key );
-	return repeatedKeys[key];
+	return ( active && repeatedKeys[key] );
 }
 
 bool Input::buttonDown( int button )
 {
 	LOG_ASSERT( button >= 0 && button < INPUT_MAX_KEYS, "Bad button argument: %d", button );
-	return buttons[button];
+	return ( active && buttons[button] );
 }
 
 bool Input::buttonPressed( int button )
 {
 	LOG_ASSERT( button >= 0 && button < INPUT_MAX_KEYS, "Bad button argument: %d", button );
-	return ( buttons[button] && !prevButtons[button] );
+	return ( active && buttons[button] && !prevButtons[button] );
 }
 
 bool Input::buttonReleased( int button )
 {
 	LOG_ASSERT( button >= 0 && button < INPUT_MAX_KEYS, "Bad button argument: %d", button );
-	return ( !buttons[button] && prevButtons[button] );
+	return ( active && !buttons[button] && prevButtons[button] );
 }
 
 Point Input::getMousePosition() const
@@ -145,4 +160,9 @@ int Input::getMouseWheel() const
 const char* Input::getTextInput() const
 {
 	return textInput;
+}
+
+bool Input::getActive() const
+{
+	return active;
 }

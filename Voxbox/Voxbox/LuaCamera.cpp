@@ -10,18 +10,20 @@ namespace LuaCamera
 		luaL_newmetatable( lua, "cameraMeta" );
 		luaL_Reg cameraRegs[] =
 		{
-			{ "project",			project },
-			{ "unproject",			unproject },
+			{ "project",				project },
+			{ "unproject",				unproject },
 
-			{ "relativeMovement",	relativeMovement },
-			{ "absoluteMovement",	absoluteMovement },
-			{ "updateDirection",	updateDirection },
+			{ "relativeMovement",		relativeMovement },
+			{ "absoluteMovement",		absoluteMovement },
+			{ "updateDirection",		updateDirection },
 			
-			{ "setPosition",		setPosition },
-			{ "setDirection",		setDirection },
+			{ "setPosition",			setPosition },
+			{ "setDirection",			setDirection },
+			{ "setHorizontalAngle",		setHorizontalAngle },
+			{ "setVerticalAngle",		setVerticalAngle },
 
-			{ "getPosition",		getPosition },
-			{ "getDirection",		getDirection },
+			{ "getPosition",			getPosition },
+			{ "getDirection",			getDirection },
 			{ NULL, NULL }
 		};
 
@@ -183,6 +185,38 @@ namespace LuaCamera
 				lua_getvec3( lua, 1, direction );
 
 				g_coreData->perspectiveCamera->setDirection( direction );
+			}
+		}
+
+		return 0;
+	}
+
+	int setHorizontalAngle( lua_State* lua )
+	{
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_NUMBER( 1 ) )
+			{
+				// get angle
+				float angle = lua_tofloat( lua, 1 );
+
+				g_coreData->perspectiveCamera->setHorizontalAngle( angle );
+			}
+		}
+
+		return 0;
+	}
+
+	int setVerticalAngle( lua_State* lua )
+	{
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_NUMBER( 1 ) )
+			{
+				// get angle
+				float angle = lua_tofloat( lua, 1 );
+
+				g_coreData->perspectiveCamera->setVerticalAngle( angle );
 			}
 		}
 

@@ -8,16 +8,21 @@ camera =
 	borderWidth = 128,			-- width of the virtual border along the screen edges
 	height = 55,				-- height above the ground
 	angle = -0.7,				-- angle of the camera facing the ground
-	rotation = 0.7,
+	rotation = 0.0,
+	rotationSpeed = 0.01,
 	debugMode = false
 }
 
 function camera:load()
 	Camera.setPosition( {0,self.height,0} )
-	Camera.setDirection( { 0, self.angle, self.rotation } )
+	--Camera.setDirection( { 0, self.angle, self.rotation } )
+	Camera.setVerticalAngle( self.angle )
+	Camera.setHorizontalAngle( self.rotation )
 end
 
 function camera:update( dt )
+	if not Input.getActive() then return end
+
 	-- get mouse position and mouse delta
 	Input.getMousePosition( self.mousePosition )
 	Input.getMouseDelta( self.mouseDelta )
@@ -25,7 +30,7 @@ function camera:update( dt )
 	-- project mouse cursor into 3D space
 	Camera.unproject( self.mousePosition, 0.0, self.rayStart )
 	Camera.unproject( self.mousePosition, 1.0, self.rayEnd )
-
+	
 	if self.debugMode then
 		-- check for direction change
 		if Input.buttonDown( Buttons.Left ) then
@@ -63,6 +68,12 @@ function camera:update( dt )
 		
 		if movement:length() > 0.0 then
 			Camera.absoluteMovement( movement )
+		end
+		
+		-- rotation
+		if Input.buttonDown( Buttons.Middle ) then
+			self.rotation = self.rotation + ( self.mouseDelta[1] * self.rotationSpeed )
+			Camera.setHorizontalAngle( self.rotation )
 		end
 	end
 end

@@ -16,6 +16,8 @@ namespace LuaCamera
 	
 	int setPosition( lua_State* lua );
 	int setDirection( lua_State* lua );
+	int setHorizontalAngle( lua_State* lua );
+	int setVerticalAngle( lua_State* lua );
 
 	int getPosition( lua_State* lua );
 	int getDirection( lua_State* lua );
