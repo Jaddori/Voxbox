@@ -139,6 +139,7 @@ function mainUpdate( dt )
 			-- execute action
 			if Input.keyReleased( Keys.Space ) then
 				selectedWorker:dig( action.selectionBounds )
+				actionBar.action = ACTION_SELECT
 			end
 		end
 	elseif actionBar.action == ACTION_BUILD and selectedWorker then
@@ -180,6 +181,7 @@ function mainUpdate( dt )
 			-- execution action
 			if Input.keyReleased( Keys.Space ) then
 				selectedWorker:build( action.selectionBounds )
+				actionBar.action = ACTION_SELECT
 			end
 		end
 	end
@@ -197,7 +199,7 @@ function mainRender()
 		Graphics.queueQuad( unitSelectionMin, unitSelectionSize, {0,0,0,0}, 0.85 )
 	end
 	
-	if currentAction == ACTION_DIG then
+	if actionBar.action == ACTION_DIG then
 		-- render preview block
 		if action.havePreview then
 			Graphics.queueBlock( action.previewBlock, {1,0,0,0.65} )
@@ -213,7 +215,7 @@ function mainRender()
 				end
 			end
 		end
-	elseif currentAction == ACTION_BUILD then
+	elseif actionBar.action == ACTION_BUILD then
 		-- render preview block
 		if action.havePreview then
 			Graphics.queueBlock( action.previewBlock, {1,0,0,0.65} )
