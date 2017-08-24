@@ -108,7 +108,7 @@ namespace LuaDebug
 				// get threshold
 				int threshold = lua_toint( lua, 1 );
 
-				if( threshold >= VERBOSITY_INFORMATION && threshold <= VERBOSITY_DEBUG )
+				if( threshold < VERBOSITY_INFORMATION || threshold > VERBOSITY_DEBUG )
 				{
 					LOG_ERROR( "Bad threshold value: %d", threshold );
 				}

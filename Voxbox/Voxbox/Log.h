@@ -8,12 +8,22 @@
 #define LOG_START( file ) Log::instance().start( file )
 #define LOG_STOP() Log::instance().stop()
 #define LOG_FINALIZE() Log::instance().finalize()
+
+#if _WIN32
+#define LOG( verbosity, fmt, ... ) \
+	{ \
+		char buffer[1024] = {}; \
+		snprintf( buffer, 1024, __FUNCTION__ " - " fmt, ## __VA_ARGS__ ); \
+		Log::instance().addMessage( verbosity, buffer ); \
+	}
+#else
 #define LOG( verbosity, fmt, ... ) \
 	{ \
 		char buffer[1024] = {}; \
 		snprintf( buffer, 1024, "%s - " fmt, __func__, ## __VA_ARGS__ ); \
 		Log::instance().addMessage( verbosity, buffer ); \
 	}
+#endif
 #define LOG_ASSERT( condition, fmt, ... ) \
 	{ \
 		if( !(condition) ) \
