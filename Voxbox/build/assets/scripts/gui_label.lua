@@ -34,8 +34,11 @@ function GuiLabel:onClick()
 	Log.log( VERBOSITY_DEBUG, "GuiLabel clicked." )
 end
 
-function GuiLabel:render()
+function GuiLabel:render( position )
+	position = position or self.textPosition
+	local textPosition = position + self.textOffset
+
 	if self.visible then
-		Graphics.queueText( self.font, self.text, self.textPosition, self.textColor )
+		Graphics.queueText( self.font, self.text, textPosition, self.textColor )
 	end
 end

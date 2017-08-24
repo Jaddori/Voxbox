@@ -23,7 +23,7 @@ function GuiBase:create()
 		textColor = {1,1,1,1},
 		textAlignmentX = GUI_TEXT_ALIGNMENT_NEAR,
 		textAlignmentY = GUI_TEXT_ALIGNMENT_NEAR,
-		textPosition = vec2(),
+		textOffset = vec2(),
 		textPadding = vec2(2,2),
 		
 		background = Assets.loadTexture( "./assets/textures/gui_base_background.dds" ),
@@ -69,20 +69,20 @@ function GuiBase:alignText()
 
 	-- align text horizontally
 	if self.textAlignmentX == GUI_TEXT_ALIGNMENT_NEAR then
-		self.textPosition[1] = self.position[1] + self.textPadding[1]
+		self.textOffset[1] = self.textPadding[1]
 	elseif self.textAlignmentX == GUI_TEXT_ALIGNMENT_CENTER then
-		self.textPosition[1] = ( self.position[1] + self.size[1] * 0.5 ) - ( textBounds[1] * 0.5 )
+		self.textOffset[1] = ( self.size[1] * 0.5 ) - ( textBounds[1] * 0.5 )
 	else -- GUI_TEXT_ALIGNMENT_FAR
-		self.textPosition[1] = self.position[1] + self.size[1] - textBounds[1] - self.textPadding[1]
+		self.textOffset[1] = self.size[1] - textBounds[1] - self.textPadding[1]
 	end
 	
 	-- align text vertically
 	if self.textAlignmentY == GUI_TEXT_ALIGNMENT_NEAR then
-		self.textPosition[2] = self.position[2] + self.textPadding[2]
+		self.textOffset[2] = self.textPadding[2]
 	elseif self.textAlignmentY == GUI_TEXT_ALIGNMENT_CENTER then
-		self.textPosition[2] = ( self.position[2] + self.size[2] * 0.5 ) - ( textBounds[2] * 0.5 )
+		self.textOffset[2] = ( self.size[2] * 0.5 ) - ( textBounds[2] * 0.5 )
 	else -- GUI_TEXT_ALIGNMENT_FAR
-		self.textPosition[2] = self.position[2] + self.size[2] - textBounds[2] - self.textPadding[2]
+		self.textOffset[2] = self.size[2] - textBounds[2] - self.textPadding[2]
 	end
 end
 
@@ -105,13 +105,19 @@ function GuiBase:setTextPadding( padding )
 	self:alignText()
 end
 
-function GuiBase:update( dt )
+function GuiBase:getHeight()
+	return self.size[2]
+end
+
+function GuiBase:update( dt, position )
+	position = position or self.position
+
 	if self.enabled then
 		local mpos = camera.mousePosition
 		local prevHovered = self.hovered
 		local prevPressed = self.pressed
 		
-		self.hovered = inside( self.position, self.size, mpos )
+		self.hovered = inside( position, self.size, mpos )
 		self.pressed = self.hovered and Input.buttonDown( Buttons.Left )
 		
 		self.uv = GUI_BASE_UV_IDLE
@@ -145,9 +151,12 @@ function GuiBase:update( dt )
 	end
 end
 
-function GuiBase:render()
+function GuiBase:render( position )
+	position = position or self.position
+	local textPosition = position + self.textOffset
+
 	if self.visible then
-		Graphics.queueQuad( self.position, self.size, self.uv, self.backgroundOpacity, self.background )
-		Graphics.queueText( self.font, self.text, self.textPosition, self.textColor )
+		Graphics.queueQuad( position, self.size, self.uv, self.backgroundOpacity, self.background )
+		Graphics.queueText( self.font, self.text, textPosition, self.textColor )
 	end
 end

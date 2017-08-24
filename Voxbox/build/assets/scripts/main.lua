@@ -16,10 +16,6 @@ local unitSelectionSize = vec2()
 local haveUnitSelection = false
 local selectedWorker = {}
 
-local testLabel = GuiLabel:create( {300,128}, {128,128}, "Test Label" )
-local testButton = GuiButton:create( {128,164}, {128,24}, "Test Button" )
-local testTextbox = GuiTextbox:create( {128,196}, {128,24} )
-
 local action =
 {
 	previewBlock = vec3(),

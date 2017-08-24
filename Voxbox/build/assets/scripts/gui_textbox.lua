@@ -36,8 +36,10 @@ function GuiTextbox:onConfirm()
 end
 
 GPADDING = 0
-function GuiTextbox:update( dt )
-	GuiBase.update( self, dt )
+function GuiTextbox:update( dt, position )
+	position = position or self.position
+
+	GuiBase.update( self, dt, position )
 
 	-- update caret flashing
 	self.caretElapsed = self.caretElapsed + dt
@@ -67,15 +69,18 @@ function GuiTextbox:update( dt )
 	end
 end
 
-function GuiTextbox:render()
+function GuiTextbox:render( position )
+	position = position or self.position
+	local textPosition = position + self.textOffset
+
 	if self.visible then
-		Graphics.queueQuad( self.position, self.size, GUI_BASE_UV_PRESS, self.backgroundOpacity, self.background )
+		Graphics.queueQuad( position, self.size, GUI_BASE_UV_PRESS, self.backgroundOpacity, self.background )
 		
 		local text = self.text
 		if self.focused and self.caretVisible then
 			text = text .. "_"
 		end
 		
-		Graphics.queueText( self.font, text, self.textPosition, self.textColor )
+		Graphics.queueText( self.font, text, textPosition, self.textColor )
 	end
 end
