@@ -1,9 +1,9 @@
 require( "./assets/scripts/utils" )
 
-local GUI_BASE_UV_IDLE = {0,0,1,0.25}
-local GUI_BASE_UV_HOVER = {0,0.25,1,0.5}
-local GUI_BASE_UV_PRESS = {0,0.5,1,0.75}
-local GUI_BASE_UV_DISABLED = {0,0.75,1,1}
+GUI_BASE_UV_IDLE = {0,0,1,0.25}
+GUI_BASE_UV_HOVER = {0,0.25,1,0.5}
+GUI_BASE_UV_PRESS = {0,0.5,1,0.75}
+GUI_BASE_UV_DISABLED = {0,0.75,1,1}
 
 GuiBase =
 {
@@ -21,6 +21,7 @@ GuiBase =
 	
 	visible = true,
 	enabled = true,
+	focusd = false,
 	hovered = false,
 	pressed = false,
 }
@@ -76,6 +77,11 @@ function GuiBase:update( dt )
 			if prevHovered then
 				self:onLeave()
 			end
+		end
+		
+		-- check if we have focus
+		if Input.buttonReleased( Buttons.Left ) then
+			self.focused = self.hovered
 		end
 	else
 		self.uv = GUI_BASE_UV_DISABLED

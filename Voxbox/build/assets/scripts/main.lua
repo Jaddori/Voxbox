@@ -21,6 +21,7 @@ local currentAction = ACTION_DIG
 
 local testLabel = GuiLabel:create( {128,128} )
 local testButton = GuiButton:create( {128,164}, {128,24} )
+local testTextbox = GuiTextbox:create( {128,196}, {128,24} )
 
 local action =
 {
@@ -196,8 +197,9 @@ function mainUpdate( dt )
 	end
 	
 	-- update gui stuff
-	--testLabel:update( dt )
+	testLabel:update( dt )
 	testButton:update( dt )
+	testTextbox:update( dt )
 end
 
 function mainRender()
@@ -248,4 +250,5 @@ function mainRender()
 	-- render gui stuff
 	testLabel:render()
 	testButton:render()
+	testTextbox:render()
 end
