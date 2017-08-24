@@ -53,8 +53,8 @@ int update( void* args )
 				*data->coreData->running = false;
 			}
 
-			const Frustum& frustum = perspectiveCamera.getFrustum();
-			world.queueChunks( data->coreData, frustum );
+			//const Frustum& frustum = perspectiveCamera.getFrustum();
+			//world.queueChunks( data->coreData, frustum );
 
 			long curTick = SDL_GetTicks();
 			float deltaTime = ( curTick - lastTick ) * 0.001f; // delta time in seconds

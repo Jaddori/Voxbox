@@ -21,4 +21,5 @@ namespace LuaVoxels
 	int saveWorld( lua_State* lua );
 	int setBlock( lua_State* lua );
 	int findPath( lua_State* lua );
+	int queueChunks( lua_State* lua );
 }

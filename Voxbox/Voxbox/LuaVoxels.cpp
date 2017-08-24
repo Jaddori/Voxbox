@@ -21,6 +21,7 @@ namespace LuaVoxels
 			{ "saveWorld",		saveWorld },
 			{ "setBlock",		setBlock },
 			{ "findPath",		findPath },
+			{ "queueChunks",	queueChunks },
 			{ NULL, NULL }
 		};
 
@@ -273,5 +274,11 @@ namespace LuaVoxels
 		}
 
 		return result;
+	}
+
+	int queueChunks( lua_State* lua )
+	{
+		g_coreData->world->queueChunks( g_coreData, g_coreData->perspectiveCamera->getFrustum() );
+		return 0;
 	}
 }
