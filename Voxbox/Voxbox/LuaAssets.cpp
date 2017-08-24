@@ -27,6 +27,7 @@ namespace LuaAssets
 		luaL_newmetatable( lua, "fontMeta" );
 		luaL_Reg fontRegs[] =
 		{
+			{ "measureText",			measureText },
 			{ "getWidth",				getWidth },
 			{ "getHorizontalOffset",	getHorizontalOffset },
 			{ "getVerticalOffset",		getVerticalOffset },
@@ -149,6 +150,31 @@ namespace LuaAssets
 		}
 
 		return 0;
+	}
+
+	int measureText( lua_State* lua )
+	{
+		int result = 0;
+		LUA_EXPECT_ARGS( 2 )
+		{
+			if( LUA_EXPECT_TABLE( 1 ) &&
+				LUA_EXPECT_STRING( 2 ) )
+			{
+				// get font and text
+				Font* font = lua_getuserdata<Font>( lua, 1 );
+				const char* text = lua_tostring( lua, 2 );
+
+				// push result
+				glm::vec2 bounds = font->measureText( text );
+				lua_newtable( lua );
+				luaL_setmetatable( lua, "vec2Meta" );
+				lua_setvec2( lua, bounds );
+
+				result = 1;
+			}
+		}
+
+		return result;
 	}
 
 	int getWidth( lua_State* lua )

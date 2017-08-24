@@ -1,18 +1,31 @@
 require( "./assets/scripts/gui_base" )
 
-GuiButton = GuiBase:create()
-GuiButton.text = "[GuiButton]"
+GuiButton = {}
+GuiButton.__index = GuiButton
+setmetatable( GuiButton, GuiBase )
 
-function GuiButton:create( position, size )
-	position = position or vec2(0,0)
-	size = size or vec2(128,24)
+function GuiButton:create( position, size, text )
+	if position then
+		position = vec2( position[1], position[2] )
+	else
+		position = vec2()
+	end
 	
-	local button = {}
-	setmetatable( button, self )
-	self.__index = self
+	if size then
+		size = vec2( size[1], size[2] )
+	else
+		size = vec2()
+	end
+	
+	text = text or "[GuiButton]"
+	
+	local button = GuiBase:create()
+	setmetatable( button, GuiButton )
 	
 	button.position = position
 	button.size = size
+	button.text = text
+	button:alignText()
 	
 	return button
 end

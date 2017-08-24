@@ -16,6 +16,7 @@ namespace LuaAssets
 	// font
 	int loadFont( lua_State* lua );
 	int unloadFont( lua_State* lua );
+	int measureText( lua_State* lua );
 	int getWidth( lua_State* lua );
 	int getHorizontalOffset( lua_State* lua );
 	int getVerticalOffset( lua_State* lua );

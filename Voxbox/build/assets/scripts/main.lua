@@ -19,8 +19,8 @@ local ACTION_DIG = 1
 local ACTION_BUILD = 2
 local currentAction = ACTION_DIG
 
-local testLabel = GuiLabel:create( {128,128} )
-local testButton = GuiButton:create( {128,164}, {128,24} )
+local testLabel = GuiLabel:create( {300,128}, {128,128}, "Test Label" )
+local testButton = GuiButton:create( {128,164}, {128,24}, "Test Button" )
 local testTextbox = GuiTextbox:create( {128,196}, {128,24} )
 
 local action =

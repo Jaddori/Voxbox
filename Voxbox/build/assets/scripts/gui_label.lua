@@ -1,16 +1,31 @@
 require( "./assets/scripts/gui_base" )
 
-GuiLabel = GuiBase:create()
-GuiLabel.text = "[GuiLabel]"
+GuiLabel = {}
+GuiLabel.__index = GuiLabel
+setmetatable( GuiLabel, GuiBase )
 
-function GuiLabel:create( position )
-	position = position or vec2(0,0)
+function GuiLabel:create( position, size, text )
+	if position then
+		position = vec2( position[1], position[2] )
+	else
+		position = vec2()
+	end
 	
-	local label = {}
-	setmetatable( label, self )
-	self.__index = self
+	if size then
+		size = vec2( size[1], size[2] )
+	else
+		size = vec2()
+	end
+	
+	text = text or "[GuiLabel]"
+	
+	local label = GuiBase:create()
+	setmetatable( label, GuiLabel )
 	
 	label.position = position
+	label.size = size
+	label.text = text
+	label:alignText()
 	
 	return label
 end
@@ -21,6 +36,6 @@ end
 
 function GuiLabel:render()
 	if self.visible then
-		Graphics.queueText( self.font, self.text, self.position, self.textColor )
+		Graphics.queueText( self.font, self.text, self.textPosition, self.textColor )
 	end
 end
