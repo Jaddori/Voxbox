@@ -113,7 +113,9 @@ function GuiBase:update( dt, position )
 	position = position or self.position
 
 	if self.enabled then
-		local mpos = camera.mousePosition
+		local mpos = {0,0}
+		Input.getMousePosition( mpos )
+		
 		local prevHovered = self.hovered
 		local prevPressed = self.pressed
 		

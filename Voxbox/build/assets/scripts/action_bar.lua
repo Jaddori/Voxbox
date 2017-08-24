@@ -1,4 +1,4 @@
-require( "./assets/scripts/gui" )
+require( "./assets/scripts/gui/gui" )
 
 ACTION_SELECT = 0
 ACTION_DIG = 1

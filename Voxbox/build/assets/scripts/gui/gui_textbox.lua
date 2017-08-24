@@ -1,4 +1,4 @@
-require( "./assets/scripts/gui_base" )
+require( "./assets/scripts/gui/gui_base" )
 
 local GUI_TEXTBOX_CARET_FLASH_TIME = 0.5
 

@@ -12,7 +12,7 @@ namespace LuaCore
 		{
 			{ "convertBytes",	convertBytes },
 			{ "shrinkBytes",	shrinkBytes },
-			{ "exit",			exit },
+			{ "quit",			quit },
 			{ "restart",		restart },
 			{ NULL, NULL }
 		};
@@ -180,7 +180,7 @@ namespace LuaCore
 		return result;
 	}
 
-	int exit( lua_State* lua )
+	int quit( lua_State* lua )
 	{
 		//LUA_ASSERT_ARGS( 0 );
 

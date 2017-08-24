@@ -1,4 +1,4 @@
-require( "./assets/scripts/gui_base" )
+require( "./assets/scripts/gui/gui_base" )
 
 GuiButton = {}
 GuiButton.__index = GuiButton

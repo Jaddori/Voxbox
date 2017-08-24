@@ -1,4 +1,4 @@
-require( "./assets/scripts/gui_base" )
+require( "./assets/scripts/gui/gui_base" )
 
 GuiLabel = {}
 GuiLabel.__index = GuiLabel
@@ -35,7 +35,7 @@ function GuiLabel:onClick()
 end
 
 function GuiLabel:render( position )
-	position = position or self.textPosition
+	position = position or self.position
 	local textPosition = position + self.textOffset
 
 	if self.visible then

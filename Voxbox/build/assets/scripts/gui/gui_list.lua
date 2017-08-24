@@ -1,4 +1,4 @@
-require( "./assets/scripts/gui_base" )
+require( "./assets/scripts/gui/gui_base" )
 
 GUI_LIST_SLIDER_WIDTH = 8
 GUI_LIST_SLIDER_HEIGHT = 24
