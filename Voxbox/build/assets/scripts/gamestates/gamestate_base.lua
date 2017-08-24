@@ -5,16 +5,16 @@ Gamestate =
 }
 
 function Gamestate:push( state )
-	table.insert( Gamestate.states, state )
-	Gamestate.current = Gamestate.current + 1
+	self.current = self.current + 1
+	self.states[self.current] = state
 end
 
 function Gamestate:pop()
-	Gamestate.current = Gamestate.current - 1
+	self.current = self.current - 1
 end
 
 function Gamestate:clear()
-	Gamestate.current = 0
+	self.current = 0
 end
 
 function Gamestate:update( dt )

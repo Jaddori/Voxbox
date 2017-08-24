@@ -3,6 +3,7 @@ require( "./assets/scripts/info" )
 require( "./assets/scripts/camera" )
 require( "./assets/scripts/gamestates/gamestate_gameplay" )
 require( "./assets/scripts/gamestates/gamestate_main_menu" )
+require( "./assets/scripts/gamestates/gamestate_pause" )
 
 function mainLoad()
 	console:load()
@@ -12,6 +13,7 @@ function mainLoad()
 	-- TEMP
 	MainMenu:load()
 	Gameplay:load()
+	Pause:load()
 
 	Gamestate:push( MainMenu )
 end
@@ -23,6 +25,7 @@ function mainUnload()
 	-- TEMP
 	MainMenu:unload()
 	Gameplay:unload()
+	Pause:unload()
 end
 
 function mainUpdate( dt )

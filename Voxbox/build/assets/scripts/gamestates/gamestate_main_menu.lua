@@ -16,7 +16,10 @@ function MainMenu:load()
 	self.playButton = GuiButton:create( {screenCenterX-64, 256}, {128,32}, "Play" )
 	self.quitButton = GuiButton:create( {screenCenterX-64, 256+32+8}, {128,32}, "Quit" )
 	
-	self.playButton.onClick = function( button ) Gamestate:push( Gameplay ) end
+	self.playButton.onClick = function( button )
+		Gamestate:clear()
+		Gamestate:push( Gameplay )
+	end
 	self.quitButton.onClick = function( button ) Core.quit() end
 end
 

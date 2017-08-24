@@ -1,4 +1,5 @@
 require( "./assets/scripts/gamestates/gamestate_base" )
+require( "./assets/scripts/gamestates/gamestate_pause" )
 require( "./assets/scripts/action_bar" )
 require( "./assets/scripts/worker" )
 require( "./assets/scripts/actions/action_select" )
@@ -37,6 +38,10 @@ function Gameplay:update( dt )
 	-- update workers
 	for i=1, #self.workers do
 		self.workers[i]:update( dt )
+	end
+	
+	if Input.keyReleased( "F" ) then
+		Gamestate:push( Pause )
 	end
 end
 
