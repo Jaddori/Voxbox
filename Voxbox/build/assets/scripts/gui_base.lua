@@ -42,6 +42,11 @@ function GuiBase:create()
 	return newGuiBase
 end
 
+function GuiBase:unload()
+	Assets.unloadFont( self.font )
+	Assets.unloadTexture( self.background )
+end
+
 function GuiBase:onEnter()
 end
 

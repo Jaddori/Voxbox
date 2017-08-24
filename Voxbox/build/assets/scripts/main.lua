@@ -4,6 +4,7 @@ require( "./assets/scripts/console" )
 require( "./assets/scripts/info" )
 require( "./assets/scripts/camera" )
 require( "./assets/scripts/gui" )
+require( "./assets/scripts/action_bar" )
 
 local workers = {}
 
@@ -14,10 +15,6 @@ local unitSelectionMax = vec2()
 local unitSelectionSize = vec2()
 local haveUnitSelection = false
 local selectedWorker = {}
-
-local ACTION_DIG = 1
-local ACTION_BUILD = 2
-local currentAction = ACTION_DIG
 
 local testLabel = GuiLabel:create( {300,128}, {128,128}, "Test Label" )
 local testButton = GuiButton:create( {128,164}, {128,24}, "Test Button" )
@@ -37,6 +34,7 @@ function mainLoad()
 	console:load()
 	info:load()
 	camera:load()
+	actionBar:load()
 	
 	workerLoad()
 	workers[1] = Worker:create()
@@ -53,6 +51,7 @@ end
 function mainUpdate( dt )
 	console:update( dt )
 	info:update( dt )
+	actionBar:update( dt )
 	
 	if not console.visible then
 		camera:update( dt )
@@ -102,19 +101,8 @@ function mainUpdate( dt )
 		end
 	end
 	
-	-- select action
-	if Input.keyReleased( Keys.One ) then
-		currentAction = ACTION_DIG
-		action.haveSelection = false
-		Log.log( VERBOSITY_DEBUG, "Selected dig action." )
-	elseif Input.keyReleased( Keys.Two ) then
-		currentAction = ACTION_BUILD
-		action.haveSelection = false
-		Log.log( VERBOSITY_DEBUG, "Selected build action." )
-	end
-	
 	-- perform action
-	if currentAction == ACTION_DIG and selectedWorker then
+	if actionBar.action == ACTION_DIG and selectedWorker then
 		-- get preview block
 		if World.hitBlock( camera.rayStart, camera.rayEnd, action.previewBlock ) then
 			World.localToWorld( action.previewBlock, action.previewBlock )
@@ -153,7 +141,7 @@ function mainUpdate( dt )
 				selectedWorker:dig( action.selectionBounds )
 			end
 		end
-	elseif currentAction == ACTION_BUILD and selectedWorker then
+	elseif actionBar.action == ACTION_BUILD and selectedWorker then
 		-- get preview block
 		if World.hitBlock( camera.rayStart, camera.rayEnd, action.previewBlock ) then
 			World.localToWorld( action.previewBlock, action.previewBlock )
@@ -195,16 +183,12 @@ function mainUpdate( dt )
 			end
 		end
 	end
-	
-	-- update gui stuff
-	testLabel:update( dt )
-	testButton:update( dt )
-	testTextbox:update( dt )
 end
 
 function mainRender()
 	console:render()
 	info:render()
+	actionBar:render()
 	
 	workers[1]:render()
 	
@@ -246,9 +230,4 @@ function mainRender()
 			end
 		end
 	end
-	
-	-- render gui stuff
-	testLabel:render()
-	testButton:render()
-	testTextbox:render()
 end

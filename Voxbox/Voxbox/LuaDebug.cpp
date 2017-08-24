@@ -7,7 +7,7 @@ namespace LuaDebug
 
 	void bind( lua_State* lua, CoreData* coreData )
 	{
-		lua_register( lua, "log", log );
+		lua_register( lua, "debugLog", debugLog );
 
 		lua_pushnumber( lua, VERBOSITY_INFORMATION );
 		lua_setglobal( lua, "VERBOSITY_INFORMATION" );
@@ -90,6 +90,21 @@ namespace LuaDebug
 				const char* str = lua_tostring( lua, 2 );
 
 				LOG( verbosity, "%s", str );
+			}
+		}
+
+		return 0;
+	}
+
+	int debugLog( lua_State* lua )
+	{
+		LUA_EXPECT_ARGS( 1 )
+		{
+			if( LUA_EXPECT_STRING( 1 ) )
+			{
+				const char* str = lua_tostring( lua, 1 );
+
+				LOG_DEBUG( "%s", str );
 			}
 		}
 
@@ -306,7 +321,7 @@ namespace LuaDebug
 	{
 		int args = lua_gettop( lua );
 
-		if( args <= 1 )
+		if( args > 1 )
 		{
 			LOG_ERROR( "Expected less than 2 arguments. Got %d.", args );
 		}

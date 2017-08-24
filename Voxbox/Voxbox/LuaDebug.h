@@ -10,6 +10,7 @@ namespace LuaDebug
 
 	// log
 	int log( lua_State* lua );
+	int debugLog( lua_State* lua );
 
 	int setThreshold( lua_State* lua );
 

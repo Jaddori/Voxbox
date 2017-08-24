@@ -73,16 +73,16 @@ function console:update( dt )
 		-- get enter
 		if Input.keyReleased( Keys.Enter ) then
 			if self.input.text:len() > 0 then
-				log( VERBOSITY_DEBUG, self.input.text )
+				Log.log( VERBOSITY_DEBUG, self.input.text )
 		
 				-- execute entered command
 				local chunk, errorMessage = load( self.input.text )
 				if errorMessage then
-					log( VERBOSITY_ERROR, errorMessage )
+					Log.log( VERBOSITY_ERROR, errorMessage )
 				else
 					local success, errorMessage = pcall(chunk)
 					if not success then
-						log( VERBOSITY_ERROR, errorMessage )
+						Log.log( VERBOSITY_ERROR, errorMessage )
 					end
 				end
 				

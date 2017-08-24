@@ -17,7 +17,7 @@ function GuiButton:create( position, size, text )
 		size = vec2()
 	end
 	
-	text = text or "[GuiButton]"
+	text = text or ""
 	
 	local button = GuiBase:create()
 	setmetatable( button, GuiButton )
