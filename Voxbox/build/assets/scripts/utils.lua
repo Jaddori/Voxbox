@@ -59,3 +59,13 @@ function makeCube( a, b, cube )
 	cube[5] = math.max( a[2], b[2] )
 	cube[6] = math.max( a[3], b[3] )
 end
+
+function inside( position, size, point )
+	return
+	(
+		point[1] >= position[1] and
+		point[1] <= position[1] + size[1] and
+		point[2] >= position[2] and
+		point[2] <= position[2] + size[2]
+	)
+end

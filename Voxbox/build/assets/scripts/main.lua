@@ -3,6 +3,7 @@ require( "./assets/scripts/worker" )
 require( "./assets/scripts/console" )
 require( "./assets/scripts/info" )
 require( "./assets/scripts/camera" )
+require( "./assets/scripts/gui" )
 
 local workers = {}
 
@@ -17,6 +18,9 @@ local selectedWorker = {}
 local ACTION_DIG = 1
 local ACTION_BUILD = 2
 local currentAction = ACTION_DIG
+
+local testLabel = GuiLabel:create( {128,128} )
+local testButton = GuiButton:create( {128,164}, {128,24} )
 
 local action =
 {
@@ -190,6 +194,10 @@ function mainUpdate( dt )
 			end
 		end
 	end
+	
+	-- update gui stuff
+	--testLabel:update( dt )
+	testButton:update( dt )
 end
 
 function mainRender()
@@ -236,4 +244,8 @@ function mainRender()
 			end
 		end
 	end
+	
+	-- render gui stuff
+	testLabel:render()
+	testButton:render()
 end
