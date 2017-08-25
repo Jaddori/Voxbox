@@ -69,3 +69,7 @@ function inside( position, size, point )
 		point[2] <= position[2] + size[2]
 	)
 end
+
+function round( value, decimals )
+	return math.floor( value * ( 10 ^ decimals ) ) * ( 10 ^ (-decimals) )
+end

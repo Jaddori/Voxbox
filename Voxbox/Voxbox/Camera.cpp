@@ -72,7 +72,7 @@ void Camera::relativeMovement( const glm::vec3& localMovement )
 	}
 
 	// move up and down
-	if( fabs( localMovement.y > EPSILON ) )
+	if( fabs( localMovement.y ) > EPSILON )
 	{
 		glm::vec3 up( 0.0f, 1.0f, 0.0f );
 		position += up * localMovement.y;

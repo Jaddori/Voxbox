@@ -11,7 +11,6 @@
 #include "Assets.h"
 #include "ThreadPool.h"
 #include "SystemInfo.h"
-#include <errno.h>
 
 #define THREAD_UPDATE_WAIT 1000
 
@@ -27,12 +26,9 @@ int update( void* args )
 {
 	ThreadData* data = (ThreadData*)args;
 
-	Camera& perspectiveCamera	=	*data->coreData->perspectiveCamera;
 	Input& input				=	*data->coreData->input;
-	World& world				=	*data->coreData->world;
-	Graphics& graphics			=	*data->coreData->graphics;
-	DebugShapes& debugShapes	=	*data->coreData->debugShapes;
 	LuaBinds& luaBinds			=	*data->luaBinds;
+	SystemInfo& systemInfo		=	*data->coreData->systemInfo;
 
 	long lastTick = SDL_GetTicks();
 
@@ -41,6 +37,8 @@ int update( void* args )
 		int result = SDL_SemWaitTimeout( data->renderDone, THREAD_UPDATE_WAIT );
 		if( result == 0 )
 		{
+			systemInfo.startUpdate();
+			
 			// stop execution
 			if( input.keyReleased( SDL_SCANCODE_ESCAPE ) )
 			{
@@ -53,15 +51,14 @@ int update( void* args )
 				*data->coreData->running = false;
 			}
 
-			//const Frustum& frustum = perspectiveCamera.getFrustum();
-			//world.queueChunks( data->coreData, frustum );
-
 			long curTick = SDL_GetTicks();
 			float deltaTime = ( curTick - lastTick ) * 0.001f; // delta time in seconds
 			lastTick = curTick;
 
 			luaBinds.update( deltaTime );
 			luaBinds.render();
+			
+			systemInfo.stopUpdate();
 
 			SDL_SemPost( data->updateDone );
 		}
@@ -201,6 +198,8 @@ int main( int argc, char* argv[] )
 					}
 
 					// render
+					systemInfo.startRender();
+					
 					glClearColor( 0.15f, 0.15f, 0.15f, 0.0f );
 					glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -220,6 +219,8 @@ int main( int argc, char* argv[] )
 					}
 					else
 						fps++;
+					
+					systemInfo.stopRender();
 				}
 
 				LOG_INFO( "Waiting for update thread to finish." );

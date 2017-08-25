@@ -58,11 +58,14 @@ namespace LuaDebug
 		luaL_newmetatable( lua, "systemInfoMeta" );
 		luaL_Reg systemInfoRegs[] =
 		{
-			{ "poll",		poll },
-			{ "getCores",	getCores },
-			{ "getThreads",	getThreads },
-			{ "getRam",		getRam },
-			{ "getVsync",	getVsync },
+			{ "poll",			poll },
+			{ "getCores",		getCores },
+			{ "getThreads",		getThreads },
+			{ "getRam",			getRam },
+			{ "getVsync",		getVsync },
+			{ "getUpdateMs",	getUpdateMs },
+			{ "getRenderMs",	getRenderMs },
+			{ "getDeltaTime",	getDeltaTime },
 			{ NULL, NULL }
 		};
 
@@ -411,6 +414,30 @@ namespace LuaDebug
 		bool vsync = g_coreData->systemInfo->getVsync();
 		lua_pushboolean( lua, vsync );
 
+		return 1;
+	}
+	
+	int getUpdateMs( lua_State* lua )
+	{
+		int ms = g_coreData->systemInfo->getUpdateMs();
+		lua_pushnumber( lua, ms );
+		
+		return 1;
+	}
+	
+	int getRenderMs( lua_State* lua )
+	{
+		int ms = g_coreData->systemInfo->getRenderMs();
+		lua_pushnumber( lua, ms );
+		
+		return 1;
+	}
+	
+	int getDeltaTime( lua_State* lua )
+	{
+		float dt = g_coreData->systemInfo->getDeltaTime();
+		lua_pushnumber( lua, dt );
+		
 		return 1;
 	}
 }

@@ -13,6 +13,9 @@ function info:load()
 	self.ram = 0
 	self.luaRam = 0
 	self.vsync = true
+	self.updateMs = 0
+	self.renderMs = 0
+	self.deltaTime = 0.0
 	self.cameraPosition = vec3()
 	self.cameraDirection = vec3()
 	
@@ -21,6 +24,9 @@ function info:load()
 	self.ramText = ""
 	self.luaRamText = ""
 	self.vsyncText = ""
+	self.updateMsText = ""
+	self.renderMsText = ""
+	self.deltaTimeText = ""
 	self.cameraLabel = "Camera:"
 	self.cameraPositionText = ""
 	self.cameraDirectionText = ""
@@ -39,6 +45,15 @@ function info:load()
 	
 	yoffset = yoffset + self.font.height
 	self.vsyncPosition = { self.bounds[1], self.bounds[2] + yoffset }
+	
+	yoffset = yoffset + self.font.height
+	self.updateMsPosition = { self.bounds[1], self.bounds[2] + yoffset }
+	
+	yoffset = yoffset + self.font.height
+	self.renderMsPosition = { self.bounds[1], self.bounds[2] + yoffset }
+	
+	yoffset = yoffset + self.font.height
+	self.deltaTimePosition = { self.bounds[1], self.bounds[2] + yoffset }
 	
 	yoffset = yoffset + self.font.height
 	self.cameraLabelPosition = { self.bounds[1], self.bounds[2] + yoffset }
@@ -66,6 +81,9 @@ function info:update( dt )
 		self.ram = SystemInfo.getRam()
 		self.luaRam = collectgarbage("count") * UNIT_KILOBYTES
 		self.vsync = SystemInfo.getVsync()
+		self.updateMs = SystemInfo.getUpdateMs()
+		self.renderMs = SystemInfo.getRenderMs()
+		self.deltaTime = SystemInfo.getDeltaTime()
 		
 		self.coreText = tostring( self.cores ) .. " available cores"
 		self.threadText = tostring( self.threads ) .. " running threads"
@@ -82,6 +100,10 @@ function info:update( dt )
 			self.vsyncText = "VSYNC disabled"
 		end
 		
+		self.updateMsText = "Update(ms): " .. tostring(self.updateMs)
+		self.renderMsText = "Render(ms): " .. tostring(self.renderMs)
+		self.deltaTimeText = "Delta Time: " .. tostring(round(self.deltaTime,4))
+		
 		-- get camera information
 		Camera.getPosition( self.cameraPosition )
 		Camera.getDirection( self.cameraDirection )
@@ -97,6 +119,9 @@ function info:render()
 	Graphics.queueText( self.font, self.ramText, self.ramPosition, INFO_TEXT_COLOR )
 	Graphics.queueText( self.font, self.luaRamText, self.luaRamPosition, INFO_TEXT_COLOR )
 	Graphics.queueText( self.font, self.vsyncText, self.vsyncPosition, INFO_TEXT_COLOR )
+	Graphics.queueText( self.font, self.updateMsText, self.updateMsPosition, INFO_TEXT_COLOR )
+	Graphics.queueText( self.font, self.renderMsText, self.renderMsPosition, INFO_TEXT_COLOR )
+	Graphics.queueText( self.font, self.deltaTimeText, self.deltaTimePosition, INFO_TEXT_COLOR )
 	Graphics.queueText( self.font, self.cameraLabel, self.cameraLabelPosition, INFO_TEXT_COLOR )
 	Graphics.queueText( self.font, self.cameraPositionText, self.cameraPositionPosition, INFO_TEXT_COLOR )
 	Graphics.queueText( self.font, self.cameraDirectionText, self.cameraDirectionPosition, INFO_TEXT_COLOR )

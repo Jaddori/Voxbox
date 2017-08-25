@@ -31,4 +31,7 @@ namespace LuaDebug
 	int getThreads( lua_State* lua );
 	int getRam( lua_State* lua );
 	int getVsync( lua_State* lua );
+	int getUpdateMs( lua_State* lua );
+	int getRenderMs( lua_State* lua );
+	int getDeltaTime( lua_State* lua );
 };
