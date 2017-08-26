@@ -43,6 +43,8 @@ void Camera::finalize()
 void Camera::project( const glm::vec3& worldCoordinates, Point& result )
 {
 	glm::vec3 windowCoordinates = glm::project( worldCoordinates, viewMatrix.getWrite(), projectionMatrix.getWrite(), WINDOW_VIEWPORT );
+	
+	windowCoordinates.y = WINDOW_HEIGHT - windowCoordinates.y;
 
 	result.x = (int)(windowCoordinates.x+0.5f);
 	result.y = (int)(windowCoordinates.y+0.5f);
